@@ -22,18 +22,26 @@ func fileExists(filename string) bool {
 var generateDockerfileCmd = &cobra.Command{
 	Use:   "dockerfile",
 	Short: "Generate a Dockerfile for the current project",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if fileExists("Dockerfile") {
 			fmt.Println("Dockerfile already exists")
 			os.Exit(1)
 		}
 
+		// prompt := "Generate a Dockerfile for the current project"
+		// command := exec.Command("cwc", "apply", "-f")
+
+		fmt.Println("Generating dockerfile...")
+		// s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+		// s.Start()
+		// out, err := command.Output()
+		// if err != nil {
+		// 	fmt.Println("Could not run command: ", err)
+		// }
+		// s.Stop()
+
+		// fmt.Println(string(out))
 	},
 }
 

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
-	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -19,15 +18,19 @@ var clusterCreateCmd = &cobra.Command{
 	Short: "Create a new cluster",
 	Long:  `Create a new cluster with the specified configuration.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var clusterName string
+		// var clusterName string
 
-		if Name == "" {
-			clusterName = uuid.NewString()[:6]
-		}
+		// clusterName = Name
+		// if Name == "" {
+		// 	clusterName = uuid.NewString()[:6]
+		// }
 
-		command := exec.Command("kind", "create", "cluster", "--name", clusterName)
+		// command := exec.Command("kind", "create", "cluster", "--name", clusterName)
 
-		fmt.Println("Creating cluster with name:", "kind-"+clusterName)
+		// fmt.Println("Creating cluster with name: kind-" + clusterName)
+		command := exec.Command("init-kind.sh")
+
+		fmt.Println("Creating cluster...")
 		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Start()
 		out, err := command.Output()
