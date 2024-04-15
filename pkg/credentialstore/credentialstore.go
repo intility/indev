@@ -1,47 +1,87 @@
 package credentialstore
 
-import "fmt"
+import (
+	"fmt"
+	"path/filepath"
+	"syscall"
 
-type CredentialStore interface {
-	Get(key string) ([]byte, error)
-	Set(key string, value []byte) error
+	"github.com/99designs/keyring"
+	"github.com/adrg/xdg"
+	"golang.org/x/term"
+)
+
+const (
+	appName = "minctl"
+)
+
+type CredentialStore struct {
+	keyringConfig keyring.Config
+	keyring       keyring.Keyring
 }
 
-type CrossPlatformCredentialStore struct {
-	innerStore CredentialStore
-}
+func New() *CredentialStore {
+	return &CredentialStore{
+		keyringConfig: keyring.Config{ //nolint:exhaustruct
+			ServiceName: appName,
+			FileDir:     filepath.Join(xdg.DataHome, appName),
+			FilePasswordFunc: func(prompt string) (string, error) {
+				fmt.Print(prompt + ": ")
 
-func NewCrossPlatformCredentialStore() *CrossPlatformCredentialStore {
-	var innerStore CredentialStore
+				bytePassword, err := term.ReadPassword(syscall.Stdin)
+				fmt.Println()
 
-	if IsKeyringSupported() {
-		innerStore = NewKeyringCredentialStore()
-	} else {
-		innerStore = NewEncryptedFileCredentialStore()
+				if err != nil {
+					return "", fmt.Errorf("could not read password: %w", err)
+				}
+
+				return string(bytePassword), nil
+			},
+		},
+		keyring: nil,
 	}
-
-	return &CrossPlatformCredentialStore{
-		innerStore: innerStore,
-	}
 }
 
-func (c *CrossPlatformCredentialStore) Get(key string) ([]byte, error) {
-	value, err := c.innerStore.Get(key)
+func (c *CredentialStore) Get(key string) ([]byte, error) {
+	err := c.ensureKeyringOpen()
 	if err != nil {
-		return nil, fmt.Errorf("could not get credentials from underlying store: %w", err)
+		return nil, err
 	}
 
-	return value, nil
+	item, err := c.keyring.Get(key)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get item from keyring: %w", err)
+	}
+
+	return item.Data, nil
 }
 
-func (c *CrossPlatformCredentialStore) Set(key string, value []byte) error {
-	if err := c.innerStore.Set(key, value); err != nil {
-		return fmt.Errorf("could not set credentials in underlying store: %w", err)
+func (c *CredentialStore) Set(key string, value []byte) error {
+	err := c.ensureKeyringOpen()
+	if err != nil {
+		return err
+	}
+
+	err = c.keyring.Set(keyring.Item{ //nolint:exhaustruct
+		Key:  key,
+		Data: value,
+	})
+
+	if err != nil {
+		return fmt.Errorf("failed to set item in keyring: %w", err)
 	}
 
 	return nil
 }
 
-func IsKeyringSupported() bool {
-	return true
+func (c *CredentialStore) ensureKeyringOpen() error {
+	if c.keyring == nil {
+		ring, err := keyring.Open(c.keyringConfig)
+		if err != nil {
+			return fmt.Errorf("failed to open keyring: %w", err)
+		}
+
+		c.keyring = ring
+	}
+
+	return nil
 }
