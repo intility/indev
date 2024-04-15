@@ -1,26 +1,22 @@
-/*
-Copyright © 2024 Callum Powell <callum.powell@intility.no>
-*/
 package cmd
 
 import (
+	"errors"
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
+
+	"github.com/intility/minctl/pkg/cmderrors"
 )
 
 var Name string
-var Path string
-var Deployment string
 
-// rootCmd represents the base command when called without any subcommands
+// rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "minctl",
 	Short: "",
 	Long:  ``,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -28,20 +24,25 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
+		fmt.Println(err)
+
+		var usageErr cmderrors.InvalidUsageError
+		if errors.As(err, &usageErr) {
+			_ = usageErr.Cmd.Usage()
+		}
+
 		os.Exit(1)
 	}
 }
 
+// init initializes the root command and flags.
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
+	// use InvalidUsageErrors for flag errors to trigger usage output
+	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		return cmderrors.NewInvalidUsageError(cmd, err.Error())
+	})
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.minctl.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.CompletionOptions.HiddenDefaultCmd = true
-
+	rootCmd.CompletionOptions.HiddenDefaultCmd = false
+	rootCmd.SilenceUsage = true
+	rootCmd.SilenceErrors = true
 }

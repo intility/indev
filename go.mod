@@ -1,4 +1,4 @@
-module minctl
+module github.com/intility/minctl
 
 go 1.22.1
 
