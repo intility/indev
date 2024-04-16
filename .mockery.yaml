@@ -1,0 +1,12 @@
+quiet: false
+disable-version-string: true
+with-expecter: true
+all: true
+mockname: "{{.InterfaceName}}"
+filename: "{{.MockName}}.go"
+dir: "mocks"
+outpkg: "mocks"
+packages:
+  github.com/intility/minctl/pkg/credentialstore:
+  github.com/intility/minctl/pkg/tokencache:
+  github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache:
