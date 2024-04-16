@@ -16,16 +16,11 @@ var loginCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		credStore := credentialstore.New()
 
-		if err := credStore.Set("foo", []byte("success")); err != nil {
+		if err := credStore.Set("foo", []byte("max.mekker@example.com")); err != nil {
 			return fmt.Errorf("could not set credentials: %w", err)
 		}
 
-		val, err := credStore.Get("foo")
-		if err != nil {
-			return fmt.Errorf("could not get credentials: %w", err)
-		}
-
-		fmt.Println(string(val))
+		fmt.Println("Successfully signed in")
 
 		return nil
 	},

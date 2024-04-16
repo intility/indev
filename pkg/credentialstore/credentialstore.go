@@ -22,9 +22,12 @@ type CredentialStore struct {
 func New() *CredentialStore {
 	return &CredentialStore{
 		keyringConfig: keyring.Config{ //nolint:exhaustruct
-			ServiceName: appName,
-			FileDir:     filepath.Join(xdg.DataHome, appName),
+			ServiceName:                    appName,
+			FileDir:                        filepath.Join(xdg.DataHome, appName),
+			KeychainTrustApplication:       true,
+			KeychainAccessibleWhenUnlocked: true,
 			FilePasswordFunc: func(prompt string) (string, error) {
+
 				fmt.Print(prompt + ": ")
 
 				bytePassword, err := term.ReadPassword(syscall.Stdin)
@@ -36,6 +39,7 @@ func New() *CredentialStore {
 
 				return string(bytePassword), nil
 			},
+			//AllowedBackends: []keyring.BackendType{keyring.FileBackend},
 		},
 		keyring: nil,
 	}
