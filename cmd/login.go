@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
 	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
@@ -22,7 +21,6 @@ var loginCmd = &cobra.Command{
 		// confidential clients have a credential, such as a secret or a certificate
 		clientID := "b65cf9b0-290c-4b44-a4b1-0b02b7752b3c"
 		authority := "https://login.microsoftonline.com/intility.no"
-
 
 		cacheFile := filepath.Join(xdg.DataHome, "minctl", "msal.cache")
 		credStore := credentialstore.NewFilesystemCredentialStore(cacheFile)

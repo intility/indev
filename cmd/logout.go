@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-
 	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
 

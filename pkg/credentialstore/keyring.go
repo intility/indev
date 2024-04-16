@@ -27,7 +27,6 @@ func NewKeyringCredentialStore() *KeyringCredentialStore {
 			KeychainTrustApplication:       true,
 			KeychainAccessibleWhenUnlocked: true,
 			FilePasswordFunc:               passwdPromptFunc,
-			AllowedBackends:                []keyring.BackendType{keyring.FileBackend},
 		},
 		keyring: nil,
 	}
