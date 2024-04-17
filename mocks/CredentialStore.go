@@ -67,7 +67,7 @@ func (_m *CredentialStore) Get(partitionKey string) ([]byte, error) {
 	ret := _m.Called(partitionKey)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Get")
+		panic("no return value specified for GetCluster")
 	}
 
 	var r0 []byte
@@ -92,7 +92,7 @@ func (_m *CredentialStore) Get(partitionKey string) ([]byte, error) {
 	return r0, r1
 }
 
-// CredentialStore_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+// CredentialStore_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCluster'
 type CredentialStore_Get_Call struct {
 	*mock.Call
 }
@@ -100,7 +100,7 @@ type CredentialStore_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - partitionKey string
 func (_e *CredentialStore_Expecter) Get(partitionKey interface{}) *CredentialStore_Get_Call {
-	return &CredentialStore_Get_Call{Call: _e.mock.On("Get", partitionKey)}
+	return &CredentialStore_Get_Call{Call: _e.mock.On("GetCluster", partitionKey)}
 }
 
 func (_c *CredentialStore_Get_Call) Run(run func(partitionKey string)) *CredentialStore_Get_Call {

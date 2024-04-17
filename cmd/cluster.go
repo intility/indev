@@ -2,13 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/spf13/cobra"
-)
 
-const (
-	spinnerDelay = 100 * time.Millisecond
+	"github.com/intility/minctl/pkg/cli"
 )
 
 // clusterCmd represents the cluster command.
@@ -27,5 +24,8 @@ var clusterCmd = &cobra.Command{
 }
 
 func init() {
+	clusterCmd.PersistentPreRunE = cli.CreateAuthGate(
+		"please log in with 'minctl login' before managing cluster resources")
+
 	rootCmd.AddCommand(clusterCmd)
 }

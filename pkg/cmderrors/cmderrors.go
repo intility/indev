@@ -1,19 +1,15 @@
 package cmderrors
 
-import "github.com/spf13/cobra"
-
-type InvalidUsageError struct {
-	Cmd     *cobra.Command
+type NotSignedInError struct {
 	Message string
 }
 
-func NewInvalidUsageError(cmd *cobra.Command, message string) InvalidUsageError {
-	return InvalidUsageError{
-		Cmd:     cmd,
-		Message: message,
-	}
+func (e *NotSignedInError) Error() string {
+	return e.Message
 }
 
-func (e InvalidUsageError) Error() string {
-	return e.Message
+func NewNotSignedInError(message string) error {
+	return &NotSignedInError{
+		Message: message,
+	}
 }

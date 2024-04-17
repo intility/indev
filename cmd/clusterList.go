@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
-	"os/exec"
 
 	"github.com/spf13/cobra"
+
+	"github.com/intility/minctl/pkg/client"
 )
 
 // clusterListCmd represents the list command.
@@ -14,20 +14,17 @@ var clusterListCmd = &cobra.Command{
 	Short: "List all clusters",
 	Long:  `List all clusters that are currently running in kind on the local machine.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		command := exec.Command("kind", "get", "clusters")
+		cmd.SilenceUsage = true
+		c := client.New(client.WithDevConfig())
 
-		stdErrBuffer := &bytes.Buffer{}
-		command.Stderr = stdErrBuffer
-
-		out, err := command.Output()
+		clusters, err := c.ListClusters(cmd.Context())
 		if err != nil {
-			// get content from err buffer
-			cmd.SilenceUsage = true
-			return fmt.Errorf("could not run command: %w: %s", err, stdErrBuffer.String())
+			return fmt.Errorf("could not list clusters: %w", err)
 		}
 
-		// otherwise, print the output from running the command
-		fmt.Println(string(out))
+		for _, cluster := range clusters {
+			cmd.Println(cluster.Name)
+		}
 
 		return nil
 	},

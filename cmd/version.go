@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +13,6 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version number of minctl",
 	Long:  `All software has versions. This is minctl's`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("minctl 0.0.1")
+		cmd.Println("minctl 0.0.1")
 	},
 }

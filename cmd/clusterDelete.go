@@ -2,34 +2,27 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 
-	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
+
+	"github.com/intility/minctl/pkg/client"
 )
 
 // clusterDeleteCmd represents the clusterDelete command.
 var clusterDeleteCmd = &cobra.Command{
-	Use:   "delete",
+	Use:   "delete [name]",
 	Short: "Delete a cluster",
 	Long:  ``,
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		clusterName := Name
-		command := exec.Command("kind", "delete", "cluster", "--name", clusterName)
-		spin := spinner.New(spinner.CharSets[11], spinnerDelay)
+		c := client.New(client.WithDevConfig())
 
-		spin.Start()
-
-		out, err := command.Output()
+		err := c.DeleteCluster(cmd.Context(), args[0])
 		if err != nil {
-			return fmt.Errorf("could not run command: %w", err)
+			return fmt.Errorf("could not delete cluster: %w", err)
 		}
 
-		spin.Stop()
-
-		// otherwise, print the output from running the command
-		fmt.Println(string(out))
+		cmd.Println(args[0])
 
 		return nil
 	},
@@ -37,11 +30,4 @@ var clusterDeleteCmd = &cobra.Command{
 
 func init() {
 	clusterCmd.AddCommand(clusterDeleteCmd)
-	clusterDeleteCmd.Flags().StringVarP(&Name, "name", "n", "", "Name of the cluster to delete")
-
-	err := clusterDeleteCmd.MarkFlagRequired("name")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 }

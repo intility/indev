@@ -2,31 +2,32 @@ package cmd
 
 import (
 	"fmt"
-	"os/exec"
 
-	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
+
+	"github.com/intility/minctl/pkg/client"
 )
 
 // clusterCreateCmd represents the create command.
 var clusterCreateCmd = &cobra.Command{
-	Use:   "create",
+	Use:   "create [name]",
 	Short: "Create a new cluster",
 	Long:  `Create a new cluster with the specified configuration.`,
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		command := exec.Command("init-kind.sh")
-		spin := spinner.New(spinner.CharSets[11], spinnerDelay)
+		c := client.New(client.WithDevConfig())
 
-		spin.Start()
+		req := client.NewClusterRequest{Name: args[0]}
+		cluster, err := c.CreateCluster(cmd.Context(), req)
 
-		out, err := command.Output()
+		// we are done with validating the input
+		cmd.SilenceUsage = true
+
 		if err != nil {
-			return fmt.Errorf("could not run command: %w", err)
+			return fmt.Errorf("could not create cluster: %w", err)
 		}
 
-		spin.Stop()
-
-		fmt.Println(string(out))
+		cmd.Println(cluster.Name)
 
 		return nil
 	},
@@ -34,5 +35,4 @@ var clusterCreateCmd = &cobra.Command{
 
 func init() {
 	clusterCmd.AddCommand(clusterCreateCmd)
-	clusterCreateCmd.Flags().StringVarP(&Name, "name", "n", "", "Name of the cluster to create")
 }

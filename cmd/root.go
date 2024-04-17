@@ -1,13 +1,11 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
-
-	"github.com/intility/minctl/pkg/cmderrors"
 )
 
 var Name string
@@ -24,25 +22,16 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		fmt.Println(err)
-
-		var usageErr cmderrors.InvalidUsageError
-		if errors.As(err, &usageErr) {
-			_ = usageErr.Cmd.Usage()
-		}
-
+		// lipgloss will handle TTY detection and color support
+		style := lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
+		_, _ = fmt.Fprintf(os.Stderr, "%s %s", style.Render("ERROR"), err.Error())
 		os.Exit(1)
 	}
 }
 
 // init initializes the root command and flags.
 func init() {
-	// use InvalidUsageErrors for flag errors to trigger usage output
-	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
-		return cmderrors.NewInvalidUsageError(cmd, err.Error())
-	})
-
 	rootCmd.CompletionOptions.HiddenDefaultCmd = false
-	rootCmd.SilenceUsage = true
+	rootCmd.SilenceUsage = false
 	rootCmd.SilenceErrors = true
 }
