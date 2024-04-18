@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/intility/minctl/pkg/authenticator"
+	"github.com/intility/minctl/pkg/config"
 )
 
 const (
@@ -20,9 +21,9 @@ var errNotAuthenticated = errors.New("not authenticated")
 func CreateAuthGate(message string) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		auth := authenticator.NewAuthenticator(authenticator.AuthConfig{
-			ClientID:  "b65cf9b0-290c-4b44-a4b1-0b02b7752b3c",
-			Authority: "https://login.microsoftonline.com/intility.no",
-			Scopes:    []string{"api://containerplatform.intility.com/user_impersonation"},
+			ClientID:  config.ClientID,
+			Authority: config.Authority,
+			Scopes:    []string{config.ScopePlatform},
 		})
 
 		ctx, cancel := context.WithTimeout(cmd.Context(), timeout)

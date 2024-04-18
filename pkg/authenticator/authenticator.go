@@ -7,6 +7,7 @@ import (
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache"
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
 
+	"github.com/intility/minctl/pkg/config"
 	"github.com/intility/minctl/pkg/tokencache"
 )
 
@@ -18,9 +19,11 @@ type AuthConfig struct {
 
 func DefaultAuthConfig() AuthConfig {
 	return AuthConfig{
-		ClientID:  "b65cf9b0-290c-4b44-a4b1-0b02b7752b3c",
-		Authority: "https://login.microsoftonline.com/intility.no",
-		Scopes:    []string{"api://containerplatform.intility.com/user_impersonation"},
+		ClientID:  config.ClientID,
+		Authority: config.Authority,
+		Scopes: []string{
+			config.ScopePlatform,
+		},
 	}
 }
 

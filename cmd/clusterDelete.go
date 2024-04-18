@@ -10,24 +10,28 @@ import (
 
 // clusterDeleteCmd represents the clusterDelete command.
 var clusterDeleteCmd = &cobra.Command{
-	Use:   "delete [name]",
+	Use:   "delete",
 	Short: "Delete a cluster",
 	Long:  ``,
-	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c := client.New(client.WithDevConfig())
 
-		err := c.DeleteCluster(cmd.Context(), args[0])
+		if clusterName == "" {
+			return fmt.Errorf("cluster name is required")
+		}
+
+		err := c.DeleteCluster(cmd.Context(), clusterName)
 		if err != nil {
 			return fmt.Errorf("could not delete cluster: %w", err)
 		}
 
-		cmd.Println(args[0])
+		cmd.Println(clusterName)
 
 		return nil
 	},
 }
 
 func init() {
+	clusterDeleteCmd.Flags().StringVarP(&clusterName, "name", "n", "", "Name of the cluster to delete")
 	clusterCmd.AddCommand(clusterDeleteCmd)
 }
