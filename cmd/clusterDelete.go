@@ -17,7 +17,7 @@ var clusterDeleteCmd = &cobra.Command{
 		c := client.New(client.WithDevConfig())
 
 		if clusterName == "" {
-			return fmt.Errorf("cluster name is required")
+			return errEmptyName
 		}
 
 		err := c.DeleteCluster(cmd.Context(), clusterName)

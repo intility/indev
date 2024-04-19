@@ -11,14 +11,14 @@ import (
 	"github.com/intility/minctl/pkg/tokencache"
 )
 
-type AuthConfig struct {
+type Config struct {
 	ClientID  string
 	Authority string
 	Scopes    []string
 }
 
-func DefaultAuthConfig() AuthConfig {
-	return AuthConfig{
+func DefaultAuthConfig() Config {
+	return Config{
 		ClientID:  config.ClientID,
 		Authority: config.Authority,
 		Scopes: []string{
@@ -36,7 +36,7 @@ type Authenticator struct {
 
 type Option func(authenticator *Authenticator)
 
-func NewAuthenticator(config AuthConfig, options ...Option) *Authenticator {
+func NewAuthenticator(config Config, options ...Option) *Authenticator {
 	authenticator := &Authenticator{
 		clientID:  config.ClientID,
 		authority: config.Authority,

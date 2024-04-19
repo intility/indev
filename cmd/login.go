@@ -3,14 +3,12 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/charmbracelet/lipgloss"
 	"time"
-
-	"github.com/intility/minctl/pkg/config"
 
 	"github.com/spf13/cobra"
 
 	"github.com/intility/minctl/pkg/authenticator"
+	"github.com/intility/minctl/pkg/config"
 )
 
 const (
@@ -23,7 +21,7 @@ var loginCmd = &cobra.Command{
 	Short: "Login to Intility Container Platform",
 	Long:  `Login to Intility Container Platform using your Intility credentials.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		auth := authenticator.NewAuthenticator(authenticator.AuthConfig{
+		auth := authenticator.NewAuthenticator(authenticator.Config{
 			ClientID:  config.ClientID,
 			Authority: config.Authority,
 			Scopes: []string{
@@ -39,8 +37,7 @@ var loginCmd = &cobra.Command{
 			return fmt.Errorf("could not authenticate: %w", err)
 		}
 
-		style := lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
-		cmd.Println(style.Render("success: ") + "authenticated as " + result.Account.PreferredUsername)
+		cmd.Println(styleSuccess.Render("success: ") + "authenticated as " + result.Account.PreferredUsername)
 
 		return nil
 	},
