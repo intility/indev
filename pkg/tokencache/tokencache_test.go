@@ -57,7 +57,7 @@ func TestTokenCache_Replace(t *testing.T) {
 			name:          "successful replacement",
 			cacheFilePath: "cache_file",
 			prepareStore: func(store *mocks.CredentialStore) {
-				store.On("GetCluster", "test").Return([]byte{}, nil).Once() // Expecting the GetCluster function to be called once
+				store.On("Get", "test").Return([]byte{}, nil).Once() // Expecting the GetCluster function to be called once
 			},
 			unmarshal: func(u *mocks.Unmarshaler) {
 				u.On("Unmarshal", mock.Anything).Return(nil).Once() // Expecting the Unmarshal function to be called once
@@ -67,7 +67,7 @@ func TestTokenCache_Replace(t *testing.T) {
 		{
 			name: "error reading credential store",
 			prepareStore: func(store *mocks.CredentialStore) {
-				store.On("GetCluster", "test").Return(nil, errors.New("unknown err")).Once() // Expecting the GetCluster function to be called once
+				store.On("Get", "test").Return(nil, errors.New("unknown err")).Once() // Expecting the GetCluster function to be called once
 			},
 			wantErr: "could not read cache file: unknown err",
 		},
@@ -75,7 +75,7 @@ func TestTokenCache_Replace(t *testing.T) {
 			name:          "error unmarshalling cache",
 			cacheFilePath: "cache_file",
 			prepareStore: func(store *mocks.CredentialStore) {
-				store.On("GetCluster", "test").Return([]byte{}, nil).Once() // Expecting the GetCluster function to be called once
+				store.On("Get", "test").Return([]byte{}, nil).Once() // Expecting the GetCluster function to be called once
 			},
 			unmarshal: func(u *mocks.Unmarshaler) {
 				u.On("Unmarshal", mock.Anything).Return(errors.New("unknown err")).Once() // Expecting the Unmarshal function to be called once

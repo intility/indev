@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 
 	"github.com/intility/minctl/pkg/authenticator"
 	"github.com/intility/minctl/pkg/config"
@@ -20,7 +22,7 @@ var errNotAuthenticated = errors.New("not authenticated")
 
 func CreateAuthGate(message string) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		auth := authenticator.NewAuthenticator(authenticator.AuthConfig{
+		auth := authenticator.NewAuthenticator(authenticator.Config{
 			ClientID:  config.ClientID,
 			Authority: config.Authority,
 			Scopes:    []string{config.ScopePlatform},
@@ -40,5 +42,21 @@ func CreateAuthGate(message string) func(cmd *cobra.Command, args []string) erro
 		}
 
 		return nil
+	}
+}
+
+func CreatePasswordPrompter(cmd *cobra.Command) func(string) (string, error) {
+	return func(prompt string) (string, error) {
+		cmd.Print(prompt + ": ")
+
+		bytePassword, err := term.ReadPassword(syscall.Stdin)
+
+		cmd.Println()
+
+		if err != nil {
+			return "", fmt.Errorf("could not read password: %w", err)
+		}
+
+		return string(bytePassword), nil
 	}
 }

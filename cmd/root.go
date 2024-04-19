@@ -8,7 +8,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var Name string
+var (
+	Name string
+
+	styleSuccess = lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
+	styleError   = lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
+)
 
 // rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
@@ -23,8 +28,7 @@ func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
 		// lipgloss will handle TTY detection and color support
-		style := lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
-		_, _ = fmt.Fprintf(os.Stderr, "%s %s", style.Render("ERROR"), err.Error())
+		_, _ = fmt.Fprintf(os.Stderr, "%s %s", styleError.Render("ERROR"), err.Error())
 		os.Exit(1)
 	}
 }

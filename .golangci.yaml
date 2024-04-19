@@ -108,6 +108,11 @@ issues:
     - path: '(.+)\.go$'
       linters:
         - varnamelen
+    # pkg/wizard is based on charmbracelet/bubbletea that uses
+    # interfaces as return values to manage the state machine.
+    - path: 'pkg/wizard/.*\.go$'
+      linters:
+        - ireturn
 run:
   tests: false # skip test files
   skip-dirs:

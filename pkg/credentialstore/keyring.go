@@ -3,11 +3,9 @@ package credentialstore
 import (
 	"fmt"
 	"path/filepath"
-	"syscall"
 
 	"github.com/99designs/keyring"
 	"github.com/adrg/xdg"
-	"golang.org/x/term"
 )
 
 const (
@@ -19,14 +17,14 @@ type KeyringCredentialStore struct {
 	keyring       keyring.Keyring
 }
 
-func NewKeyringCredentialStore() *KeyringCredentialStore {
+func NewKeyringCredentialStore(passwdPrompter func(string) (string, error)) *KeyringCredentialStore {
 	return &KeyringCredentialStore{
 		keyringConfig: keyring.Config{ //nolint:exhaustruct
 			ServiceName:                    appName,
 			FileDir:                        filepath.Join(xdg.DataHome, appName),
 			KeychainTrustApplication:       true,
 			KeychainAccessibleWhenUnlocked: true,
-			FilePasswordFunc:               passwdPromptFunc,
+			FilePasswordFunc:               passwdPrompter,
 		},
 		keyring: nil,
 	}
@@ -93,17 +91,4 @@ func (c *KeyringCredentialStore) ensureKeyringOpen() error {
 	}
 
 	return nil
-}
-
-func passwdPromptFunc(prompt string) (string, error) {
-	fmt.Print(prompt + ": ")
-
-	bytePassword, err := term.ReadPassword(syscall.Stdin)
-	fmt.Println()
-
-	if err != nil {
-		return "", fmt.Errorf("could not read password: %w", err)
-	}
-
-	return string(bytePassword), nil
 }
