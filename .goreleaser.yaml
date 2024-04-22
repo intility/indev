@@ -14,6 +14,8 @@ before:
     - go mod tidy
     # you may remove this if you don't need go generate
     - go generate ./...
+    # generate completion scripts
+    - ./scripts/completions.sh
 
 builds:
   - env:
@@ -29,8 +31,8 @@ gitlab_urls:
 
 release:
   gitlab:
-    owner: ""
-    name: "7075" #minctl
+    owner: "developer-infrastructure/platform-2.0/minato"
+    name: "minctl" #minctl
 
 archives:
   - format: tar.gz
@@ -46,6 +48,30 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+
+    files:
+      - LICENSE*
+      - README*
+      - completions/*
+
+brews:
+  - name: minctl
+    repository:
+      owner: homebrew
+      name: tap
+      token: "{{ .Env.GITLAB_TOKEN }}"
+    homepage: https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/minctl
+    description: "A CLI for managing container platform resources."
+    goarm: 6
+    goamd64: v1
+    url_template: "https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/minctl/-/releases/{{ .Tag }}/downloads/{{ .ArtifactName }}"
+    install: |
+      bin.install "minctl"
+      bash_completion.install "completions/minctl.bash" => "minctl"
+      zsh_completion.install "completions/minctl.zsh" => "_minctl"
+      fish_completion.install "completions/minctl.fish"
+    caveats: |
+      You can uninstall with `brew uninstall intility/tap/minctl`
 
 changelog:
   sort: asc
