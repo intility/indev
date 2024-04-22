@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"syscall"
+	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -49,7 +49,7 @@ func CreatePasswordPrompter(cmd *cobra.Command) func(string) (string, error) {
 	return func(prompt string) (string, error) {
 		cmd.Print(prompt + ": ")
 
-		bytePassword, err := term.ReadPassword(syscall.Stdin)
+		bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 
 		cmd.Println()
 
