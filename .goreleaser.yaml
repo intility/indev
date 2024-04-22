@@ -23,6 +23,10 @@ builds:
       - windows
       - darwin
 
+release:
+  gitlab:
+    owner: ""
+    name: "7075" #minctl
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
