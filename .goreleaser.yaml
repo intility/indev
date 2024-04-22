@@ -64,6 +64,7 @@ brews:
     description: "A CLI for managing container platform resources."
     goarm: 6
     goamd64: v1
+    folder: Formula
     url_template: "https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/minctl/-/releases/{{ .Tag }}/downloads/{{ .ArtifactName }}"
     install: |
       bin.install "minctl"
