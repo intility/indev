@@ -23,6 +23,10 @@ builds:
       - windows
       - darwin
 
+gitlab_urls:
+  api: https://gitlab.intility.com/api/v4/
+  download: https://gitlab.intility.com
+
 release:
   gitlab:
     owner: ""
