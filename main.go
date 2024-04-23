@@ -7,6 +7,8 @@ import (
 	"github.com/intility/minctl/cmd"
 )
 
+//go:generate ./scripts/completions.sh
+
 func main() {
 	cmd.Execute()
 }
