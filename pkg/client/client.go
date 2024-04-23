@@ -14,7 +14,7 @@ import (
 
 const (
 	BaseURIDev         = "http://localhost:8080"
-	BaseURI            = "https://containerplatform.intility.com"
+	BaseURI            = "https://minato-customer-backend.apps.hypershift.intilitycloud.com"
 	defaultHTTPTimeout = 10 * time.Second
 	defaultAuthTimeout = 5 * time.Minute
 )

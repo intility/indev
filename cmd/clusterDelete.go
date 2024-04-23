@@ -14,7 +14,7 @@ var clusterDeleteCmd = &cobra.Command{
 	Short: "Delete a cluster",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		c := client.New(client.WithDevConfig())
+		c := client.New()
 
 		if clusterName == "" {
 			return errEmptyName
