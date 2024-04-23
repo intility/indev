@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/intility/minctl/pkg/authenticator"
+	"github.com/intility/minctl/pkg/cli"
 	"github.com/intility/minctl/pkg/config"
 )
 
@@ -15,19 +16,28 @@ const (
 	authTimeout = 5 * time.Minute
 )
 
+var useDeviceCodeFlow bool
+
 // loginCmd represents the login command.
 var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Login to Intility Container Platform",
 	Long:  `Login to Intility Container Platform using your Intility credentials.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		auth := authenticator.NewAuthenticator(authenticator.Config{
+		cfg := authenticator.Config{
 			ClientID:  config.ClientID,
 			Authority: config.Authority,
 			Scopes: []string{
 				config.ScopePlatform,
 			},
-		})
+		}
+
+		var options []authenticator.Option
+		if useDeviceCodeFlow {
+			options = append(options, authenticator.WithDeviceCodeFlow(cli.CreatePrinter(cmd)))
+		}
+
+		auth := authenticator.NewAuthenticator(cfg, options...)
 
 		ctx, cancel := context.WithTimeout(cmd.Context(), authTimeout)
 		defer cancel()
@@ -44,5 +54,6 @@ var loginCmd = &cobra.Command{
 }
 
 func init() {
+	loginCmd.Flags().BoolVar(&useDeviceCodeFlow, "device", false, "Use device code flow for authentication")
 	rootCmd.AddCommand(loginCmd)
 }
