@@ -56,6 +56,7 @@ archives:
     files:
       - LICENSE*
       - README*
+      - completions/*
 
 brews:
   - name: minctl
@@ -71,6 +72,9 @@ brews:
     url_template: "https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/minctl/-/releases/{{ .Tag }}/downloads/{{ .ArtifactName }}"
     install: |
       bin.install "minctl"
+      bash_completion.install "completions/minctl.bash" => "minctl"
+      zsh_completion.install "completions/minctl.zsh" => "_minctl"
+      fish_completion.install "completions/minctl.fish"
     caveats: |
       You can uninstall with `brew uninstall intility/tap/minctl`
 
