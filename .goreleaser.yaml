@@ -78,8 +78,6 @@ brews:
       bash_completion.install "completions/minctl.bash" => "minctl"
       zsh_completion.install "completions/minctl.zsh" => "_minctl"
       fish_completion.install "completions/minctl.fish"
-    caveats: |
-      You can uninstall with `brew uninstall intility/tap/minctl`
 
 changelog:
   sort: asc
