@@ -15,7 +15,7 @@ var clusterListCmd = &cobra.Command{
 	Long:  `List all clusters that are currently running in kind on the local machine.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceUsage = true
-		c := client.New(client.WithDevConfig())
+		c := client.New()
 
 		clusters, err := c.ListClusters(cmd.Context())
 		if err != nil {

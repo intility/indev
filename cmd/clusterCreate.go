@@ -17,7 +17,7 @@ var clusterCreateCmd = &cobra.Command{
 	Short: "Create a new cluster",
 	Long:  `Create a new cluster with the specified configuration.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		c := client.New(client.WithDevConfig())
+		c := client.New()
 
 		if clusterName == "" {
 			wz := wizard.NewWizard([]wizard.Input{
