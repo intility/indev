@@ -9,9 +9,7 @@ import (
 	"github.com/intility/minctl/pkg/wizard"
 )
 
-var (
-	clusterName string
-)
+var clusterName string
 
 // clusterCreateCmd represents the create command.
 var clusterCreateCmd = &cobra.Command{
