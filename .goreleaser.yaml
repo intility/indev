@@ -81,9 +81,19 @@ brews:
 
 changelog:
   sort: asc
+  groups:
+    - title: "Features"
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: "Bug Fixes"
+      regexp: '^.*?fix(es)?(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: Others
+      order: 999
   filters:
     exclude:
       - "^docs"
       - "^test"
       - "^ci"
       - "^chore"
+      - "^[Mm]erge.+$"
