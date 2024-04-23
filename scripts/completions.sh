@@ -6,3 +6,4 @@ mkdir completions
 for sh in bash zsh fish; do
 	go run main.go completion "$sh" >"completions/minctl.$sh"
 done
+sleep 1
