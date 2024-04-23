@@ -8,9 +8,7 @@ import (
 	"github.com/intility/minctl/pkg/cli"
 )
 
-var (
-	errEmptyName = fmt.Errorf("cluster name cannot be empty")
-)
+var errEmptyName = fmt.Errorf("cluster name cannot be empty")
 
 // clusterCmd represents the cluster command.
 var clusterCmd = &cobra.Command{

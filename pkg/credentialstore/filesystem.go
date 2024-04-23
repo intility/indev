@@ -6,12 +6,14 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/afero"
 )
 
 const (
 	cacheFileMode = 0o600
+	cacheDirMode  = 0o700
 )
 
 type FilesystemCredentialStore struct {
@@ -41,8 +43,15 @@ func WithFilesystem(fs afero.Fs) FileSystemOption {
 }
 
 func (store *FilesystemCredentialStore) Get(partitionKey string) ([]byte, error) {
+	err := store.createCacheDirIfNotExists()
+	if err != nil {
+		return nil, err
+	}
+
 	file, err := store.fs.OpenFile(store.filePath, os.O_RDONLY, cacheFileMode)
 	if err != nil {
+		// the cache file may not exist yet, so we return an empty byte slice
+		// instead to indicate that there is no data in the cache
 		if errors.Is(err, fs.ErrNotExist) {
 			return []byte{}, nil
 		}
@@ -59,6 +68,11 @@ func (store *FilesystemCredentialStore) Get(partitionKey string) ([]byte, error)
 }
 
 func (store *FilesystemCredentialStore) Set(data []byte, partitionKey string) error {
+	err := store.createCacheDirIfNotExists()
+	if err != nil {
+		return err
+	}
+
 	file, err := store.fs.OpenFile(store.filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, cacheFileMode)
 	if err != nil {
 		return fmt.Errorf("could not open cache file: %w", err)
@@ -67,6 +81,22 @@ func (store *FilesystemCredentialStore) Set(data []byte, partitionKey string) er
 	_, err = file.Write(data)
 	if err != nil {
 		return fmt.Errorf("could not write to cache file: %w", err)
+	}
+
+	return nil
+}
+
+func (store *FilesystemCredentialStore) createCacheDirIfNotExists() error {
+	dir := filepath.Dir(store.filePath)
+
+	_, err := store.fs.Stat(dir)
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			err = store.fs.MkdirAll(dir, cacheDirMode)
+			if err != nil {
+				return fmt.Errorf("could not create cache directory: %w", err)
+			}
+		}
 	}
 
 	return nil
