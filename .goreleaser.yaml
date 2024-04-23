@@ -16,12 +16,14 @@ before:
     - go generate ./...
 
 builds:
-  - env:
+  - id: minctl
+    env:
       - CGO_ENABLED=0
     ldflags:
       - "-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser"
     mod_timestamp: "{{.CommitTimestamp}}"
     flags: "-trimpath"
+    binary: minctl
     goos:
       - linux
       - windows
@@ -67,7 +69,12 @@ brews:
     goarm: 6
     goamd64: v1
     directory: Formula
-    url_template: https://gitlab.intility.com/api/v4/projects/{{ .Env.CI_PROJECT_ID }}/packages/generic/minctl/{{ trimprefix .Tag "v"}}/{{ .ArtifactName }}?private_token={{ .Env.DOWNLOADER_TOKEN }}
+    download_strategy: CurlDownloadStrategy
+    dependencies:
+      - curl
+    url_template: https://gitlab.intility.com/api/v4/projects/{{ .Env.CI_PROJECT_ID }}/packages/generic/minctl/{{ trimprefix .Tag "v"}}/{{ .ArtifactName }}
+    url_headers:
+      - "Authorization: Basic {{ .Env.DOWNLOADER_BASIC_TOKEN }}"
     #url_template: "https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/minctl/-/releases/{{ .Tag }}/downloads/{{ .ArtifactName }}"
     install: |
       bin.install "minctl"
