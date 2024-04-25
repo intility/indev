@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/intility/minctl/internal/build"
 	"github.com/intility/minctl/pkg/authenticator"
 )
 
 const (
-	BaseURIDev         = "http://localhost:8080"
-	BaseURI            = "https://minato-customer-backend.apps.hypershift.intilitycloud.com"
 	defaultHTTPTimeout = 10 * time.Second
 	defaultAuthTimeout = 5 * time.Minute
 )
@@ -40,9 +39,9 @@ type RestClient struct {
 
 func New(options ...RestClientOption) *RestClient {
 	client := &RestClient{
-		baseURI:       BaseURI,
+		baseURI:       build.PlatformAPIHost(),
 		httpClient:    &http.Client{Timeout: defaultHTTPTimeout},
-		authenticator: authenticator.NewAuthenticator(authenticator.DefaultAuthConfig()),
+		authenticator: authenticator.NewAuthenticator(authenticator.ConfigFromBuildProps()),
 	}
 
 	for _, opt := range options {
@@ -50,12 +49,6 @@ func New(options ...RestClientOption) *RestClient {
 	}
 
 	return client
-}
-
-func WithDevConfig() RestClientOption {
-	return func(client *RestClient) {
-		client.baseURI = BaseURIDev
-	}
 }
 
 func WithAuthenticator(authenticator *authenticator.Authenticator) RestClientOption {

@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
+	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/minctl/internal/ux"
 	"github.com/intility/minctl/pkg/client"
 )
 
@@ -22,10 +22,10 @@ var clusterDeleteCmd = &cobra.Command{
 
 		err := c.DeleteCluster(cmd.Context(), clusterName)
 		if err != nil {
-			return fmt.Errorf("could not delete cluster: %w", err)
+			return redact.Errorf("could not delete cluster: %w", redact.Safe(err))
 		}
 
-		cmd.Println(clusterName)
+		ux.Fprint(cmd.OutOrStdout(), clusterName+"\n")
 
 		return nil
 	},

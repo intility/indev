@@ -77,6 +77,30 @@ Here are some of the commonly used Minctl commands:
 
 For a full list of command and options, run `minctl --help`.
 
+## Telemetry
+
+Minctl includes a telemetry feature that helps improve the tool by collecting anonymous usage data. 
+The telemetry system gathers information such as command usage, performance metrics, and error reports. 
+This data is crucial for identifying common issues, understanding user behavior, and prioritizing new features.
+
+### What We Collect
+
+- Command usage: Which commands are run, along with flag usage.
+- Performance metrics: Response times for commands and other performance-related metrics.
+- Error reports: Unhandled errors or exceptions that occur during the use of the tool.
+
+### Anonymity and Privacy
+
+We are fully committed to ensuring user privacy and anonymity. 
+The telemetry system only collects non-personally identifiable information. 
+Additionally, data is stored securely and in compliance with relevant data protection regulations.
+
+### Opting Out
+
+Telemetry is enabled by default to help us improve Minctl. However, respecting user choice is paramount, 
+and you can opt-out of telemetry at any time. To disable telemetry, set the environment variable 
+`DO_NOT_TRACK` to `1`.
+
 ## Contributing
 
 Contributions are welcome! Feel free to open an issue or submit a pull request.

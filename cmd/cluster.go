@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
-	"github.com/intility/minctl/pkg/cli"
+	"github.com/intility/minctl/internal/cli"
+	"github.com/intility/minctl/internal/redact"
 )
 
-var errEmptyName = fmt.Errorf("cluster name cannot be empty")
+var errEmptyName = redact.Errorf("%s", redact.Safe("cluster name cannot be empty"))
 
 // clusterCmd represents the cluster command.
 var clusterCmd = &cobra.Command{
@@ -18,7 +17,7 @@ var clusterCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := cmd.Help()
 		if err != nil {
-			return fmt.Errorf("could not run help command: %w", err)
+			return redact.Errorf("could not run help command: %w", redact.Safe(err))
 		}
 
 		return nil
@@ -27,7 +26,7 @@ var clusterCmd = &cobra.Command{
 
 func init() {
 	clusterCmd.PersistentPreRunE = cli.CreateAuthGate(
-		"please log in with 'minctl login' before managing cluster resources")
+		redact.Safe("please log in with 'minctl login' before managing cluster resources"))
 
 	rootCmd.AddCommand(clusterCmd)
 }

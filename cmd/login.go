@@ -2,14 +2,14 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/intility/minctl/internal/build"
+	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/minctl/internal/ux"
 	"github.com/intility/minctl/pkg/authenticator"
-	"github.com/intility/minctl/pkg/cli"
-	"github.com/intility/minctl/pkg/config"
 )
 
 const (
@@ -21,20 +21,18 @@ var useDeviceCodeFlow bool
 // loginCmd represents the login command.
 var loginCmd = &cobra.Command{
 	Use:   "login",
-	Short: "Login to Intility Container Platform",
-	Long:  `Login to Intility Container Platform using your Intility credentials.`,
+	Short: "Sign in to Intility Container Platform",
+	Long:  `Sign in to Intility Container Platform using your Intility credentials.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := authenticator.Config{
-			ClientID:  config.ClientID,
-			Authority: config.Authority,
-			Scopes: []string{
-				config.ScopePlatform,
-			},
+			ClientID:  build.ClientID(),
+			Authority: build.Authority(),
+			Scopes:    build.Scopes(),
 		}
 
 		var options []authenticator.Option
 		if useDeviceCodeFlow {
-			options = append(options, authenticator.WithDeviceCodeFlow(cli.CreatePrinter(cmd)))
+			options = append(options, authenticator.WithDeviceCodeFlow(nil))
 		}
 
 		auth := authenticator.NewAuthenticator(cfg, options...)
@@ -44,10 +42,10 @@ var loginCmd = &cobra.Command{
 
 		result, err := auth.Authenticate(ctx)
 		if err != nil {
-			return fmt.Errorf("could not authenticate: %w", err)
+			return redact.Errorf("could not authenticate: %w", err)
 		}
 
-		cmd.Println(styleSuccess.Render("success: ") + "authenticated as " + result.Account.PreferredUsername)
+		ux.Fsuccess(cmd.OutOrStdout(), "authenticated as "+result.Account.PreferredUsername)
 
 		return nil
 	},
