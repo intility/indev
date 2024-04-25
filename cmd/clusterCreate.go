@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
+	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/minctl/internal/ux"
+	"github.com/intility/minctl/internal/wizard"
 	"github.com/intility/minctl/pkg/client"
-	"github.com/intility/minctl/pkg/wizard"
 )
 
 var clusterName string
@@ -32,7 +32,7 @@ var clusterCreateCmd = &cobra.Command{
 
 			result, err := wz.Run()
 			if err != nil {
-				return fmt.Errorf("could not gather information: %w", err)
+				return redact.Errorf("could not gather information: %w", redact.Safe(err))
 			}
 
 			if result.Cancelled() {
@@ -50,10 +50,10 @@ var clusterCreateCmd = &cobra.Command{
 
 			_, err = c.CreateCluster(cmd.Context(), req)
 			if err != nil {
-				return fmt.Errorf("could not create cluster: %w", err)
+				return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 			}
 
-			cmd.Printf("%s: cluster created\n", styleSuccess.Render("success"))
+			ux.Fsuccess(cmd.OutOrStdout(), "cluster created\n")
 
 			return nil
 		}
@@ -65,10 +65,10 @@ var clusterCreateCmd = &cobra.Command{
 		cmd.SilenceUsage = true
 
 		if err != nil {
-			return fmt.Errorf("could not create cluster: %w", err)
+			return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 		}
 
-		cmd.Println(cluster.Name)
+		ux.Fprint(cmd.OutOrStdout(), cluster.Name+"\n")
 
 		return nil
 	},

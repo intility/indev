@@ -77,7 +77,8 @@ linters-settings:
     forbid:
       - p: ^fmt\.Print.*$
         msg: "reasons"
-
+      - p: ^cmd\.Print.*$
+        msg: "use ux.Fprint(cmd.OutOrStdout(), msg) instead"
   varnamelen:
     ignore-decls:
       - w http.ResponseWriter
@@ -105,12 +106,34 @@ issues:
       linters:
         - gochecknoinits
         - gochecknoglobals
+
+    - path: internal/build
+      linters:
+        - gochecknoglobals
+
+    - path: internal/telemetry
+      linters:
+        - gochecknoglobals
+
+    - path: internal/pipeline
+      linters:
+        - ireturn
+
+    - path: internal/ux
+      linters:
+        - gochecknoglobals
+
+    - path: internal/debug
+      linters:
+        - gochecknoinits
+        - gochecknoglobals
+
     - path: '(.+)\.go$'
       linters:
         - varnamelen
     # pkg/wizard is based on charmbracelet/bubbletea that uses
     # interfaces as return values to manage the state machine.
-    - path: 'pkg/wizard/.*\.go$'
+    - path: 'internal/wizard/.*\.go$'
       linters:
         - ireturn
 run:

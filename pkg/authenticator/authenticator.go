@@ -2,18 +2,20 @@ package authenticator
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache"
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
 
-	"github.com/intility/minctl/pkg/config"
+	"github.com/intility/minctl/internal/build"
+	"github.com/intility/minctl/internal/redact"
 	"github.com/intility/minctl/pkg/tokencache"
 )
 
 var (
-	errNoPrinter        = fmt.Errorf("printer is required for device code flow")
-	errFlowNotSupported = fmt.Errorf("unsupported authentication flow")
+	errNoPrinter        = errors.New("printer is required for device code flow")
+	errFlowNotSupported = errors.New("unsupported authentication flow")
 )
 
 type Config struct {
@@ -22,13 +24,11 @@ type Config struct {
 	Scopes    []string
 }
 
-func DefaultAuthConfig() Config {
+func ConfigFromBuildProps() Config {
 	return Config{
-		ClientID:  config.ClientID,
-		Authority: config.Authority,
-		Scopes: []string{
-			config.ScopePlatform,
-		},
+		ClientID:  build.ClientID(),
+		Authority: build.Authority(),
+		Scopes:    build.Scopes(),
 	}
 }
 
@@ -153,7 +153,7 @@ func (a *Authenticator) authenticateWithFlow(
 
 		err = a.printer(ctx, code.Result.Message)
 		if err != nil {
-			return result, fmt.Errorf("could not print device code message: %w", err)
+			return result, redact.Errorf("could not print device code message: %w", redact.Safe(err))
 		}
 
 		// blocks until user has authenticated
@@ -163,7 +163,7 @@ func (a *Authenticator) authenticateWithFlow(
 	}
 
 	if err != nil {
-		return result, fmt.Errorf("could not acquire token: %w", err)
+		return result, redact.Errorf("could not acquire token: %w", redact.Safe(err))
 	}
 
 	return result, nil

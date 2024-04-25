@@ -1,36 +1,53 @@
 package cmd
 
 import (
-	"fmt"
+	"context"
 	"os"
+	"time"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
+
+	"github.com/intility/minctl/internal/pipeline"
+	"github.com/intility/minctl/internal/telemetry"
 )
 
-var (
-	Name string
-
-	styleSuccess = lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
-	styleError   = lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
-)
+const telemetryUploadTimeout = time.Second * 5
 
 // rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
-	Use:   "minctl",
+	Use:   "icpctl",
 	Short: "",
 	Long:  ``,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// RunPipeline adds all child commands to the root command and sets flags appropriately.
+// This is called by Execute(). It only needs to happen once to the rootCmd.
+func RunPipeline(ctx context.Context) int {
+	pipe := pipeline.New(rootCmd)
+	pipe.AddMiddleware(pipeline.Telemetry())
+	pipe.AddMiddleware(pipeline.Logger())
+
+	return pipe.Execute(ctx, os.Args[1:])
+}
+
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		// lipgloss will handle TTY detection and color support
-		_, _ = fmt.Fprintf(os.Stderr, "%s %s", styleError.Render("ERROR"), err.Error())
-		os.Exit(1)
+	ctx := context.Background()
+
+	if len(os.Args) > 1 && os.Args[1] == "upload-telemetry" {
+		// This subcommand is hidden and only run by minctl itself as a
+		// child process. We need to really make sure that we always
+		// exit and don't leave orphaned processes lying around.
+		time.AfterFunc(telemetryUploadTimeout, func() {
+			os.Exit(0)
+		})
+
+		telemetry.Upload()
+
+		return
 	}
+
+	exitCode := RunPipeline(ctx)
+	os.Exit(exitCode)
 }
 
 // init initializes the root command and flags.

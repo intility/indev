@@ -12,7 +12,7 @@ before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
+    # you may remove this if you don't need 'go generate'
     - go generate ./...
 
 builds:
@@ -20,7 +20,15 @@ builds:
     env:
       - CGO_ENABLED=0
     ldflags:
-      - "-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser"
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.CommitDate}}
+      - -X main.builtBy=goreleaser"
+      - -X github.com/intility/minctl/internal/build.Version={{.Version}}
+      - -X github.com/intility/minctl/internal/build.Commit={{.ShortCommit}}
+      - -X github.com/intility/minctl/internal/build.CommitDate={{.CommitDate}}
+      - -X github.com/intility/minctl/internal/build.SentryDSN={{.Env.SENTRY_DSN}}
     mod_timestamp: "{{.CommitTimestamp}}"
     flags: "-trimpath"
     binary: minctl

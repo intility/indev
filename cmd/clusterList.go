@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
+	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/minctl/internal/ux"
 	"github.com/intility/minctl/pkg/client"
 )
 
@@ -19,11 +19,11 @@ var clusterListCmd = &cobra.Command{
 
 		clusters, err := c.ListClusters(cmd.Context())
 		if err != nil {
-			return fmt.Errorf("could not list clusters: %w", err)
+			return redact.Errorf("could not list clusters: %w", redact.Safe(err))
 		}
 
 		for _, cluster := range clusters {
-			cmd.Println(cluster.Name)
+			ux.Fprint(cmd.OutOrStdout(), cluster.Name+"\n")
 		}
 
 		return nil
