@@ -101,6 +101,26 @@ linters-settings:
       - ".+openai.ChatCompletionRequest"
       - ".+openai.ChatCompletionMessage"
 issues:
+  exclude-dirs:
+    - bin
+    - vendor
+    - .codecov.yml
+    - .coveralls.yml
+    - .git
+    - .gitattributes
+    - .github
+    - .gitignore
+    - .gitlab
+    - .gitmodules
+    - .golangci
+    - .golangci.yaml
+    - .goreleaser
+    - .goreleaser.d
+    - .goreleaser.yml
+    - .idea
+    - .mockery.yaml
+    - .travis.yml
+    - .vscode
   exclude-rules:
     - path: cmd
       linters:
@@ -138,23 +158,3 @@ issues:
         - ireturn
 run:
   tests: false # skip test files
-  skip-dirs:
-    - bin
-    - vendor
-    - .codecov.yml
-    - .coveralls.yml
-    - .git
-    - .gitattributes
-    - .github
-    - .gitignore
-    - .gitlab
-    - .gitmodules
-    - .golangci
-    - .golangci.yaml
-    - .goreleaser
-    - .goreleaser.d
-    - .goreleaser.yml
-    - .idea
-    - .mockery.yaml
-    - .travis.yml
-    - .vscode
