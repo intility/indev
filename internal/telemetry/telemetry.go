@@ -96,6 +96,8 @@ func Error(err error, meta Metadata) {
 		User: sentry.User{ //nolint:exhaustruct
 			ID: deviceID,
 		},
+		// exception is redacted by default to avoid leaking sensitive information.
+		// Use redact.Safe to mark individual fields (or wrapped errors) as safe to log.
 		Exception: newSentryException(redact.Error(errToLog)),
 		Contexts: map[string]map[string]any{
 			"app": {

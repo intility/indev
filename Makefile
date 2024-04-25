@@ -58,6 +58,11 @@ lint-fix: golangci-lint ## Run golangci-lint linter and perform fixes
 mocks: mockery ## Generate mocks
 	$(MOCKERY)
 
+.PHONY: docs
+docs: vhs ## Generate docs
+	@echo "Generating gifs..."
+	@$(VHS) docs/create_cluster_interactive.tape -o docs/create_cluster_interactive.gif
+
 ##@ Build
 
 .PHONY: build
@@ -123,13 +128,15 @@ GOLANGCI_LINT = $(LOCALBIN)/golangci-lint-$(GOLANGCI_LINT_VERSION)
 GOSEC = $(LOCALBIN)/gosec-$(GOSEC_VERSION)
 GOVULNCHECK = $(LOCALBIN)/govulncheck-$(GOVULNCHECK_VERSION)
 MOCKERY = $(LOCALBIN)/mockery-$(MOCKERY_VERSION)
+VHS= $(LOCALBIN)/vhs
 
 ## Tool Versions
 TOOLKIT_TOOLS_GEN_VERSION ?= latest
-GOLANGCI_LINT_VERSION ?= v1.54
+GOLANGCI_LINT_VERSION ?= v1.57.2
 GOSEC_VERSION ?= latest
 GOVULNCHECK_VERSION ?= latest
 MOCKERY_VERSION ?= v2.42.1
+VHS_VERSION ?= latest
 
 
 .PHONY: golangci-lint
@@ -138,12 +145,12 @@ $(GOLANGCI_LINT): $(LOCALBIN)
 	$(call go-install-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint,${GOLANGCI_LINT_VERSION})
 
 .PHONY: gosec
-gosec: $(GOSEC) ## Download golangci-lint locally if necessary.
+gosec: $(GOSEC) ## Download gosec locally if necessary.
 $(GOSEC): $(LOCALBIN)
 	$(call go-install-tool,$(GOSEC),github.com/securego/gosec/v2/cmd/gosec,$(GOSEC_VERSION))
 
 .PHONY: govulncheck
-govulncheck: $(GOVULNCHECK) ## Download golangci-lint locally if necessary.
+govulncheck: $(GOVULNCHECK) ## Download govulncheck locally if necessary.
 $(GOVULNCHECK): $(LOCALBIN)
 	$(call go-install-tool,$(GOVULNCHECK),golang.org/x/vuln/cmd/govulncheck,$(GOVULNCHECK_VERSION))
 
@@ -153,11 +160,17 @@ $(TOOLKIT_TOOLS_GEN): $(LOCALBIN)
 	$(call go-install-tool,$(TOOLKIT_TOOLS_GEN),github.com/intility/go-openai-toolkit/cmd/toolkit-tools-gen,$(TOOLKIT_TOOLS_GEN_VERSION))
 
 .PHONY: mockery
-mockery: $(MOCKERY) ## Download toolkit-tools-gen locally if necessary.
+mockery: $(MOCKERY) ## Download mockery locally if necessary.
 $(MOCKERY): $(LOCALBIN)
 	$(call go-install-tool,$(MOCKERY),github.com/vektra/mockery/v2,$(MOCKERY_VERSION))
 
-
+.PHONY: vhs
+vhs: $(VHS) ## Download vhs locally if necessary.
+$(VHS): $(LOCALBIN)
+	# check for the precense of ttyd and ffmpeg
+	@which ttyd || { echo "ttyd is not installed. Please install it from https://github.com/tsl0922/ttyd"; exit 1; }
+	@which ffmpeg || { echo "ffmpeg is not installed. Please install it from https://ffmpeg.org"; exit 1; }
+	$(call go-install-tool,$(VHS),github.com/charmbracelet/vhs,$(VHS_VERSION))
 # go-install-tool will 'go install' any package with custom target and name of binary, if it doesn't exist
 # $1 - target path with name of binary (ideally with version)
 # $2 - package url which can be installed

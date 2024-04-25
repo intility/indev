@@ -58,7 +58,6 @@ func (c *KeyringCredentialStore) Set(data []byte, partitionKey string) error {
 		Key:  "minctl-msal-cache",
 		Data: data,
 	})
-
 	if err != nil {
 		return fmt.Errorf("failed to set item in keyring: %w", err)
 	}

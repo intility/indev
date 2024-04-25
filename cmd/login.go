@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/intility/minctl/internal/build"
+	"github.com/intility/minctl/internal/cli"
 	"github.com/intility/minctl/internal/redact"
 	"github.com/intility/minctl/internal/ux"
 	"github.com/intility/minctl/pkg/authenticator"
@@ -32,7 +33,7 @@ var loginCmd = &cobra.Command{
 
 		var options []authenticator.Option
 		if useDeviceCodeFlow {
-			options = append(options, authenticator.WithDeviceCodeFlow(nil))
+			options = append(options, authenticator.WithDeviceCodeFlow(cli.CreatePrinter(cmd)))
 		}
 
 		auth := authenticator.NewAuthenticator(cfg, options...)

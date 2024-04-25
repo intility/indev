@@ -1,5 +1,10 @@
 stages:
+  - test
   - release
+
+variables:
+  # must match Makefile GOLANGCI_LINT_VERSION
+  GOLANGCI_LINT_VERSION: 'v1.57.2'
 
 release:
   stage: release
@@ -14,3 +19,19 @@ release:
     GIT_DEPTH: 0
   script:
     - goreleaser release --clean
+
+lint:
+  image: golangci/golangci-lint:$GOLANGCI_LINT_VERSION
+  stage: test
+  only:
+    - merge_requests
+  script:
+    # Write the code coverage report to gl-code-quality-report.json
+    # and print linting issues to stdout in the format: path/to/file:line description
+    # remove `--issues-exit-code 0` or set to non-zero to fail the job if linting issues are detected
+    - golangci-lint run --issues-exit-code 0 --print-issued-lines=false --out-format code-climate:gl-code-quality-report.json,line-number
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+    paths:
+      - gl-code-quality-report.json
