@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
+	"time"
 
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache"
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
@@ -16,29 +18,35 @@ import (
 var (
 	errNoPrinter        = errors.New("printer is required for device code flow")
 	errFlowNotSupported = errors.New("unsupported authentication flow")
+	errNoAccounts       = errors.New("no accounts found")
+	errTokenExpired     = errors.New("token has expired")
+	errDeclinedScopes   = errors.New("scopes have been declined")
 )
 
 type Config struct {
-	ClientID  string
-	Authority string
-	Scopes    []string
+	ClientID    string
+	Authority   string
+	Scopes      []string
+	RedirectURI string
 }
 
 func ConfigFromBuildProps() Config {
 	return Config{
-		ClientID:  build.ClientID(),
-		Authority: build.Authority(),
-		Scopes:    build.Scopes(),
+		ClientID:    build.ClientID(),
+		Authority:   build.Authority(),
+		Scopes:      build.Scopes(),
+		RedirectURI: build.SuccessRedirect(),
 	}
 }
 
 type Authenticator struct {
-	clientID  string
-	authority string
-	scopes    []string
-	cache     cache.ExportReplace
-	flow      Flow
-	printer   Printer
+	clientID    string
+	authority   string
+	scopes      []string
+	redirectURI string
+	cache       cache.ExportReplace
+	flow        Flow
+	printer     Printer
 }
 
 type Flow int
@@ -53,12 +61,13 @@ type Option func(authenticator *Authenticator)
 // NewAuthenticator creates a new authenticator with the given configuration.
 func NewAuthenticator(config Config, options ...Option) *Authenticator {
 	authenticator := &Authenticator{
-		clientID:  config.ClientID,
-		authority: config.Authority,
-		scopes:    config.Scopes,
-		cache:     tokencache.New(),
-		flow:      FlowInteractive,
-		printer:   nil,
+		clientID:    config.ClientID,
+		authority:   config.Authority,
+		scopes:      config.Scopes,
+		redirectURI: config.RedirectURI,
+		cache:       tokencache.New(),
+		flow:        FlowInteractive,
+		printer:     nil,
 	}
 
 	for _, opt := range options {
@@ -69,6 +78,8 @@ func NewAuthenticator(config Config, options ...Option) *Authenticator {
 }
 
 // WithTokenCache configures the authenticator to use a custom token cache.
+//
+//goland:noinspection GoUnusedExportedFunction
 func WithTokenCache(cache cache.ExportReplace) Option {
 	return func(auth *Authenticator) {
 		auth.cache = cache
@@ -138,7 +149,7 @@ func (a *Authenticator) authenticateWithFlow(
 
 	switch flow {
 	case FlowInteractive:
-		result, err = publicClient.AcquireTokenInteractive(ctx, scopes, public.WithRedirectURI("http://localhost:42069"))
+		result, err = publicClient.AcquireTokenInteractive(ctx, scopes, public.WithRedirectURI(a.redirectURI))
 	case FlowDeviceCode:
 		var code public.DeviceCode
 
@@ -186,7 +197,32 @@ func (a *Authenticator) IsAuthenticated(ctx context.Context) (bool, error) {
 		return false, fmt.Errorf("could not get accounts: %w", err)
 	}
 
-	return len(accounts) > 0, nil
+	if len(accounts) == 0 {
+		return false, errNoAccounts
+	}
+
+	var result public.AuthResult
+
+	result, err = publicClient.AcquireTokenSilent(
+		ctx,
+		a.scopes,
+		public.WithSilentAccount(accounts[0]),
+	)
+	if err != nil {
+		return false, fmt.Errorf("could not acquire token: %w", err)
+	}
+
+	if result.ExpiresOn.Before(time.Now()) {
+		return false, errTokenExpired
+	}
+
+	for _, s := range a.scopes {
+		if slices.Contains(result.DeclinedScopes, s) {
+			return false, errDeclinedScopes
+		}
+	}
+
+	return true, nil
 }
 
 type Printer func(ctx context.Context, message string) error

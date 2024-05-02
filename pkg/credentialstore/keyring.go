@@ -17,6 +17,7 @@ type KeyringCredentialStore struct {
 	keyring       keyring.Keyring
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewKeyringCredentialStore(passwdPrompter func(string) (string, error)) *KeyringCredentialStore {
 	return &KeyringCredentialStore{
 		keyringConfig: keyring.Config{ //nolint:exhaustruct
@@ -30,6 +31,7 @@ func NewKeyringCredentialStore(passwdPrompter func(string) (string, error)) *Key
 	}
 }
 
+//goland:noinspection GoUnusedParameter
 func (c *KeyringCredentialStore) Get(partitionKey string) ([]byte, error) {
 	err := c.ensureKeyringOpen()
 	if err != nil {
@@ -48,6 +50,7 @@ func (c *KeyringCredentialStore) Get(partitionKey string) ([]byte, error) {
 	return item.Data, nil
 }
 
+//goland:noinspection GoUnusedParameter
 func (c *KeyringCredentialStore) Set(data []byte, partitionKey string) error {
 	err := c.ensureKeyringOpen()
 	if err != nil {

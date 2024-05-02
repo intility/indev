@@ -138,14 +138,10 @@ issues:
     - path: internal/pipeline
       linters:
         - ireturn
+        - wrapcheck
 
     - path: internal/ux
       linters:
-        - gochecknoglobals
-
-    - path: internal/debug
-      linters:
-        - gochecknoinits
         - gochecknoglobals
 
     - path: '(.+)\.go$'

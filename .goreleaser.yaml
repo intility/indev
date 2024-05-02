@@ -28,7 +28,17 @@ builds:
       - -X github.com/intility/minctl/internal/build.Version={{.Version}}
       - -X github.com/intility/minctl/internal/build.Commit={{.ShortCommit}}
       - -X github.com/intility/minctl/internal/build.CommitDate={{.CommitDate}}
+      # telemetry
+      - -X github.com/intility/minctl/internal/build.OTELCollectorEndpoint={{.Env.OTLP_ENDPOINT}}
+      - -X github.com/intility/minctl/internal/build.OTELCollectorToken={{.Env.OTLP_TOKEN}}
       - -X github.com/intility/minctl/internal/build.SentryDSN={{.Env.SENTRY_DSN}}
+      # authentication
+      - -X github.com/intility/minctl/internal/build.AuthPlatformAudience={{.Env.AUTH_AUDIENCE}}
+      - -X github.com/intility/minctl/internal/build.AuthAuthority={{.Env.AUTH_AUTHORITY}}
+      - -X github.com/intility/minctl/internal/build.AuthClientID={{.Env.AUTH_CLIENT_ID}}
+      - -X github.com/intility/minctl/internal/build.AuthRedirectURI={{.Env.AUTH_REDIRECT_URI}}
+      # application
+      - -X github.com/intility/minctl/internal/build.PlatformBaseURI={{.Env.PLATFORM_BASE_URI}}
     mod_timestamp: "{{.CommitTimestamp}}"
     flags: "-trimpath"
     binary: minctl

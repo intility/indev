@@ -26,9 +26,10 @@ var loginCmd = &cobra.Command{
 	Long:  `Sign in to Intility Container Platform using your Intility credentials.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := authenticator.Config{
-			ClientID:  build.ClientID(),
-			Authority: build.Authority(),
-			Scopes:    build.Scopes(),
+			ClientID:    build.ClientID(),
+			Authority:   build.Authority(),
+			Scopes:      build.Scopes(),
+			RedirectURI: build.SuccessRedirect(),
 		}
 
 		var options []authenticator.Option

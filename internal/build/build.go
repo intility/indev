@@ -19,18 +19,24 @@ var (
 	Commit     = "none"
 	CommitDate = "unknown"
 
+	//goland:noinspection GoBoolExpressions
 	IsDev = Version == "0.0.0-dev" && !forceProd
 
 	PlatformBaseURI = "https://minato-customer-backend.apps.hypershift.intilitycloud.com"
 
 	// SentryDSN is injected in the build from the CI/CD pipeline.
 	// It is disabled by default.
-	SentryDSN = "https://358ccd99e95f4c89b2df84752f9320c0@sentry.intility.no/508"
+	SentryDSN = ""
 
-	AuthPlatformAudience = "api://containerplatform.intility.com/user_impersonation"
+	// OTELCollectorEndpoint is injected in the build from the CI/CD pipeline.
+	// It is disabled by default.
+	OTELCollectorEndpoint = "localhost:8200"
+	OTELCollectorToken    = ""
+
+	AuthPlatformAudience = "api://adc683b8-0523-4d0e-9f99-0a8536d4c618/user_impersonation"
 	AuthAuthority        = "https://login.microsoftonline.com/intility.no"
 	AuthClientID         = "b65cf9b0-290c-4b44-a4b1-0b02b7752b3c"
-	AuthRedirect         = "http://localhost"
+	AuthRedirect         = "http://localhost:42069"
 )
 
 // User-presentable names of operating systems supported by icpctl.
@@ -131,7 +137,7 @@ func Authority() string {
 
 func SuccessRedirect() string {
 	if IsDev {
-		return "http://localhost"
+		return "http://localhost:42069"
 	}
 
 	return AuthRedirect

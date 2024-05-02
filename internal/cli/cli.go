@@ -8,12 +8,15 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/term"
 
+	"github.com/intility/minctl/internal/build"
 	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/minctl/internal/telemetry"
 	"github.com/intility/minctl/internal/ux"
 	"github.com/intility/minctl/pkg/authenticator"
-	"github.com/intility/minctl/pkg/config"
 )
 
 const (
@@ -24,18 +27,36 @@ var errNotAuthenticated = errors.New("not authenticated")
 
 func CreateAuthGate(message any) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
+		var (
+			span trace.Span
+			ctx  = cmd.Context()
+		)
+
+		ctx, span = telemetry.StartSpan(ctx, "authenticator.AuthGate")
+		defer span.End()
+
 		auth := authenticator.NewAuthenticator(authenticator.Config{
-			ClientID:  config.ClientID,
-			Authority: config.Authority,
-			Scopes:    []string{config.ScopePlatform},
+			ClientID:    build.ClientID(),
+			Authority:   build.Authority(),
+			Scopes:      build.Scopes(),
+			RedirectURI: build.SuccessRedirect(),
 		})
 
-		ctx, cancel := context.WithTimeout(cmd.Context(), timeout)
+		ctx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
 
 		authenticated, err := auth.IsAuthenticated(ctx)
 		if err != nil {
-			return redact.Errorf("failed to determine authentication status: %w", redact.Safe(err))
+			reportErr := redact.Errorf("auth gate failed to determine authentication status: %w", redact.Safe(err))
+
+			if span != nil {
+				span.SetStatus(codes.Error, "authentication gate failed")
+				span.RecordError(reportErr, trace.WithStackTrace(true))
+			}
+
+			cmd.SilenceUsage = true
+
+			return redact.Errorf("%w: %v", redact.Safe(errNotAuthenticated), message)
 		}
 
 		if !authenticated {
@@ -47,6 +68,7 @@ func CreateAuthGate(message any) func(cmd *cobra.Command, args []string) error {
 	}
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func CreatePasswordPrompter(cmd *cobra.Command) func(string) (string, error) {
 	return func(prompt string) (string, error) {
 		ux.Fprint(cmd.OutOrStdout(), prompt+": ")

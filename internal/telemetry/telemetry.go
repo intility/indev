@@ -50,6 +50,7 @@ var (
 
 // Start enables telemetry for the current program.
 func Start() {
+	//goland:noinspection GoBoolExpressions
 	if started || env.DoNotTrack() || build.SentryDSN == "" {
 		return
 	}

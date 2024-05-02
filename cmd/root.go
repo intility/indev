@@ -24,7 +24,9 @@ var rootCmd = &cobra.Command{
 // This is called by Execute(). It only needs to happen once to the rootCmd.
 func RunPipeline(ctx context.Context) int {
 	pipe := pipeline.New(rootCmd)
+	pipe.AddMiddleware(pipeline.Metrics())
 	pipe.AddMiddleware(pipeline.Telemetry())
+	pipe.AddMiddleware(pipeline.Trace())
 	pipe.AddMiddleware(pipeline.Logger())
 
 	return pipe.Execute(ctx, os.Args[1:])

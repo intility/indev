@@ -1,7 +1,7 @@
 .idea/
 bin/
 .DS_Store
-
 completions/
-
 dist/
+.env
+.envrc

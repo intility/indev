@@ -25,11 +25,11 @@ type TelemetryMiddleware struct{}
 // TelemetryMiddleware implements interface Middleware (compile-time check).
 var _ Middleware = (*TelemetryMiddleware)(nil)
 
-func (m *TelemetryMiddleware) preRun(_ *cobra.Command, _ []string) {
+func (m *TelemetryMiddleware) Handle(cmd *cobra.Command, args []string, next NextFunc) error {
 	telemetry.Start()
-}
 
-func (m *TelemetryMiddleware) postRun(cmd *cobra.Command, args []string, runErr error) {
+	runErr := next(cmd, args)
+
 	defer trace.StartRegion(cmd.Context(), "telemetryPostRun").End()
 	defer telemetry.Stop()
 
@@ -38,7 +38,7 @@ func (m *TelemetryMiddleware) postRun(cmd *cobra.Command, args []string, runErr 
 	subCmd, flags, err := getSubcommand(cmd, args)
 	if err != nil {
 		// Ignore invalid commands/flags.
-		return
+		return runErr
 	}
 
 	meta.Command = subCmd.CommandPath()
@@ -48,8 +48,9 @@ func (m *TelemetryMiddleware) postRun(cmd *cobra.Command, args []string, runErr 
 
 	if runErr != nil {
 		telemetry.Error(runErr, meta)
-		return
 	}
+
+	return runErr
 }
 
 func getSubcommand( //nolint:nonamedreturns
@@ -63,7 +64,7 @@ func getSubcommand( //nolint:nonamedreturns
 	}
 
 	if err != nil {
-		return nil, nil, err //nolint:wrapcheck
+		return nil, nil, err
 	}
 
 	subCmd.Flags().Visit(func(f *pflag.Flag) {
@@ -72,5 +73,5 @@ func getSubcommand( //nolint:nonamedreturns
 
 	sort.Strings(flags)
 
-	return subCmd, flags, err //nolint:wrapcheck
+	return subCmd, flags, err
 }
