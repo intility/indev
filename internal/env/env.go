@@ -4,24 +4,25 @@ import (
 	"os"
 	"os/user"
 	"strconv"
+
+	"github.com/intility/minctl/internal/build"
 )
 
 const (
-	eDoNotTrack = "DO_NOT_TRACK"
+	envKeyDoNotTrack               = "DO_NOT_TRACK"
+	envKeyOTELExporterOTLPEndpoint = "OTEL_EXPORTER_OTLP_ENDPOINT"
+	envKeyOTELExporterToken        = "OTEL_EXPORTER_OTLP_TOKEN" //nolint: gosec
 )
 
 // system.
 const (
-	Env   = "ENV"
-	Home  = "HOME"
-	Path  = "PATH"
 	Shell = "SHELL"
 	User  = "USER"
 )
 
 func DoNotTrack() bool {
 	// https://consoledonottrack.com/
-	doNotTrack, _ := strconv.ParseBool(os.Getenv(eDoNotTrack))
+	doNotTrack, _ := strconv.ParseBool(os.Getenv(envKeyDoNotTrack))
 	return doNotTrack
 }
 
@@ -37,6 +38,14 @@ func Username() string {
 	}
 
 	return "NN"
+}
+
+func OtelExporterEndpoint() string {
+	return build.OTELCollectorEndpoint
+}
+
+func OtelExporterToken() string {
+	return build.OTELCollectorToken
 }
 
 func UserShell() string {

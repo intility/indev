@@ -51,12 +51,14 @@ func New(options ...RestClientOption) *RestClient {
 	return client
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func WithAuthenticator(authenticator *authenticator.Authenticator) RestClientOption {
 	return func(client *RestClient) {
 		client.authenticator = authenticator
 	}
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func WithHTTPClient(httpClient *http.Client) RestClientOption {
 	return func(client *RestClient) {
 		client.httpClient = httpClient

@@ -252,6 +252,7 @@ func (e *redactedError) Unwrap() error { return e.wrapped }
 // an error.
 type formatter string
 
+//goland:noinspection GoUnusedParameter
 func (f formatter) Format(s fmt.State, verb rune) {
 	_, _ = s.Write([]byte(f))
 }

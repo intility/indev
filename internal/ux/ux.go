@@ -19,11 +19,13 @@ func Fsuccess(w io.Writer, format string, a ...any) {
 	_, _ = fmt.Fprintf(w, format, a...)
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func Finfo(w io.Writer, format string, a ...any) {
 	_, _ = fmt.Fprint(w, styleInfo.Render("info: "))
 	_, _ = fmt.Fprintf(w, format, a...)
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func Fwarning(w io.Writer, format string, a ...any) {
 	_, _ = fmt.Fprint(w, styleWarning.Render("warning: "))
 	_, _ = fmt.Fprintf(w, format, a...)

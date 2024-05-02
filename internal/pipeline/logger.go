@@ -14,15 +14,12 @@ type LoggerMiddleware struct{}
 
 var _ Middleware = (*LoggerMiddleware)(nil)
 
-func (m *LoggerMiddleware) preRun(_ *cobra.Command, _ []string) {
-}
-
-func (m *LoggerMiddleware) postRun(cmd *cobra.Command, args []string, runErr error) {
-	if runErr == nil {
-		return
+func (m *LoggerMiddleware) Handle(cmd *cobra.Command, args []string, next NextFunc) error {
+	err := next(cmd, args)
+	if err != nil {
+		// We can introduce warnings here if needed.
+		ux.Ferror(cmd.ErrOrStderr(), err.Error())
 	}
 
-	// We can introduce warnings here if needed.
-
-	ux.Ferror(cmd.ErrOrStderr(), runErr.Error())
+	return err
 }

@@ -36,12 +36,14 @@ func NewFilesystemCredentialStore(filePath string, options ...FileSystemOption) 
 	return store
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func WithFilesystem(fs afero.Fs) FileSystemOption {
 	return func(store *FilesystemCredentialStore) {
 		store.fs = fs
 	}
 }
 
+//goland:noinspection GoUnusedParameter
 func (store *FilesystemCredentialStore) Get(partitionKey string) ([]byte, error) {
 	err := store.createCacheDirIfNotExists()
 	if err != nil {
@@ -67,6 +69,7 @@ func (store *FilesystemCredentialStore) Get(partitionKey string) ([]byte, error)
 	return cacheData, nil
 }
 
+//goland:noinspection GoUnusedParameter
 func (store *FilesystemCredentialStore) Set(data []byte, partitionKey string) error {
 	err := store.createCacheDirIfNotExists()
 	if err != nil {

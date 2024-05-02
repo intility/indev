@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/minctl/internal/telemetry"
 	"github.com/intility/minctl/internal/ux"
 	"github.com/intility/minctl/internal/wizard"
 	"github.com/intility/minctl/pkg/client"
@@ -48,7 +49,15 @@ var clusterCreateCmd = &cobra.Command{
 			req := client.NewClusterRequest{Name: clusterName}
 			cmd.SilenceUsage = true
 
-			_, err = c.CreateCluster(cmd.Context(), req)
+			tracer, ok := telemetry.TracerFromContext(cmd.Context())
+			if !ok {
+				return redact.Errorf("could not get tracer from context")
+			}
+
+			ctx, span := tracer.Start(cmd.Context(), "CreateCluster")
+			defer span.End()
+
+			_, err = c.CreateCluster(ctx, req)
 			if err != nil {
 				return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 			}
