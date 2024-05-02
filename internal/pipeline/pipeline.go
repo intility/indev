@@ -67,11 +67,12 @@ func (ex *executable) execute(ctx context.Context, args []string) error {
 	ex.cmd.SetContext(ctx)
 	_ = ex.cmd.ParseFlags(args)
 
-	// wrap the cmd.Execute with the middlewares´
+	// wrap the cmd.Execute as the innermost middleware
 	next := func(cm *cobra.Command, args []string) error {
 		return cm.Execute()
 	}
 
+	// compose the middleware chain
 	for i := len(ex.middlewares) - 1; i >= 0; i-- {
 		next = func(next NextFunc, middleware Middleware) NextFunc {
 			return func(cmd *cobra.Command, args []string) error {
@@ -102,7 +103,7 @@ func (ex *executable) executeInstrumented(ctx context.Context, args []string) er
 	defer func() { _ = shutdown(ctx) }()
 
 	var span trace.Span
-	ctx, span = tracer.Start(ctx, "operation")
+	ctx, span = tracer.Start(ctx, "cli.command")
 
 	defer span.End()
 
