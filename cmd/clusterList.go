@@ -105,7 +105,11 @@ func printClusterList(writer io.Writer, clusters client.ClusterList) error {
 		return nil
 	}
 
-	return redact.Errorf("output encoder failed: %w", redact.Safe(err))
+	if err != nil {
+		return redact.Errorf("output encoder failed: %w", redact.Safe(err))
+	}
+
+	return nil
 }
 
 func statusString(cluster client.Cluster) string {
