@@ -1,4 +1,4 @@
-// Package pipeline collects some light telemetry to be able to improve minctl over time.
+// Package pipeline collects some light telemetry to be able to improve icpctl over time.
 // We're aware how important privacy is and value it ourselves, so we have
 // the following rules:
 // 1. We only collect anonymized data – nothing that is personally identifiable
@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/intility/minctl/internal/telemetry"
+	"github.com/intility/icpctl/internal/telemetry"
 )
 
 func Telemetry() *TelemetryMiddleware {

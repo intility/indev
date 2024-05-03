@@ -20,9 +20,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/intility/minctl/internal/build"
-	"github.com/intility/minctl/internal/env"
-	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/icpctl/internal/build"
+	"github.com/intility/icpctl/internal/env"
+	"github.com/intility/icpctl/internal/redact"
 )
 
 type EventName int
@@ -193,7 +193,7 @@ func (m *Metadata) cmdTags() map[string]string {
 	return tags
 }
 
-var sentryBufferDir = filepath.Join(xdg.StateHome, "minctl", "sentry")
+var sentryBufferDir = filepath.Join(xdg.StateHome, "icpctl", "sentry")
 
 func Upload() {
 	wg := sync.WaitGroup{}

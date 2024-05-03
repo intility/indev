@@ -16,9 +16,9 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
 
-	"github.com/intility/minctl/internal/build"
-	"github.com/intility/minctl/internal/env"
-	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/icpctl/internal/build"
+	"github.com/intility/icpctl/internal/env"
+	"github.com/intility/icpctl/internal/redact"
 )
 
 func Metrics() *MetricsMiddleware {

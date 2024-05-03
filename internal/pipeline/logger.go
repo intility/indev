@@ -3,7 +3,7 @@ package pipeline
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/intility/minctl/internal/ux"
+	"github.com/intility/icpctl/internal/ux"
 )
 
 func Logger() *LoggerMiddleware {

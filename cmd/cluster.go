@@ -3,8 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/intility/minctl/internal/cli"
-	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/icpctl/internal/cli"
+	"github.com/intility/icpctl/internal/redact"
 )
 
 var errEmptyName = redact.Errorf("%s", redact.Safe("cluster name cannot be empty"))
@@ -26,7 +26,7 @@ var clusterCmd = &cobra.Command{
 
 func init() {
 	clusterCmd.PersistentPreRunE = cli.CreateAuthGate(
-		redact.Safe("please log in with 'minctl login' before managing cluster resources"))
+		redact.Safe("please log in with 'icpctl login' before managing cluster resources"))
 
 	rootCmd.AddCommand(clusterCmd)
 }

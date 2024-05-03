@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 
-	"github.com/intility/minctl/internal/telemetry"
+	"github.com/intility/icpctl/internal/telemetry"
 )
 
 func Trace() *TraceMiddleware {

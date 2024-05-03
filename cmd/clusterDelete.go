@@ -3,9 +3,9 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/intility/minctl/internal/redact"
-	"github.com/intility/minctl/internal/ux"
-	"github.com/intility/minctl/pkg/client"
+	"github.com/intility/icpctl/internal/redact"
+	"github.com/intility/icpctl/internal/ux"
+	"github.com/intility/icpctl/pkg/client"
 )
 
 // clusterDeleteCmd represents the clusterDelete command.

@@ -15,9 +15,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
 
-	"github.com/intility/minctl/internal/build"
-	"github.com/intility/minctl/internal/env"
-	"github.com/intility/minctl/internal/telemetry"
+	"github.com/intility/icpctl/internal/build"
+	"github.com/intility/icpctl/internal/env"
+	"github.com/intility/icpctl/internal/telemetry"
 )
 
 type Executable interface {

@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/intility/minctl/internal/pipeline"
-	"github.com/intility/minctl/internal/telemetry"
+	"github.com/intility/icpctl/internal/pipeline"
+	"github.com/intility/icpctl/internal/telemetry"
 )
 
 const telemetryUploadTimeout = time.Second * 5
@@ -36,7 +36,7 @@ func Execute() {
 	ctx := context.Background()
 
 	if len(os.Args) > 1 && os.Args[1] == "upload-telemetry" {
-		// This subcommand is hidden and only run by minctl itself as a
+		// This subcommand is hidden and only run by icpctl itself as a
 		// child process. We need to really make sure that we always
 		// exit and don't leave orphaned processes lying around.
 		time.AfterFunc(telemetryUploadTimeout, func() {

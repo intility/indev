@@ -10,7 +10,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
-	"github.com/intility/minctl/internal/redact"
+	"github.com/intility/icpctl/internal/redact"
 )
 
 type MetricFileExporter struct {

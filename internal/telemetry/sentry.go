@@ -14,7 +14,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/pkg/errors"
 
-	"github.com/intility/minctl/internal/build"
+	"github.com/intility/icpctl/internal/build"
 )
 
 const (

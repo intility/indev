@@ -3,8 +3,8 @@ package tokencache_test
 import (
 	"errors"
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache"
-	"github.com/intility/minctl/mocks"
-	"github.com/intility/minctl/pkg/tokencache"
+	"github.com/intility/icpctl/mocks"
+	"github.com/intility/icpctl/pkg/tokencache"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

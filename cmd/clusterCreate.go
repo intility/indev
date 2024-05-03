@@ -3,11 +3,11 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/intility/minctl/internal/redact"
-	"github.com/intility/minctl/internal/telemetry"
-	"github.com/intility/minctl/internal/ux"
-	"github.com/intility/minctl/internal/wizard"
-	"github.com/intility/minctl/pkg/client"
+	"github.com/intility/icpctl/internal/redact"
+	"github.com/intility/icpctl/internal/telemetry"
+	"github.com/intility/icpctl/internal/ux"
+	"github.com/intility/icpctl/internal/wizard"
+	"github.com/intility/icpctl/pkg/client"
 )
 
 var clusterName string

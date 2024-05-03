@@ -8,9 +8,9 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/intility/minctl/internal/redact"
-	"github.com/intility/minctl/internal/ux"
-	"github.com/intility/minctl/pkg/client"
+	"github.com/intility/icpctl/internal/redact"
+	"github.com/intility/icpctl/internal/ux"
+	"github.com/intility/icpctl/pkg/client"
 )
 
 var (

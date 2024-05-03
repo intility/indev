@@ -6,11 +6,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/intility/minctl/internal/build"
-	"github.com/intility/minctl/internal/cli"
-	"github.com/intility/minctl/internal/redact"
-	"github.com/intility/minctl/internal/ux"
-	"github.com/intility/minctl/pkg/authenticator"
+	"github.com/intility/icpctl/internal/build"
+	"github.com/intility/icpctl/internal/cli"
+	"github.com/intility/icpctl/internal/redact"
+	"github.com/intility/icpctl/internal/ux"
+	"github.com/intility/icpctl/pkg/authenticator"
 )
 
 const (
