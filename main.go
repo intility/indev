@@ -4,7 +4,7 @@ Copyright © 2024 Callum Powell <callum.powell@intility.no>
 package main
 
 import (
-	"github.com/intility/minctl/cmd"
+	"github.com/intility/icpctl/cmd"
 )
 
 //go:generate ./scripts/completions.sh

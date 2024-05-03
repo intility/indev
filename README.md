@@ -25,20 +25,20 @@ To install Minctl, follow these steps:
 1. Clone the repository:
 
     ```sh
-    git clone git@gitlab.intility.com:developer-infrastructure/platform-2.0/minctl.git
-    cd minctl
+    git clone git@gitlab.intility.com:developer-infrastructure/platform-2.0/icpctl.git
+    cd icpctl
     ```
 
 2. Build from source:
 
     ```sh
-    go build -o minctl main.go
+    go build -o icpctl main.go
     ```
 
 3. (Optional) Move the binary to a location in your PATH:
 
     ```sh
-    mv minctl /usr/local/bin/minctl
+    mv icpctl /usr/local/bin/icpctl
     ```
 
 ### Usage
@@ -47,35 +47,35 @@ Here are some of the commonly used Minctl commands:
 
 - Create a cluster:
     ```sh
-    minctl cluster create
+    icpctl cluster create
     ```
 
 - List clusters:
     ```sh
-    minctl cluster list
+    icpctl cluster list
     ```
 
 - Delete a cluster:
     ```sh
-    minctl cluster delete --name <cluster-name>
+    icpctl cluster delete --name <cluster-name>
     ```
 
 - Deploy an application:
     ```sh
-    minctl app deploy --path <app-manifest-path>
+    icpctl app deploy --path <app-manifest-path>
     ```
 
 - Delete an application:
     ```sh
-    minctl app delete --path <app-manifest-path>
+    icpctl app delete --path <app-manifest-path>
     ```
 
 - Forward a port:
     ```sh
-    minctl app port-forward --deployment <deployment-name>
+    icpctl app port-forward --deployment <deployment-name>
     ```
 
-For a full list of command and options, run `minctl --help`.
+For a full list of command and options, run `icpctl --help`.
 
 ## Telemetry
 
@@ -107,7 +107,7 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 
 ## Acknowledgments
 
-- The `minctl` team and all contributors
+- The `icpctl` team and all contributors
 - The Go and Kubernetes communities for their tools and libraries
 
 ## Contact

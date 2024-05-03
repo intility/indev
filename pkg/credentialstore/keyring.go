@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	appName = "minctl"
+	appName = "icpctl"
 )
 
 type KeyringCredentialStore struct {
@@ -38,7 +38,7 @@ func (c *KeyringCredentialStore) Get(partitionKey string) ([]byte, error) {
 		return nil, err
 	}
 
-	item, err := c.keyring.Get("minctl-msal-cache")
+	item, err := c.keyring.Get("icpctl-msal-cache")
 	if err != nil {
 		if err.Error() == "The specified item could not be found in the keyring" {
 			return []byte{}, nil
@@ -58,7 +58,7 @@ func (c *KeyringCredentialStore) Set(data []byte, partitionKey string) error {
 	}
 
 	err = c.keyring.Set(keyring.Item{ //nolint:exhaustruct
-		Key:  "minctl-msal-cache",
+		Key:  "icpctl-msal-cache",
 		Data: data,
 	})
 	if err != nil {
@@ -74,7 +74,7 @@ func (c *KeyringCredentialStore) Clear() error {
 		return err
 	}
 
-	err = c.keyring.Remove("minctl-msal-cache")
+	err = c.keyring.Remove("icpctl-msal-cache")
 	if err != nil {
 		return fmt.Errorf("failed to remove item from keyring: %w", err)
 	}

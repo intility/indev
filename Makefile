@@ -10,7 +10,7 @@ endif
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
 
-BINARY_NAME=minctl
+BINARY_NAME=icpctl
 
 .PHONY: all
 all: build
@@ -63,6 +63,12 @@ docs: vhs ## Generate docs
 	@echo "Generating gifs..."
 	@$(VHS) docs/create_cluster_interactive.tape -o docs/create_cluster_interactive.gif
 
+.PHONY: rename
+rename: gum ## Rename the project
+	@set -e; \
+	OLD_NAME=$(shell awk 'NR==1{print $$2}' go.mod); \
+	NEW_NAME=$(shell $(GUM) input --prompt "github.com/intility/" --placeholder "new_name"); \
+	./scripts/rename-project.sh $$OLD_NAME github.com/intility/$$NEW_NAME
 ##@ Build
 
 .PHONY: build
@@ -129,6 +135,7 @@ GOSEC = $(LOCALBIN)/gosec-$(GOSEC_VERSION)
 GOVULNCHECK = $(LOCALBIN)/govulncheck-$(GOVULNCHECK_VERSION)
 MOCKERY = $(LOCALBIN)/mockery-$(MOCKERY_VERSION)
 VHS= $(LOCALBIN)/vhs
+GUM= $(LOCALBIN)/gum
 
 ## Tool Versions
 TOOLKIT_TOOLS_GEN_VERSION ?= latest
@@ -137,6 +144,7 @@ GOSEC_VERSION ?= latest
 GOVULNCHECK_VERSION ?= latest
 MOCKERY_VERSION ?= v2.42.1
 VHS_VERSION ?= latest
+GUM_VERSION ?= latest
 
 
 .PHONY: golangci-lint
@@ -171,6 +179,11 @@ $(VHS): $(LOCALBIN)
 	@which ttyd || { echo "ttyd is not installed. Please install it from https://github.com/tsl0922/ttyd"; exit 1; }
 	@which ffmpeg || { echo "ffmpeg is not installed. Please install it from https://ffmpeg.org"; exit 1; }
 	$(call go-install-tool,$(VHS),github.com/charmbracelet/vhs,$(VHS_VERSION))
+
+.PHONY: gum
+gum: $(GUM) ## Download gum locally if necessary.
+$(GUM): $(LOCALBIN)
+	$(call go-install-tool,$(GUM),github.com/charmbracelet/gum,$(GUM_VERSION))
 # go-install-tool will 'go install' any package with custom target and name of binary, if it doesn't exist
 # $1 - target path with name of binary (ideally with version)
 # $2 - package url which can be installed

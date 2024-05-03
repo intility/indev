@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/intility/minctl/internal/build"
-	"github.com/intility/minctl/pkg/authenticator"
+	"github.com/intility/icpctl/internal/build"
+	"github.com/intility/icpctl/pkg/authenticator"
 )
 
 const (

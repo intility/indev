@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/intility/minctl/pkg/tokencache"
+	"github.com/intility/icpctl/pkg/tokencache"
 )
 
 // logoutCmd represents the logout command.
