@@ -22,7 +22,7 @@ var (
 	//goland:noinspection GoBoolExpressions
 	IsDev = Version == "0.0.0-dev" && !forceProd
 
-	PlatformBaseURI = "https://minato-customer-backend.apps.hypershift.intilitycloud.com"
+	PlatformBaseURI = "https://container-platform-backend.apps.hypershift.intilitycloud.com"
 
 	// SentryDSN is injected in the build from the CI/CD pipeline.
 	// It is disabled by default.
