@@ -58,6 +58,11 @@ var clusterListCmd = &cobra.Command{
 			return redact.Errorf("could not list clusters: %w", redact.Safe(err))
 		}
 
+		if len(clusters) == 0 {
+			ux.Fprint(cmd.OutOrStdout(), "No clusters found\n")
+			return nil
+		}
+
 		if err = printClusterList(cmd.OutOrStdout(), clusters); err != nil {
 			return redact.Errorf("could not print cluster list: %w", redact.Safe(err))
 		}
