@@ -9,9 +9,7 @@ import (
 )
 
 const (
-	envKeyDoNotTrack               = "DO_NOT_TRACK"
-	envKeyOTELExporterOTLPEndpoint = "OTEL_EXPORTER_OTLP_ENDPOINT"
-	envKeyOTELExporterToken        = "OTEL_EXPORTER_OTLP_TOKEN" //nolint: gosec
+	envKeyDoNotTrack = "DO_NOT_TRACK"
 )
 
 // system.
@@ -46,6 +44,10 @@ func OtelExporterEndpoint() string {
 
 func OtelExporterToken() string {
 	return build.OTELCollectorToken
+}
+
+func SentryDSN() string {
+	return build.SentryDSN
 }
 
 func UserShell() string {

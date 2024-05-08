@@ -11,7 +11,7 @@ import (
 	"github.com/intility/icpctl/internal/telemetry"
 )
 
-const telemetryUploadTimeout = time.Second * 5
+const telemetryUploadTimeout = time.Second * 30
 
 // rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
@@ -22,20 +22,20 @@ var rootCmd = &cobra.Command{
 
 // RunPipeline adds all child commands to the root command and sets flags appropriately.
 // This is called by Execute(). It only needs to happen once to the rootCmd.
-func RunPipeline(ctx context.Context) int {
+func RunPipeline(ctx context.Context, args []string) int {
 	pipe := pipeline.New(rootCmd)
-	pipe.AddMiddleware(pipeline.Metrics())
+	// pipe.AddMiddleware(pipeline.Metrics())
 	pipe.AddMiddleware(pipeline.Telemetry())
 	pipe.AddMiddleware(pipeline.Trace())
 	pipe.AddMiddleware(pipeline.Logger())
 
-	return pipe.Execute(ctx, os.Args[1:])
+	return pipe.Execute(ctx, args[1:])
 }
 
-func Execute() {
+func Execute(args []string) int {
 	ctx := context.Background()
 
-	if len(os.Args) > 1 && os.Args[1] == "upload-telemetry" {
+	if len(args) > 1 && args[1] == "upload-telemetry" {
 		// This subcommand is hidden and only run by icpctl itself as a
 		// child process. We need to really make sure that we always
 		// exit and don't leave orphaned processes lying around.
@@ -45,11 +45,10 @@ func Execute() {
 
 		telemetry.Upload()
 
-		return
+		return 0
 	}
 
-	exitCode := RunPipeline(ctx)
-	os.Exit(exitCode)
+	return RunPipeline(ctx, args)
 }
 
 // init initializes the root command and flags.

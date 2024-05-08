@@ -1,6 +1,7 @@
 package telemetry
 
 import (
+	"os"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -15,6 +16,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/intility/icpctl/internal/build"
+	"github.com/intility/icpctl/internal/env"
+	"github.com/intility/icpctl/internal/ux"
 )
 
 const (
@@ -30,7 +33,11 @@ func initSentryClient(appName string) bool {
 
 	// This will be set by the build system.
 	//noinspection GoBoolExpressions
-	if build.SentryDSN == "" {
+	dsn := env.SentryDSN()
+	ux.Finfo(os.Stdout, "sentry DSN: %s\n", dsn)
+
+	if env.SentryDSN() == "" {
+		ux.Finfo(os.Stdout, "sentry DSN is not set, skipping initialization.\n")
 		return false
 	}
 
@@ -43,7 +50,7 @@ func initSentryClient(appName string) bool {
 	}
 
 	err := sentry.Init(sentry.ClientOptions{ //nolint:exhaustruct
-		Dsn:              build.SentryDSN,
+		Dsn:              dsn,
 		Environment:      environment,
 		Release:          appName + "@" + build.Version,
 		Transport:        transport,

@@ -26,12 +26,9 @@ type TelemetryMiddleware struct{}
 var _ Middleware = (*TelemetryMiddleware)(nil)
 
 func (m *TelemetryMiddleware) Handle(cmd *cobra.Command, args []string, next NextFunc) error {
-	telemetry.Start()
-
 	runErr := next(cmd, args)
 
 	defer trace.StartRegion(cmd.Context(), "telemetryPostRun").End()
-	defer telemetry.Stop()
 
 	meta := telemetry.Metadata{} //nolint:exhaustruct
 

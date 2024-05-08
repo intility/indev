@@ -8,7 +8,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
@@ -18,6 +17,7 @@ import (
 	"github.com/intility/icpctl/internal/build"
 	"github.com/intility/icpctl/internal/env"
 	"github.com/intility/icpctl/internal/telemetry"
+	"github.com/intility/icpctl/internal/telemetry/exporters"
 )
 
 type Executable interface {
@@ -89,6 +89,9 @@ func (ex *executable) execute(ctx context.Context, args []string) error {
 }
 
 func (ex *executable) executeInstrumented(ctx context.Context, args []string) error {
+	telemetry.Start()
+	defer telemetry.Stop()
+
 	tracer, shutdown, err := ex.initTracer(ctx, semconv.ProcessCommandArgs(args...))
 	if err != nil {
 		if build.IsDev {
@@ -160,16 +163,7 @@ func (ex *executable) initTracer(ctx context.Context, attrs ...attribute.KeyValu
 		return nil, nil, fmt.Errorf("failed to initialize resource: %w", err)
 	}
 
-	endpoint := env.OtelExporterEndpoint()
-	apiKey := env.OtelExporterToken()
-
-	exp, err := otlptracegrpc.New(ctx,
-		otlptracegrpc.WithInsecure(),
-		otlptracegrpc.WithEndpoint(endpoint),
-		otlptracegrpc.WithHeaders(map[string]string{
-			"Authorization": "Bearer " + apiKey,
-		}),
-	)
+	exp, err := exporters.NewTraceExporter()
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to initialize stdouttrace exporter: %w", err)
 	}

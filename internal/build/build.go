@@ -10,7 +10,7 @@ import (
 	"github.com/matishsiao/goInfo"
 )
 
-var forceProd, _ = strconv.ParseBool(os.Getenv("MINCTL_PROD"))
+var forceProd, _ = strconv.ParseBool(os.Getenv("ICPCTL_PROD"))
 
 // Variables in this file are set via ldflags.
 var (
@@ -30,7 +30,7 @@ var (
 
 	// OTELCollectorEndpoint is injected in the build from the CI/CD pipeline.
 	// It is disabled by default.
-	OTELCollectorEndpoint = "localhost:8200"
+	OTELCollectorEndpoint = "https://7fcac8723f5e46078e220d9f1a4b8427.elastic.intility.no:9243"
 	OTELCollectorToken    = ""
 
 	AuthPlatformAudience = "api://adc683b8-0523-4d0e-9f99-0a8536d4c618/user_impersonation"
