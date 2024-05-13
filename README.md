@@ -1,5 +1,5 @@
 
-# Minctl
+# ICPCTL
 
 Minctl is a command-line interface (CLI) tool designed for managing Kubernetes resources efficiently. With Minctl, you can perform a variety of operations such as creating and deleting clusters, deploying and managing applications, and more. It is built with simplicity and ease of use in mind, making Kubernetes operations more accessible.
 
