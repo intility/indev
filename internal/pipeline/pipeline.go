@@ -138,10 +138,8 @@ func (ex *executable) initTracer(ctx context.Context, attrs ...attribute.KeyValu
 	}
 
 	attrs = append(attrs,
-		semconv.ServiceNameKey.String(build.AppName),
-		semconv.ServiceVersionKey.String(build.Version),
-		semconv.ServiceInstanceIDKey.String(build.Commit),
 		semconv.ServiceName(build.AppName),
+		semconv.ServiceVersionKey.String(build.Version),
 	)
 
 	r, err := resource.New(

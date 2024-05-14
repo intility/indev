@@ -347,7 +347,9 @@ func restoreTraces(dir string) []*coltracepb.ExportTraceServiceRequest {
 
 		// Always delete the file, so we don't end up with an infinitely growing
 		// backlog of errors.
-		_ = os.Remove(path)
+		if !build.IsDev {
+			_ = os.Remove(path)
+		}
 
 		if err != nil {
 			continue
@@ -382,7 +384,9 @@ func restoreEvents[E any](dir string) []E {
 
 		// Always delete the file, so we don't end up with an infinitely growing
 		// backlog of errors.
-		_ = os.Remove(path)
+		if !build.IsDev {
+			_ = os.Remove(path)
+		}
 
 		if err != nil {
 			continue
