@@ -3,6 +3,7 @@ package pipeline
 import (
 	"context"
 	"fmt"
+	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
@@ -173,6 +174,7 @@ func (ex *executable) initTracer(ctx context.Context, attrs ...attribute.KeyValu
 	)
 
 	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(propagation.TraceContext{})
 
 	return tp.Tracer(build.AppName), tp.Shutdown, nil
 }

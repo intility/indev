@@ -5,9 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.opentelemetry.io/otel/trace"
 	"io"
 	"net/http"
 	"time"
+
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
 
 	"github.com/intility/icpctl/internal/build"
 	"github.com/intility/icpctl/pkg/authenticator"
@@ -34,21 +38,28 @@ type RestClientOption func(*RestClient)
 type RestClient struct {
 	baseURI       string
 	httpClient    *http.Client
+	tracer        trace.Tracer
 	authenticator *authenticator.Authenticator
 }
 
 func New(options ...RestClientOption) *RestClient {
-	client := &RestClient{
+	tracer := otel.Tracer("httpclient")
+	client := &http.Client{
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+		Timeout:   defaultHTTPTimeout,
+	}
+	restClient := &RestClient{
 		baseURI:       build.PlatformAPIHost(),
-		httpClient:    &http.Client{Timeout: defaultHTTPTimeout},
+		httpClient:    client,
+		tracer:        tracer,
 		authenticator: authenticator.NewAuthenticator(authenticator.ConfigFromBuildProps()),
 	}
 
 	for _, opt := range options {
-		opt(client)
+		opt(restClient)
 	}
 
-	return client
+	return restClient
 }
 
 //goland:noinspection GoUnusedExportedFunction
@@ -90,7 +101,14 @@ func (c *RestClient) createAuthenticatedRequest(
 }
 
 func (c *RestClient) ListClusters(ctx context.Context) (ClusterList, error) {
-	var clusters ClusterList
+	var (
+		clusters ClusterList
+		span     trace.Span
+	)
+
+	ctx, span = c.tracer.Start(ctx, "List Clusters API Call")
+
+	defer span.End()
 
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters", nil)
 	if err != nil {
@@ -105,6 +123,11 @@ func (c *RestClient) ListClusters(ctx context.Context) (ClusterList, error) {
 }
 
 func (c *RestClient) CreateCluster(ctx context.Context, request NewClusterRequest) (*Cluster, error) {
+	var span trace.Span
+
+	ctx, span = c.tracer.Start(ctx, "Create Cluster API Call")
+	defer span.End()
+
 	body, err := json.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal request: %w", err)
@@ -124,6 +147,11 @@ func (c *RestClient) CreateCluster(ctx context.Context, request NewClusterReques
 }
 
 func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, error) {
+	var span trace.Span
+
+	ctx, span = c.tracer.Start(ctx, "Get Cluster API Call")
+	defer span.End()
+
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters/"+name, nil)
 	if err != nil {
 		return nil, err
@@ -138,6 +166,11 @@ func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, err
 }
 
 func (c *RestClient) DeleteCluster(ctx context.Context, name string) error {
+	var span trace.Span
+
+	ctx, span = c.tracer.Start(ctx, "Delete Cluster API Call")
+	defer span.End()
+
 	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/clusters/"+name, nil)
 	if err != nil {
 		return err
