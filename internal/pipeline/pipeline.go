@@ -152,7 +152,6 @@ func (ex *executable) initTracer(ctx context.Context, attrs ...attribute.KeyValu
 		resource.WithProcessRuntimeVersion(),
 		resource.WithProcessRuntimeDescription(),
 		resource.WithOS(),
-		resource.WithHost(),
 		resource.WithProcessRuntimeName(),
 		resource.WithProcessRuntimeVersion(),
 		// resource.WithProcessCommandArgs(), // exposes sensitive data
