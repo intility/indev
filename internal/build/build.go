@@ -33,7 +33,7 @@ var (
 	OTELCollectorEndpoint = "https://otlp-collector.apps.hypershift.intilitycloud.com"
 	OTELCollectorToken    = ""
 
-	AuthPlatformAudience = "api://adc683b8-0523-4d0e-9f99-0a8536d4c618/user_impersonation"
+	AuthPlatformAudience = "api://cd5aff56-575c-4e7e-b68e-3f67fa42eb31/user_impersonation"
 	AuthAuthority        = "https://login.microsoftonline.com/intility.no"
 	AuthClientID         = "b65cf9b0-290c-4b44-a4b1-0b02b7752b3c"
 	AuthRedirect         = "http://localhost:42069"
