@@ -104,14 +104,14 @@ func (ex *executable) executeInstrumented(ctx context.Context, args []string) er
 		return ex.execute(ctx, args)
 	}
 
+	ctx = telemetry.WithTracer(ctx, tracer)
+
 	defer func() { _ = shutdown(ctx) }()
 
 	var span trace.Span
 	ctx, span = tracer.Start(ctx, "cli.command")
 
 	defer span.End()
-
-	ctx = telemetry.WithTracer(ctx, tracer)
 
 	err = ex.execute(ctx, args)
 
