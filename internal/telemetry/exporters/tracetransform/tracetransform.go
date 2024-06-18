@@ -186,7 +186,7 @@ func spanEvents(es []tracesdk.Event) []*tracepb.Span_Event {
 
 	events := make([]*tracepb.Span_Event, len(es))
 	// Transform message events
-	for i := 0; i < len(es); i++ {
+	for i := range es {
 		events[i] = &tracepb.Span_Event{
 			Name:                   es[i].Name,
 			TimeUnixNano:           uint64(es[i].Time.UnixNano()),

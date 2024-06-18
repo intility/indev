@@ -1,6 +1,9 @@
 package pipeline
 
 import (
+	"context"
+	"errors"
+
 	"github.com/spf13/cobra"
 
 	"github.com/intility/icpctl/internal/ux"
@@ -18,7 +21,12 @@ func (m *LoggerMiddleware) Handle(cmd *cobra.Command, args []string, next NextFu
 	err := next(cmd, args)
 	if err != nil {
 		// We can introduce warnings here if needed.
-		ux.Ferror(cmd.ErrOrStderr(), err.Error())
+		switch {
+		case errors.Is(err, context.Canceled):
+			ux.Fprint(cmd.OutOrStdout(), "Operation was canceled.")
+		default:
+			ux.Ferror(cmd.ErrOrStderr(), err.Error())
+		}
 	}
 
 	return err

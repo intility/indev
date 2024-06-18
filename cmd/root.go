@@ -21,7 +21,7 @@ var rootCmd = &cobra.Command{
 }
 
 // RunPipeline adds all child commands to the root command and sets flags appropriately.
-// This is called by Execute(). It only needs to happen once to the rootCmd.
+// It only needs to happen once to the rootCmd.
 func RunPipeline(ctx context.Context, args []string) int {
 	pipe := pipeline.New(rootCmd)
 	// pipe.AddMiddleware(pipeline.Metrics())
@@ -32,18 +32,19 @@ func RunPipeline(ctx context.Context, args []string) int {
 	return pipe.Execute(ctx, args[1:])
 }
 
-func Execute(args []string) int {
-	ctx := context.Background()
-
+func Execute(ctx context.Context, args []string) int {
 	if len(args) > 1 && args[1] == "upload-telemetry" {
 		// This subcommand is hidden and only run by icpctl itself as a
 		// child process. We need to really make sure that we always
 		// exit and don't leave orphaned processes lying around.
+		ctx, cancel := context.WithCancel(ctx)
+
 		time.AfterFunc(telemetryUploadTimeout, func() {
+			cancel()
 			os.Exit(0)
 		})
 
-		telemetry.Upload()
+		telemetry.Upload(ctx)
 
 		return 0
 	}

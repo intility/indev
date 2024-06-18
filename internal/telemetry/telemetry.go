@@ -40,7 +40,7 @@ const (
 	permissionStateDir  = 0o700
 
 	sentryUploadTimeout = time.Second * 3
-	traceUploadTimeout  = time.Second * 30
+	traceUploadTimeout  = time.Second * 3
 
 	deviceSalt = "43381f8c-da93-4098-afde-cbf6520f492f"
 	uidSalt    = "454a83fc-848f-450c-b3df-b1cfdb26e12a"
@@ -216,10 +216,10 @@ var (
 	traceBufferDir  = filepath.Join(xdg.StateHome, "icpctl", "traces")
 )
 
-func Upload() {
+func Upload(ctx context.Context) {
 	wg := sync.WaitGroup{}
 
-	wg.Add(2) //nolint:gomnd
+	wg.Add(2) //nolint:mnd
 
 	go func() {
 		defer wg.Done()
@@ -230,7 +230,7 @@ func Upload() {
 	go func() {
 		defer wg.Done()
 		ux.Finfo(os.Stdout, "flushing traces\n")
-		uploadTraces()
+		uploadTraces(ctx)
 	}()
 
 	wg.Wait()
@@ -247,7 +247,7 @@ func uploadSentryEvents() {
 	for _, event := range events {
 		// implicit memory aliasing is not a thing in Go 1.22
 		// as the iteration variable is redeclared in each iteration.
-		sentry.CaptureEvent(&event) //nolint:gosec
+		sentry.CaptureEvent(&event)
 	}
 
 	success := sentry.Flush(sentryUploadTimeout)
@@ -256,14 +256,14 @@ func uploadSentryEvents() {
 	}
 }
 
-func uploadTraces() {
+func uploadTraces(ctx context.Context) {
 	traces := restoreTraces(traceBufferDir)
 
 	if len(traces) == 0 {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), traceUploadTimeout)
+	ctx, cancel := context.WithTimeout(ctx, traceUploadTimeout)
 	defer cancel()
 
 	endpoint := env.OtelExporterEndpoint()
