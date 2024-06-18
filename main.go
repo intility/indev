@@ -4,7 +4,10 @@ Copyright © 2024 Callum Powell <callum.powell@intility.no>
 package main
 
 import (
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/intility/icpctl/cmd"
 )
@@ -17,5 +20,17 @@ func main() {
 }
 
 func run(args []string) int {
-	return cmd.Execute(args)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
+
+	go func() {
+		if <-sigChan; true {
+			cancel()
+		}
+	}()
+
+	return cmd.Execute(ctx, args)
 }

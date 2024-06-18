@@ -27,12 +27,7 @@ var errNotAuthenticated = errors.New("not authenticated")
 
 func CreateAuthGate(message any) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		var (
-			span trace.Span
-			ctx  = cmd.Context()
-		)
-
-		ctx, span = telemetry.StartSpan(ctx, "authenticator.AuthGate")
+		ctx, span := telemetry.StartSpan(cmd.Context(), "authenticator.AuthGate")
 		defer span.End()
 
 		auth := authenticator.NewAuthenticator(authenticator.Config{
@@ -47,6 +42,11 @@ func CreateAuthGate(message any) func(cmd *cobra.Command, args []string) error {
 
 		authenticated, err := auth.IsAuthenticated(ctx)
 		if err != nil {
+			// if err is cancellation, we don't want to report it
+			if errors.Is(err, context.Canceled) {
+				return err //nolint:wrapcheck
+			}
+
 			reportErr := redact.Errorf("auth gate failed to determine authentication status: %w", redact.Safe(err))
 
 			if span != nil {

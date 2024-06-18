@@ -4,7 +4,7 @@ stages:
 
 variables:
   # must match Makefile GOLANGCI_LINT_VERSION
-  GOLANGCI_LINT_VERSION: 'v1.57.2'
+  GOLANGCI_LINT_VERSION: 'v1.59.1'
 
 release:
   stage: release
