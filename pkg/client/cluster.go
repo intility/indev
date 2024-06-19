@@ -25,5 +25,13 @@ type StatusDeployment struct {
 type ClusterList []Cluster
 
 type NewClusterRequest struct {
-	Name string `json:"name"`
+	Name      string    `json:"name"`
+	NodePools NodePools `json:"nodepools,omitempty"`
+}
+
+type NodePools []NodePool
+
+type NodePool struct {
+	Preset    string `json:"preset,omitempty"`
+	NodeCount int    `json:"nodecount,omitempty"`
 }

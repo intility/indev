@@ -25,7 +25,7 @@ func (m *LoggerMiddleware) Handle(cmd *cobra.Command, args []string, next NextFu
 		case errors.Is(err, context.Canceled):
 			ux.Fprint(cmd.OutOrStdout(), "Operation was canceled.")
 		default:
-			ux.Ferror(cmd.ErrOrStderr(), err.Error())
+			ux.Ferror(cmd.ErrOrStderr(), err.Error()+"\n")
 		}
 	}
 
