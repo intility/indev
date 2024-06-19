@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"slices"
+	"strconv"
+
 	"github.com/spf13/cobra"
 
 	"github.com/intility/icpctl/internal/redact"
@@ -10,7 +13,19 @@ import (
 	"github.com/intility/icpctl/pkg/client"
 )
 
-var clusterName string
+const (
+	maxNodeCount = 20
+	minNodeCount = 2
+)
+
+var (
+	clusterName string
+	nodePreset  string
+	nodeCount   int
+
+	errInvalidPreset    = redact.Errorf("invalid node preset: preset must be one of minimal, balanced, performance")
+	errInvalidNodeCount = redact.Errorf("invalid node count: count must be between 2 and 20")
+)
 
 // clusterCreateCmd represents the create command.
 var clusterCreateCmd = &cobra.Command{
@@ -29,6 +44,20 @@ var clusterCreateCmd = &cobra.Command{
 					Limit:       0,
 					Validator:   nil,
 				},
+				{
+					ID:          "preset",
+					Placeholder: "Node Preset (minimal, balanced, performance)",
+					Type:        wizard.InputTypeText,
+					Limit:       0,
+					Validator:   nil,
+				},
+				{
+					ID:          "nodes",
+					Placeholder: "Node Count (" + strconv.Itoa(minNodeCount) + "-" + strconv.Itoa(maxNodeCount) + ")",
+					Type:        wizard.InputTypeText,
+					Limit:       0,
+					Validator:   nil,
+				},
 			})
 
 			result, err := wz.Run()
@@ -40,51 +69,67 @@ var clusterCreateCmd = &cobra.Command{
 				return nil
 			}
 
-			clusterName := result.MustGetValue("name")
+			clusterName = result.MustGetValue("name")
+			nodePreset = result.MustGetValue("preset")
+			nodeCountStr := result.MustGetValue("nodes")
 
-			if clusterName == "" {
-				return errEmptyName
-			}
-
-			req := client.NewClusterRequest{Name: clusterName}
-			cmd.SilenceUsage = true
-
-			tracer, ok := telemetry.TracerFromContext(cmd.Context())
-			if !ok {
-				return redact.Errorf("could not get tracer from context")
-			}
-
-			ctx, span := tracer.Start(cmd.Context(), "CreateCluster")
-			defer span.End()
-
-			_, err = c.CreateCluster(ctx, req)
+			nodeCount, err = strconv.Atoi(nodeCountStr)
 			if err != nil {
-				return redact.Errorf("could not create cluster: %w", redact.Safe(err))
+				return redact.Errorf("invalid node count: %w", redact.Safe(err))
 			}
-
-			ux.Fsuccess(cmd.OutOrStdout(), "cluster created\n")
-
-			return nil
 		}
 
-		req := client.NewClusterRequest{Name: clusterName}
-		cluster, err := c.CreateCluster(cmd.Context(), req)
+		if clusterName == "" {
+			return errEmptyName
+		}
 
-		// we are done with validating the input
+		if !slices.Contains([]string{"minimal", "balanced", "performance"}, nodePreset) {
+			return errInvalidPreset
+		}
+
+		if nodeCount < minNodeCount || nodeCount > maxNodeCount {
+			return errInvalidNodeCount
+		}
+
+		req := client.NewClusterRequest{
+			Name: clusterName,
+			NodePools: []client.NodePool{
+				{
+					Preset:    nodePreset,
+					NodeCount: nodeCount,
+				},
+			},
+		}
 		cmd.SilenceUsage = true
 
+		tracer, ok := telemetry.TracerFromContext(cmd.Context())
+		if !ok {
+			return redact.Errorf("could not get tracer from context")
+		}
+
+		ctx, span := tracer.Start(cmd.Context(), "CreateCluster")
+		defer span.End()
+
+		_, err := c.CreateCluster(ctx, req)
 		if err != nil {
 			return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 		}
 
-		ux.Fprint(cmd.OutOrStdout(), cluster.Name+"\n")
+		ux.Fsuccess(cmd.OutOrStdout(), "cluster created\n")
 
 		return nil
 	},
 }
 
 func init() {
-	clusterCreateCmd.Flags().StringVarP(&clusterName, "name", "n", "", "Name of the cluster to create")
+	clusterCreateCmd.Flags().StringVarP(&clusterName, "name", "n", "",
+		"Name of the cluster to create")
+
+	clusterCreateCmd.Flags().StringVar(&nodePreset, "preset", "minimal",
+		"Node preset to use (minimal, balanced, performance)")
+
+	clusterCreateCmd.Flags().IntVar(&nodeCount, "nodes", minNodeCount,
+		"Number of nodes to create (2-20)")
 
 	clusterCmd.AddCommand(clusterCreateCmd)
 }
