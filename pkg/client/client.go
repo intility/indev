@@ -9,8 +9,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/intility/icpctl/internal/telemetry"
+
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/intility/icpctl/internal/build"
@@ -25,7 +26,7 @@ const (
 type ClusterClient interface {
 	ListClusters(ctx context.Context) (ClusterList, error)
 	GetCluster(ctx context.Context, name string) (*Cluster, error)
-	CreateCluster(ctx context.Context, request NewClusterRequest) error
+	CreateCluster(ctx context.Context, request NewClusterRequest) (*Cluster, error)
 	DeleteCluster(ctx context.Context, name string) error
 }
 
@@ -38,12 +39,12 @@ type RestClientOption func(*RestClient)
 type RestClient struct {
 	baseURI       string
 	httpClient    *http.Client
-	tracer        trace.Tracer
 	authenticator *authenticator.Authenticator
 }
 
+var _ Client = New()
+
 func New(options ...RestClientOption) *RestClient {
-	tracer := otel.Tracer("httpclient")
 	client := &http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport),
 		Timeout:   defaultHTTPTimeout,
@@ -51,7 +52,6 @@ func New(options ...RestClientOption) *RestClient {
 	restClient := &RestClient{
 		baseURI:       build.PlatformAPIHost(),
 		httpClient:    client,
-		tracer:        tracer,
 		authenticator: authenticator.NewAuthenticator(authenticator.ConfigFromBuildProps()),
 	}
 
@@ -101,13 +101,9 @@ func (c *RestClient) createAuthenticatedRequest(
 }
 
 func (c *RestClient) ListClusters(ctx context.Context) (ClusterList, error) {
-	var (
-		clusters ClusterList
-		span     trace.Span
-	)
+	var clusters ClusterList
 
-	ctx, span = c.tracer.Start(ctx, "List Clusters API Call")
-
+	ctx, span := telemetry.StartSpan(ctx, "List Clusters API Call")
 	defer span.End()
 
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters", nil)
@@ -116,7 +112,7 @@ func (c *RestClient) ListClusters(ctx context.Context) (ClusterList, error) {
 	}
 
 	if err = doRequest(c.httpClient, req, &clusters); err != nil {
-		return clusters, err
+		return clusters, fmt.Errorf("request failed: %w", err)
 	}
 
 	return clusters, nil
@@ -125,7 +121,7 @@ func (c *RestClient) ListClusters(ctx context.Context) (ClusterList, error) {
 func (c *RestClient) CreateCluster(ctx context.Context, request NewClusterRequest) (*Cluster, error) {
 	var span trace.Span
 
-	ctx, span = c.tracer.Start(ctx, "Create Cluster API Call")
+	ctx, span = telemetry.StartSpan(ctx, "Create Cluster API Call")
 	defer span.End()
 
 	body, err := json.Marshal(request)
@@ -149,7 +145,7 @@ func (c *RestClient) CreateCluster(ctx context.Context, request NewClusterReques
 func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, error) {
 	var span trace.Span
 
-	ctx, span = c.tracer.Start(ctx, "Get Cluster API Call")
+	ctx, span = telemetry.StartSpan(ctx, "Get Cluster API Call")
 	defer span.End()
 
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters/"+name, nil)
@@ -168,7 +164,7 @@ func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, err
 func (c *RestClient) DeleteCluster(ctx context.Context, name string) error {
 	var span trace.Span
 
-	ctx, span = c.tracer.Start(ctx, "Delete Cluster API Call")
+	ctx, span = telemetry.StartSpan(ctx, "Delete Cluster API Call")
 	defer span.End()
 
 	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/clusters/"+name, nil)

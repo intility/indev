@@ -17,6 +17,7 @@ before:
 
 builds:
   - id: icpctl
+    main: cmd/icpctl/main.go
     env:
       - CGO_ENABLED=0
     ldflags:
