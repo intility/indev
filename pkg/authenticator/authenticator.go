@@ -137,7 +137,7 @@ func (a *Authenticator) Authenticate(ctx context.Context) (public.AuthResult, er
 }
 
 func (a *Authenticator) createPublicClient(ctx context.Context) (public.Client, error) {
-	ctx, span := telemetry.StartSpan(ctx, "CreatePublicClient")
+	_, span := telemetry.StartSpan(ctx, "CreatePublicClient")
 	defer span.End()
 
 	client, err := public.New(
@@ -276,7 +276,6 @@ func (a *Authenticator) acquireTokenSilent(
 		ctx,
 		a.scopes,
 		public.WithSilentAccount(account))
-
 	if err != nil {
 		span.RecordError(err)
 		return result, fmt.Errorf("could not acquire token silently: %w", err)

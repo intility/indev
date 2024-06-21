@@ -4,18 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/intility/icpctl/internal/telemetry/exporters/tracetransform"
-	coltracepb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
-	"google.golang.org/protobuf/proto"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"sync/atomic"
 
 	"github.com/adrg/xdg"
+	"github.com/google/uuid"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	coltracepb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
+	"google.golang.org/protobuf/proto"
 
+	"github.com/intility/icpctl/internal/telemetry/exporters/tracetransform"
 	"github.com/intility/icpctl/internal/ux"
 )
 
@@ -123,5 +123,4 @@ func (t TraceExporter) RestoreTraces() []*coltracepb.ExportTraceServiceRequest {
 	}
 
 	return traces
-
 }

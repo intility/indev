@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/intility/icpctl/internal/telemetry"
-
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/intility/icpctl/internal/build"
+	"github.com/intility/icpctl/internal/telemetry"
 	"github.com/intility/icpctl/pkg/authenticator"
 )
 

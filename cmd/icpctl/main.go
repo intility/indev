@@ -30,6 +30,7 @@ func main() {
 			ux.Ferror(os.Stderr, err.Error()+"\n")
 			os.Exit(1)
 		}
+
 		return
 	}
 

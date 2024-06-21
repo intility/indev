@@ -1,9 +1,12 @@
 package cluster
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strconv"
+
+	"github.com/spf13/cobra"
 
 	"github.com/intility/icpctl/internal/redact"
 	"github.com/intility/icpctl/internal/telemetry"
@@ -11,7 +14,6 @@ import (
 	"github.com/intility/icpctl/internal/wizard"
 	"github.com/intility/icpctl/pkg/client"
 	"github.com/intility/icpctl/pkg/clientset"
-	"github.com/spf13/cobra"
 )
 
 const (
@@ -19,16 +21,21 @@ const (
 	minCount = 2
 )
 
-func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
-	var (
-		clusterName string
-		nodePreset  string
-		nodeCount   int
+var (
+	errCancelledByUser  = redact.Errorf("cancelled by user")
+	errEmptyName        = redact.Errorf("cluster name cannot be empty")
+	errInvalidPreset    = redact.Errorf("invalid node preset: preset must be one of minimal, balanced, performance")
+	errInvalidNodeCount = redact.Errorf("invalid node count: count must be between 2 and 20")
+)
 
-		errEmptyName        = redact.Errorf("cluster name cannot be empty")
-		errInvalidPreset    = redact.Errorf("invalid node preset: preset must be one of minimal, balanced, performance")
-		errInvalidNodeCount = redact.Errorf("invalid node count: count must be between 2 and 20")
-	)
+type CreateOptions struct {
+	Name      string
+	Preset    string
+	NodeCount int
+}
+
+func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
+	var options CreateOptions
 
 	cmd := &cobra.Command{
 		Use:     "create",
@@ -39,74 +46,35 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.create")
 			defer span.End()
 
-			if clusterName == "" {
-				wz := wizard.NewWizard([]wizard.Input{
-					{
-						ID:          "name",
-						Placeholder: "Cluster Name",
-						Type:        wizard.InputTypeText,
-						Limit:       0,
-						Validator:   nil,
-					},
-					{
-						ID:          "preset",
-						Placeholder: "Node Preset (minimal, balanced, performance)",
-						Type:        wizard.InputTypeText,
-						Limit:       0,
-						Validator:   nil,
-					},
-					{
-						ID:          "nodes",
-						Placeholder: "Node Count (" + strconv.Itoa(minCount) + "-" + strconv.Itoa(maxCount) + ")",
-						Type:        wizard.InputTypeText,
-						Limit:       0,
-						Validator:   nil,
-					},
-				})
-
-				result, err := wz.Run()
+			var err error
+			if options.Name == "" {
+				options, err = optionsFromWizard()
 				if err != nil {
-					return redact.Errorf("could not gather information: %w", redact.Safe(err))
-				}
+					if errors.Is(err, errCancelledByUser) {
+						return nil
+					}
 
-				if result.Cancelled() {
-					return nil
-				}
-
-				clusterName = result.MustGetValue("name")
-				nodePreset = result.MustGetValue("preset")
-				nodeCountStr := result.MustGetValue("nodes")
-
-				nodeCount, err = strconv.Atoi(nodeCountStr)
-				if err != nil {
-					return redact.Errorf("invalid node count: %w", redact.Safe(err))
+					return redact.Errorf("could not get options from wizard: %w", redact.Safe(err))
 				}
 			}
 
-			if clusterName == "" {
-				return errEmptyName
+			err = validateOptions(options)
+			if err != nil {
+				return err
 			}
 
-			if !slices.Contains([]string{"minimal", "balanced", "performance"}, nodePreset) {
-				return errInvalidPreset
-			}
-
-			if nodeCount < minCount || nodeCount > maxCount {
-				return errInvalidNodeCount
-			}
-
-			req := client.NewClusterRequest{
-				Name: clusterName,
-				NodePools: []client.NodePool{
-					{
-						Preset:    nodePreset,
-						NodeCount: nodeCount,
-					},
-				},
-			}
+			// inputs validated, assume correct usage
 			cmd.SilenceUsage = true
 
-			_, err := set.PlatformClient.CreateCluster(ctx, req)
+			_, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
+				Name: options.Name,
+				NodePools: []client.NodePool{
+					{
+						Preset:    options.Preset,
+						NodeCount: options.NodeCount,
+					},
+				},
+			})
 			if err != nil {
 				return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 			}
@@ -117,9 +85,78 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&clusterName, "name", "n", "", "Name of the cluster to create")
-	cmd.Flags().StringVar(&nodePreset, "preset", "minimal", "Node preset to use (minimal, balanced, performance)")
-	cmd.Flags().IntVar(&nodeCount, "nodes", minCount, fmt.Sprintf("Number of nodes to create (%d-%d)", minCount, maxCount))
+	cmd.Flags().StringVarP(&options.Name,
+		"name", "n", "", "Name of the cluster to create")
+
+	cmd.Flags().StringVar(&options.Preset,
+		"preset", "minimal", "Node preset to use (minimal, balanced, performance)")
+
+	cmd.Flags().IntVar(&options.NodeCount,
+		"nodes", minCount, fmt.Sprintf("Number of nodes to create (%d-%d)", minCount, maxCount))
 
 	return cmd
+}
+
+func optionsFromWizard() (CreateOptions, error) {
+	var options CreateOptions
+
+	wz := wizard.NewWizard([]wizard.Input{
+		{
+			ID:          "name",
+			Placeholder: "Cluster Name",
+			Type:        wizard.InputTypeText,
+			Limit:       0,
+			Validator:   nil,
+		},
+		{
+			ID:          "preset",
+			Placeholder: "Node Preset (minimal, balanced, performance)",
+			Type:        wizard.InputTypeText,
+			Limit:       0,
+			Validator:   nil,
+		},
+		{
+			ID:          "nodes",
+			Placeholder: "Node Count (" + strconv.Itoa(minCount) + "-" + strconv.Itoa(maxCount) + ")",
+			Type:        wizard.InputTypeText,
+			Limit:       0,
+			Validator:   nil,
+		},
+	})
+
+	result, err := wz.Run()
+	if err != nil {
+		return options, redact.Errorf("could not gather information: %w", redact.Safe(err))
+	}
+
+	if result.Cancelled() {
+		return options, errCancelledByUser
+	}
+
+	options.Name = result.MustGetValue("name")
+	options.Preset = result.MustGetValue("preset")
+	nodeCountStr := result.MustGetValue("nodes")
+
+	options.NodeCount, err = strconv.Atoi(nodeCountStr)
+	if err != nil {
+		return options, redact.Errorf("invalid node count: %w", redact.Safe(err))
+	}
+
+	return options, nil
+}
+
+func validateOptions(options CreateOptions) error {
+	if options.Name == "" {
+		return errEmptyName
+	}
+
+	if !slices.Contains([]string{"minimal", "balanced", "performance"}, options.Preset) {
+		return errInvalidPreset
+	}
+
+	if options.NodeCount < minCount || options.NodeCount > maxCount {
+		return errInvalidNodeCount
+	}
+
+	return nil
 }

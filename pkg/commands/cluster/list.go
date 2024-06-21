@@ -5,24 +5,20 @@ import (
 	"errors"
 	"io"
 
-	"github.com/intility/icpctl/internal/telemetry"
-	"github.com/intility/icpctl/pkg/clientset"
-
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
 	"github.com/intility/icpctl/internal/redact"
+	"github.com/intility/icpctl/internal/telemetry"
 	"github.com/intility/icpctl/internal/ux"
 	"github.com/intility/icpctl/pkg/client"
+	"github.com/intility/icpctl/pkg/clientset"
 )
 
-var (
-	errInvalidOutputFormat = errors.New(`must be one of "wide", "json", "yaml"`)
-)
+var errInvalidOutputFormat = errors.New(`must be one of "wide", "json", "yaml"`)
 
 func NewListCommand(set clientset.ClientSet) *cobra.Command {
-
-	var output = outputFormat("")
+	output := outputFormat("")
 	// clusterListCmd represents the list command.
 	cmd := &cobra.Command{
 		Use:     "list",

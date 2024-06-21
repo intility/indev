@@ -7,15 +7,14 @@ import (
 	"strings"
 
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
+	"github.com/spf13/cobra"
+
 	"github.com/intility/icpctl/internal/build"
 	"github.com/intility/icpctl/internal/telemetry"
 	"github.com/intility/icpctl/pkg/client"
-	"github.com/spf13/cobra"
 )
 
-var (
-	errNotAuthenticatedPreHook = errors.New("you need to sign in before executing this operation")
-)
+var errNotAuthenticatedPreHook = errors.New("you need to sign in before executing this operation")
 
 type Authenticator interface {
 	IsAuthenticated(ctx context.Context) (bool, error)
@@ -86,7 +85,7 @@ func (c *ClientSet) hooks(typ hookType, hooks ...Hook) Hook {
 	}
 }
 
-// fqcn returns the fully qualified command name based on its parents
+// fqcn returns the fully qualified command name based on its parents.
 func fqcn(cmd *cobra.Command) string {
 	parents := make([]string, 0)
 

@@ -2,13 +2,18 @@ package telemetry
 
 import (
 	"context"
-	"github.com/intility/icpctl/internal/env"
-	"github.com/intility/icpctl/internal/ux"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-	coltracepb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
+	"fmt"
 	"os"
 	"time"
+
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	coltracepb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
+
+	"github.com/intility/icpctl/internal/env"
+	"github.com/intility/icpctl/internal/ux"
 )
+
+const uploadTimeout = 5 * time.Second
 
 type TraceRestorer interface {
 	RestoreTraces() []*coltracepb.ExportTraceServiceRequest
@@ -22,7 +27,7 @@ type TraceUploader struct {
 func NewTraceUploader(restorer TraceRestorer) *TraceUploader {
 	return &TraceUploader{
 		restorer: restorer,
-		timeout:  5 * time.Second,
+		timeout:  uploadTimeout,
 	}
 }
 
@@ -47,13 +52,15 @@ func (t *TraceUploader) Upload(ctx context.Context) error {
 	err := client.Start(ctx)
 	if err != nil {
 		ux.Ferror(os.Stderr, "failed to start client: %v\n", err)
-		return err
+
+		return fmt.Errorf("failed to start client: %w", err)
 	}
 
 	ux.Finfo(os.Stdout, "flushing %d traces\n", len(traces))
 
 	for _, trace := range traces {
 		spans := trace.GetResourceSpans()
+
 		err = client.UploadTraces(ctx, spans)
 		if err != nil {
 			ux.Ferror(os.Stderr, "failed to upload traces: %v\n", err)
@@ -65,5 +72,5 @@ func (t *TraceUploader) Upload(ctx context.Context) error {
 		ux.Ferror(os.Stderr, "failed to stop client: %v\n", err)
 	}
 
-	return err
+	return nil
 }
