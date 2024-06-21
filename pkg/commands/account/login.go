@@ -2,6 +2,10 @@ package account
 
 import (
 	"context"
+	"time"
+
+	"github.com/spf13/cobra"
+
 	"github.com/intility/icpctl/internal/build"
 	"github.com/intility/icpctl/internal/cli"
 	"github.com/intility/icpctl/internal/redact"
@@ -9,8 +13,6 @@ import (
 	"github.com/intility/icpctl/internal/ux"
 	"github.com/intility/icpctl/pkg/authenticator"
 	"github.com/intility/icpctl/pkg/clientset"
-	"github.com/spf13/cobra"
-	"time"
 )
 
 const (

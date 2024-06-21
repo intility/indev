@@ -26,6 +26,7 @@ func NewShowCommand(set clientset.ClientSet) *cobra.Command {
 				if errors.Is(err, authenticator.ErrNoAccounts) {
 					ux.Fprint(cmd.OutOrStdout(), "You are not signed in to any accounts\n")
 					ux.Fprint(cmd.OutOrStdout(), "Use `%s %s` to sign in\n", cmd.Root().Name(), "login")
+
 					return nil
 				}
 

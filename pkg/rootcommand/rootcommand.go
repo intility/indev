@@ -1,6 +1,8 @@
 package rootcommand
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/intility/icpctl/internal/build"
 	"github.com/intility/icpctl/internal/telemetry"
 	"github.com/intility/icpctl/internal/ux"
@@ -9,12 +11,9 @@ import (
 	"github.com/intility/icpctl/pkg/clientset"
 	"github.com/intility/icpctl/pkg/commands/account"
 	"github.com/intility/icpctl/pkg/commands/cluster"
-
-	"github.com/spf13/cobra"
 )
 
 func GetRootCommand() *cobra.Command {
-
 	clients := clientset.ClientSet{
 		Authenticator:  authenticator.NewAuthenticator(authenticator.ConfigFromBuildProps()),
 		PlatformClient: client.New(),

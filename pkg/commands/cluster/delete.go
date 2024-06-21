@@ -1,15 +1,15 @@
 package cluster
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/intility/icpctl/internal/redact"
 	"github.com/intility/icpctl/internal/telemetry"
 	"github.com/intility/icpctl/internal/ux"
 	"github.com/intility/icpctl/pkg/clientset"
-	"github.com/spf13/cobra"
 )
 
 func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
-
 	var (
 		clusterName  string
 		errEmptyName = redact.Errorf("cluster name cannot be empty")

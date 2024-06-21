@@ -2,10 +2,12 @@ package account
 
 import (
 	"fmt"
+
+	"github.com/spf13/cobra"
+
 	"github.com/intility/icpctl/internal/telemetry"
 	"github.com/intility/icpctl/pkg/clientset"
 	"github.com/intility/icpctl/pkg/tokencache"
-	"github.com/spf13/cobra"
 )
 
 func NewLogoutCommand(set clientset.ClientSet) *cobra.Command {

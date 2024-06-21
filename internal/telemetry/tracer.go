@@ -3,9 +3,7 @@ package telemetry
 import (
 	"context"
 	"fmt"
-	"github.com/intility/icpctl/internal/build"
-	"github.com/intility/icpctl/internal/env"
-	"github.com/intility/icpctl/internal/telemetry/exporters"
+
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
@@ -14,6 +12,10 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
 	"go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
+
+	"github.com/intility/icpctl/internal/build"
+	"github.com/intility/icpctl/internal/env"
+	"github.com/intility/icpctl/internal/telemetry/exporters"
 )
 
 var tracerKey = struct{}{}
@@ -57,7 +59,7 @@ func StartSpan( //nolint:ireturn
 
 type ShutdownFunc func(context.Context) error
 
-func InitTracer(ctx context.Context, attrs ...attribute.KeyValue) (trace.Tracer, ShutdownFunc, error) {
+func InitTracer(ctx context.Context, attrs ...attribute.KeyValue) (trace.Tracer, ShutdownFunc, error) { //nolint:ireturn
 	if env.DoNotTrack() {
 		tp := noop.NewTracerProvider()
 		otel.SetTracerProvider(tp)
