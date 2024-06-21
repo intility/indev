@@ -1,10 +1,56 @@
 stages:
+  - build
   - test
   - release
 
 variables:
   # must match Makefile GOLANGCI_LINT_VERSION
-  GOLANGCI_LINT_VERSION: 'v1.59.1'
+  GO_VERSION: "1.22"
+  GOLANGCI_LINT_VERSION: "v1.59.1"
+
+build:
+  stage: build
+  image: golang:${GO_VERSION}
+  script:
+    - mkdir -p bin
+    - go build -o bin/icpctl cmd/icpctl/main.go
+  needs: []
+
+test:
+  stage: test
+  image: golang:${GO_VERSION}
+  before_script:
+    - go install github.com/boumenot/gocover-cobertura@latest
+    - go install gotest.tools/gotestsum@latest
+  script:
+    - go install ./...
+    - go test -short -run='^Test' ./... -coverprofile=coverage.txt -covermode count
+    - gocover-cobertura < coverage.txt > coverage.xml
+    - gotestsum --junitfile report.xml --format testname -- -run='^Test' ./... -short
+  coverage: '/coverage: \d+.\d+% of statements/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+      junit: report.xml
+  needs: ["build"]
+
+lint:
+  image: golangci/golangci-lint:${GOLANGCI_LINT_VERSION}-alpine
+  stage: test
+  script:
+    - apk --no-cache add git jq bash
+    - "[ -e .golangci.yaml ] || cp /golangci/.golangci.yml ."
+    - golangci-lint run --out-format code-climate | tee gl-code-quality-report.json | jq -r '.[] | "\(.location.path):\(.location.lines.begin) \(.description)"'
+  artifacts:
+    when: on_success
+    reports:
+      codequality: gl-code-quality-report.json
+    paths:
+      - gl-code-quality-report.json
+    expire_in: "1 day"
+  needs: ["build"]
 
 release:
   stage: release
@@ -19,19 +65,3 @@ release:
     GIT_DEPTH: 0
   script:
     - goreleaser release --clean
-
-lint:
-  image: golangci/golangci-lint:$GOLANGCI_LINT_VERSION
-  stage: test
-  only:
-    - merge_requests
-  script:
-    # Write the code coverage report to gl-code-quality-report.json
-    # and print linting issues to stdout in the format: path/to/file:line description
-    # remove `--issues-exit-code 0` or set to non-zero to fail the job if linting issues are detected
-    - golangci-lint run --issues-exit-code 0 --print-issued-lines=false --out-format code-climate:gl-code-quality-report.json,line-number
-  artifacts:
-    reports:
-      codequality: gl-code-quality-report.json
-    paths:
-      - gl-code-quality-report.json
