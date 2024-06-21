@@ -2,8 +2,18 @@ package telemetry
 
 import (
 	"context"
-
+	"fmt"
+	"github.com/intility/icpctl/internal/build"
+	"github.com/intility/icpctl/internal/env"
+	"github.com/intility/icpctl/internal/telemetry/exporters"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 var tracerKey = struct{}{}
@@ -14,8 +24,8 @@ func TracerFromContext(ctx context.Context) (trace.Tracer, bool) { //nolint:iret
 	return tracer, ok
 }
 
-// WithTracer returns a new context.Context that contains the provided tracer.
-func WithTracer(ctx context.Context, tracer trace.Tracer) context.Context {
+// ContextWithTracer returns a new context.Context that contains the provided tracer.
+func ContextWithTracer(ctx context.Context, tracer trace.Tracer) context.Context {
 	return context.WithValue(ctx, tracerKey, tracer)
 }
 
@@ -43,4 +53,54 @@ func StartSpan( //nolint:ireturn
 	}
 
 	return tracer.Start(ctx, name, opts...) //nolint:spancheck
+}
+
+type ShutdownFunc func(context.Context) error
+
+func InitTracer(ctx context.Context, attrs ...attribute.KeyValue) (trace.Tracer, ShutdownFunc, error) {
+	if env.DoNotTrack() {
+		tp := noop.NewTracerProvider()
+		otel.SetTracerProvider(tp)
+
+		return tp.Tracer(build.AppName), func(ctx context.Context) error { return nil }, nil
+	}
+
+	attrs = append(attrs,
+		semconv.ServiceName(build.AppName),
+		semconv.ServiceVersionKey.String(build.Version),
+	)
+
+	r, err := resource.New(
+		ctx,
+		resource.WithFromEnv(),
+		resource.WithTelemetrySDK(),
+		resource.WithProcessExecutableName(),
+		resource.WithProcessRuntimeName(),
+		resource.WithProcessRuntimeVersion(),
+		resource.WithProcessRuntimeDescription(),
+		resource.WithOS(),
+		resource.WithProcessRuntimeName(),
+		resource.WithProcessRuntimeVersion(),
+		// resource.WithProcessCommandArgs(), // exposes sensitive data
+		resource.WithAttributes(attrs...),
+	)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to initialize resource: %w", err)
+	}
+
+	exp, err := exporters.NewTraceExporter()
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to initialize trace exporter: %w", err)
+	}
+
+	tp := tracesdk.NewTracerProvider(
+		tracesdk.WithResource(r),
+		tracesdk.WithSampler(tracesdk.AlwaysSample()),
+		tracesdk.WithBatcher(exp),
+	)
+
+	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+
+	return tp.Tracer(build.AppName), tp.Shutdown, nil
 }

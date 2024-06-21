@@ -12,15 +12,16 @@ import (
 
 	"github.com/intility/icpctl/internal/build"
 	"github.com/intility/icpctl/internal/redact"
+	"github.com/intility/icpctl/internal/telemetry"
 	"github.com/intility/icpctl/pkg/tokencache"
 )
 
 var (
-	errNoPrinter        = errors.New("printer is required for device code flow")
-	errFlowNotSupported = errors.New("unsupported authentication flow")
-	errNoAccounts       = errors.New("no accounts found")
-	errTokenExpired     = errors.New("token has expired")
-	errDeclinedScopes   = errors.New("scopes have been declined")
+	ErrNoPrinter        = errors.New("printer is required for device code flow")
+	ErrFlowNotSupported = errors.New("unsupported authentication flow")
+	ErrNoAccounts       = errors.New("no accounts found")
+	ErrTokenExpired     = errors.New("token has expired")
+	ErrDeclinedScopes   = errors.New("scopes have been declined")
 )
 
 type Config struct {
@@ -103,22 +104,20 @@ func (a *Authenticator) Authenticate(ctx context.Context) (public.AuthResult, er
 	// confidential clients have a credential, such as a secret or a certificate
 	var result public.AuthResult
 
-	publicClient, err := public.New(
-		a.clientID,
-		public.WithAuthority(a.authority),
-		public.WithCache(a.cache),
-	)
+	ctx, span := telemetry.StartSpan(ctx, "Authenticate")
+	defer span.End()
+
+	publicClient, err := a.createPublicClient(ctx)
 	if err != nil {
-		return result, fmt.Errorf("could not create public client: %w", err)
+		return result, err
 	}
 
-	accounts, err := publicClient.Accounts(ctx)
+	accounts, err := getCachedAccounts(publicClient, ctx)
 	if len(accounts) > 0 {
-		result, err = publicClient.AcquireTokenSilent(
-			ctx,
-			a.scopes,
-			public.WithSilentAccount(accounts[0]),
-		)
+		ctx, span = telemetry.StartSpan(ctx, "SilentAcquisition")
+		defer span.End()
+
+		result, err = a.acquireTokenSilent(ctx, publicClient, accounts[0])
 	}
 
 	if err != nil || len(accounts) == 0 {
@@ -129,11 +128,28 @@ func (a *Authenticator) Authenticate(ctx context.Context) (public.AuthResult, er
 			a.scopes,
 		)
 		if err != nil {
+			span.RecordError(err)
 			return result, fmt.Errorf("could not acquire token: %w", err)
 		}
 	}
 
 	return result, nil
+}
+
+func (a *Authenticator) createPublicClient(ctx context.Context) (public.Client, error) {
+	ctx, span := telemetry.StartSpan(ctx, "CreatePublicClient")
+	defer span.End()
+
+	client, err := public.New(
+		a.clientID,
+		public.WithAuthority(a.authority),
+		public.WithCache(a.cache),
+	)
+	if err != nil {
+		return client, fmt.Errorf("could not create public client: %w", err)
+	}
+
+	return client, nil
 }
 
 func (a *Authenticator) authenticateWithFlow(
@@ -149,8 +165,14 @@ func (a *Authenticator) authenticateWithFlow(
 
 	switch flow {
 	case FlowInteractive:
+		ctx, span := telemetry.StartSpan(ctx, "InteractiveAcquisition")
+		defer span.End()
+
 		result, err = publicClient.AcquireTokenInteractive(ctx, scopes, public.WithRedirectURI(a.redirectURI))
 	case FlowDeviceCode:
+		ctx, span := telemetry.StartSpan(ctx, "DeviceCodeAcquisition")
+		defer span.End()
+
 		var code public.DeviceCode
 
 		code, err = publicClient.AcquireTokenByDeviceCode(ctx, scopes)
@@ -159,7 +181,7 @@ func (a *Authenticator) authenticateWithFlow(
 		}
 
 		if a.printer == nil {
-			return result, errNoPrinter
+			return result, ErrNoPrinter
 		}
 
 		err = a.printer(ctx, code.Result.Message)
@@ -167,10 +189,13 @@ func (a *Authenticator) authenticateWithFlow(
 			return result, redact.Errorf("could not print device code message: %w", redact.Safe(err))
 		}
 
+		ctx, span = telemetry.StartSpan(ctx, "DeviceCodeAuthentication")
+		defer span.End()
+
 		// blocks until user has authenticated
 		result, err = code.AuthenticationResult(ctx)
 	default:
-		return result, errFlowNotSupported
+		return result, ErrFlowNotSupported
 	}
 
 	if err != nil {
@@ -183,46 +208,103 @@ func (a *Authenticator) authenticateWithFlow(
 // IsAuthenticated checks if the user is authenticated by checking if there are any
 // cached accounts.
 func (a *Authenticator) IsAuthenticated(ctx context.Context) (bool, error) {
-	publicClient, err := public.New(
-		a.clientID,
-		public.WithAuthority(a.authority),
-		public.WithCache(a.cache),
-	)
+	ctx, span := telemetry.StartSpan(ctx, "IsAuthenticated")
+	defer span.End()
+
+	publicClient, err := a.createPublicClient(ctx)
 	if err != nil {
-		return false, fmt.Errorf("could not create public client: %w", err)
+		return false, err
 	}
 
-	accounts, err := publicClient.Accounts(ctx)
+	accounts, err := getCachedAccounts(publicClient, ctx)
 	if err != nil {
-		return false, fmt.Errorf("could not get accounts: %w", err)
+		return false, err
 	}
 
 	if len(accounts) == 0 {
-		return false, errNoAccounts
+		return false, ErrNoAccounts
 	}
 
-	var result public.AuthResult
-
-	result, err = publicClient.AcquireTokenSilent(
-		ctx,
-		a.scopes,
-		public.WithSilentAccount(accounts[0]),
-	)
+	result, err := a.acquireTokenSilent(ctx, publicClient, accounts[0])
 	if err != nil {
 		return false, fmt.Errorf("could not acquire token: %w", err)
 	}
 
 	if result.ExpiresOn.Before(time.Now()) {
-		return false, errTokenExpired
+		return false, ErrTokenExpired
 	}
 
 	for _, s := range a.scopes {
 		if slices.Contains(result.DeclinedScopes, s) {
-			return false, errDeclinedScopes
+			return false, ErrDeclinedScopes
 		}
 	}
 
 	return true, nil
+}
+
+func (a *Authenticator) GetCurrentAccount(ctx context.Context) (public.Account, error) {
+	ctx, span := telemetry.StartSpan(ctx, "GetCurrentAccount")
+	defer span.End()
+
+	publicClient, err := a.createPublicClient(ctx)
+	if err != nil {
+		return public.Account{}, err
+	}
+
+	accounts, err := getCachedAccounts(publicClient, ctx)
+	if err != nil {
+		return public.Account{}, err
+	}
+
+	if len(accounts) == 0 {
+		return public.Account{}, ErrNoAccounts
+	}
+
+	return accounts[0], nil
+}
+
+func (a *Authenticator) acquireTokenSilent(
+	ctx context.Context,
+	client public.Client,
+	account public.Account,
+) (public.AuthResult, error) {
+	ctx, span := telemetry.StartSpan(ctx, "SilentAcquisition")
+	defer span.End()
+
+	result, err := client.AcquireTokenSilent(
+		ctx,
+		a.scopes,
+		public.WithSilentAccount(account))
+
+	if err != nil {
+		span.RecordError(err)
+		return result, fmt.Errorf("could not acquire token silently: %w", err)
+	}
+
+	span.AddEvent("acquired token silently")
+
+	return result, nil
+}
+
+func getCachedAccounts(client public.Client, ctx context.Context) ([]public.Account, error) {
+	ctx, span := telemetry.StartSpan(ctx, "GetCachedAccounts")
+	defer span.End()
+
+	accounts, err := client.Accounts(ctx)
+	if err != nil {
+		span.RecordError(err)
+		return nil, fmt.Errorf("could not get accounts: %w", err)
+	}
+
+	if len(accounts) == 0 {
+		span.AddEvent("no cached accounts found")
+		return accounts, nil
+	}
+
+	span.AddEvent("found cached accounts")
+
+	return accounts, nil
 }
 
 type Printer func(ctx context.Context, message string) error

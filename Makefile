@@ -73,11 +73,11 @@ rename: gum ## Rename the project
 
 .PHONY: build
 build: fmt vet ## Build the code generator.
-	go build -o $(LOCALBIN)/$(BINARY_NAME) ./main.go
+	go build -o $(LOCALBIN)/$(BINARY_NAME) ./cmd/icpctl/main.go
 
 .PHONY: run
 run: fmt vet check-env-vars ## Run the example app.
-	go run main.go
+	go run ./cmd/icpctl/main.go
 
 .PHONY: generate
 generate: ## Generate code.
