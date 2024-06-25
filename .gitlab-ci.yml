@@ -64,4 +64,7 @@ release:
     # generate a changelog.
     GIT_DEPTH: 0
   script:
+    # clean up the artifacts
+    - git clean -fdx
+    # run goreleaser
     - goreleaser release --clean
