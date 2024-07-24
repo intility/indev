@@ -108,6 +108,7 @@ func (a *Authenticator) Authenticate(ctx context.Context) (public.AuthResult, er
 	defer span.End()
 
 	span.AddEvent("CreatePublicClient")
+
 	publicClient, err := a.createPublicClient(ctx)
 	if err != nil {
 		return result, err
@@ -171,6 +172,7 @@ func (a *Authenticator) authenticateWithFlow(
 		var code public.DeviceCode
 
 		span.AddEvent("AcquireDeviceCode")
+
 		code, err = publicClient.AcquireTokenByDeviceCode(ctx, scopes)
 		if err != nil {
 			return result, fmt.Errorf("could not acquire device code: %w", err)
