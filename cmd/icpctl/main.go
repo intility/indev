@@ -20,11 +20,13 @@ import (
 	"github.com/intility/icpctl/pkg/rootcommand"
 )
 
+const uploadTelemetryCommand = "upload-telemetry"
+
 //go:generate ../../scripts/completions.sh ../../
 
 func main() {
 	args := os.Args[1:]
-	if len(args) == 1 && args[0] == "upload-telemetry" {
+	if len(args) == 1 && args[0] == uploadTelemetryCommand {
 		err := uploadTelemetry(context.Background())
 		if err != nil {
 			ux.Ferror(os.Stderr, err.Error()+"\n")
@@ -44,17 +46,6 @@ func run(args []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
-
-	go func() {
-		if <-sigChan; true {
-			cancel()
-		}
-	}()
-
-	cmd := rootcommand.GetRootCommand()
-
 	tracer, shutdown, _ := telemetry.InitTracer(ctx, semconv.ProcessCommandArgs(args...))
 	ctx = telemetry.ContextWithTracer(ctx, tracer)
 
@@ -63,7 +54,22 @@ func run(args []string) error {
 	ctx, span := telemetry.StartSpan(ctx, "root")
 	defer span.End()
 
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
+
+	go func() {
+		span.AddEvent("cancellation-signal-listening")
+		if <-sigChan; true {
+			span.AddEvent("cancellation-signal-received")
+			cancel()
+		}
+	}()
+
+	cmd := rootcommand.GetRootCommand()
+
 	err := cmd.ExecuteContext(ctx)
+	span.AddEvent("command-execution-finished")
+
 	if err != nil {
 		// We can introduce warnings here if needed.
 		switch {
@@ -76,22 +82,20 @@ func run(args []string) error {
 	}
 
 	scheduleTelemetryUpload(ctx, args)
+	span.AddEvent("telemetry-upload-process-forked")
 
 	return err //nolint:wrapcheck
 }
 
 func scheduleTelemetryUpload(ctx context.Context, args []string) {
-	// prevent fork-bombing
-	if len(args) == 0 || args[0] == "upload-telemetry" {
+	// prevent fork-bomb
+	if len(args) == 0 || args[0] == uploadTelemetryCommand {
 		return
 	}
 
-	ctx, span := telemetry.StartSpan(ctx, "telemetry.scheduleUpload")
-	defer span.End()
-
 	exe, err := os.Executable()
 	if err == nil {
-		_ = exec.CommandContext(ctx, exe, "upload-telemetry").Start()
+		_ = exec.CommandContext(ctx, exe, uploadTelemetryCommand).Start()
 	}
 }
 

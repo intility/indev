@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intility/icpctl/internal/build"
 	"github.com/intility/icpctl/internal/cli"
@@ -30,6 +31,7 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "account.login")
 			defer span.End()
 
+			span.SetAttributes(attribute.Bool("device_code_flow", useDeviceCodeFlow))
 			cfg := authenticator.Config{
 				ClientID:    build.ClientID(),
 				Authority:   build.Authority(),
