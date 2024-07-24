@@ -59,6 +59,7 @@ func run(args []string) error {
 
 	go func() {
 		span.AddEvent("cancellation-signal-listening")
+
 		if <-sigChan; true {
 			span.AddEvent("cancellation-signal-received")
 			cancel()
@@ -66,8 +67,8 @@ func run(args []string) error {
 	}()
 
 	cmd := rootcommand.GetRootCommand()
-
 	err := cmd.ExecuteContext(ctx)
+
 	span.AddEvent("command-execution-finished")
 
 	if err != nil {
