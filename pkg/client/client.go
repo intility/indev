@@ -10,10 +10,8 @@ import (
 	"time"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/trace"
 
 	"github.com/intility/icpctl/internal/build"
-	"github.com/intility/icpctl/internal/telemetry"
 	"github.com/intility/icpctl/pkg/authenticator"
 )
 
@@ -102,9 +100,6 @@ func (c *RestClient) createAuthenticatedRequest(
 func (c *RestClient) ListClusters(ctx context.Context) (ClusterList, error) {
 	var clusters ClusterList
 
-	ctx, span := telemetry.StartSpan(ctx, "List Clusters API Call")
-	defer span.End()
-
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters", nil)
 	if err != nil {
 		return clusters, err
@@ -118,11 +113,6 @@ func (c *RestClient) ListClusters(ctx context.Context) (ClusterList, error) {
 }
 
 func (c *RestClient) CreateCluster(ctx context.Context, request NewClusterRequest) (*Cluster, error) {
-	var span trace.Span
-
-	ctx, span = telemetry.StartSpan(ctx, "Create Cluster API Call")
-	defer span.End()
-
 	body, err := json.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal request: %w", err)
@@ -142,11 +132,6 @@ func (c *RestClient) CreateCluster(ctx context.Context, request NewClusterReques
 }
 
 func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, error) {
-	var span trace.Span
-
-	ctx, span = telemetry.StartSpan(ctx, "Get Cluster API Call")
-	defer span.End()
-
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters/"+name, nil)
 	if err != nil {
 		return nil, err
@@ -161,11 +146,6 @@ func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, err
 }
 
 func (c *RestClient) DeleteCluster(ctx context.Context, name string) error {
-	var span trace.Span
-
-	ctx, span = telemetry.StartSpan(ctx, "Delete Cluster API Call")
-	defer span.End()
-
 	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/clusters/"+name, nil)
 	if err != nil {
 		return err

@@ -107,6 +107,7 @@ func (a *Authenticator) Authenticate(ctx context.Context) (public.AuthResult, er
 	ctx, span := telemetry.StartSpan(ctx, "Authenticate")
 	defer span.End()
 
+	span.AddEvent("CreatePublicClient")
 	publicClient, err := a.createPublicClient(ctx)
 	if err != nil {
 		return result, err
@@ -114,9 +115,6 @@ func (a *Authenticator) Authenticate(ctx context.Context) (public.AuthResult, er
 
 	accounts, err := getCachedAccounts(publicClient, ctx)
 	if len(accounts) > 0 {
-		ctx, span = telemetry.StartSpan(ctx, "SilentAcquisition")
-		defer span.End()
-
 		result, err = a.acquireTokenSilent(ctx, publicClient, accounts[0])
 	}
 
@@ -136,10 +134,7 @@ func (a *Authenticator) Authenticate(ctx context.Context) (public.AuthResult, er
 	return result, nil
 }
 
-func (a *Authenticator) createPublicClient(ctx context.Context) (public.Client, error) {
-	_, span := telemetry.StartSpan(ctx, "CreatePublicClient")
-	defer span.End()
-
+func (a *Authenticator) createPublicClient(_ context.Context) (public.Client, error) {
 	client, err := public.New(
 		a.clientID,
 		public.WithAuthority(a.authority),
@@ -175,6 +170,7 @@ func (a *Authenticator) authenticateWithFlow(
 
 		var code public.DeviceCode
 
+		span.AddEvent("AcquireDeviceCode")
 		code, err = publicClient.AcquireTokenByDeviceCode(ctx, scopes)
 		if err != nil {
 			return result, fmt.Errorf("could not acquire device code: %w", err)
@@ -189,8 +185,7 @@ func (a *Authenticator) authenticateWithFlow(
 			return result, redact.Errorf("could not print device code message: %w", redact.Safe(err))
 		}
 
-		ctx, span = telemetry.StartSpan(ctx, "DeviceCodeAuthentication")
-		defer span.End()
+		span.AddEvent("WaitForUserAuthentication")
 
 		// blocks until user has authenticated
 		result, err = code.AuthenticationResult(ctx)
