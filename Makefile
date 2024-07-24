@@ -69,11 +69,19 @@ rename: gum ## Rename the project
 	OLD_NAME=$(shell awk 'NR==1{print $$2}' go.mod); \
 	NEW_NAME=$(shell $(GUM) input --prompt "github.com/intility/" --placeholder "new_name"); \
 	./scripts/rename-project.sh $$OLD_NAME github.com/intility/$$NEW_NAME
+
+.PHONY: build-graph
+build-graph: actiongraph ## Generate docs
+	@echo "Generating build graph..."
+	@go clean -cache
+	@CGO_ENABLED=0 go build -o $(LOCALBIN)/$(BINARY_NAME) -debug-actiongraph=$(LOCALBIN)/build-graph.json ./cmd/icpctl/main.go
+	@$(ACTIONGRAPH) -f $(LOCALBIN)/build-graph.json top -n 100
+
 ##@ Build
 
 .PHONY: build
 build: fmt vet ## Build the code generator.
-	go build -o $(LOCALBIN)/$(BINARY_NAME) ./cmd/icpctl/main.go
+	CGO_ENABLED=0 go build -o $(LOCALBIN)/$(BINARY_NAME) ./cmd/icpctl/main.go
 
 .PHONY: run
 run: fmt vet check-env-vars ## Run the example app.
@@ -85,11 +93,11 @@ generate: ## Generate code.
 
 .PHONY: cross-compile
 cross-compile: ## Cross compile the code.
-	GOOS=linux GOARCH=arm64 go build -o $(LOCALBIN)/$(BINARY_NAME)-linux-arm64 ./main.go
-	GOOS=linux GOARCH=amd64 go build -o $(LOCALBIN)/$(BINARY_NAME)-linux-amd64 ./main.go
-	GOOS=darwin GOARCH=arm64 go build -o $(LOCALBIN)/$(BINARY_NAME)-darwin-arm64 ./main.go
-	GOOS=darwin GOARCH=amd64 go build -o $(LOCALBIN)/$(BINARY_NAME)-darwin-amd64 ./main.go
-	GOOS=windows GOARCH=amd64 go build -o $(LOCALBIN)/$(BINARY_NAME)-windows-amd64.exe ./main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o $(LOCALBIN)/$(BINARY_NAME)-linux-arm64 ./main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $(LOCALBIN)/$(BINARY_NAME)-linux-amd64 ./main.go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o $(LOCALBIN)/$(BINARY_NAME)-darwin-arm64 ./main.go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o $(LOCALBIN)/$(BINARY_NAME)-darwin-amd64 ./main.go
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o $(LOCALBIN)/$(BINARY_NAME)-windows-amd64.exe ./main.go
 
 ##@ Pre Deployment
 
@@ -136,6 +144,7 @@ GOVULNCHECK = $(LOCALBIN)/govulncheck-$(GOVULNCHECK_VERSION)
 MOCKERY = $(LOCALBIN)/mockery-$(MOCKERY_VERSION)
 VHS= $(LOCALBIN)/vhs
 GUM= $(LOCALBIN)/gum
+ACTIONGRAPH= $(LOCALBIN)/actiongraph-$(ACTIONGRAPH_VERSION)
 
 ## Tool Versions
 TOOLKIT_TOOLS_GEN_VERSION ?= latest
@@ -145,7 +154,7 @@ GOVULNCHECK_VERSION ?= latest
 MOCKERY_VERSION ?= v2.42.1
 VHS_VERSION ?= latest
 GUM_VERSION ?= latest
-
+ACTIONGRAPH_VERSION ?= latest
 
 .PHONY: golangci-lint
 golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
@@ -184,6 +193,12 @@ $(VHS): $(LOCALBIN)
 gum: $(GUM) ## Download gum locally if necessary.
 $(GUM): $(LOCALBIN)
 	$(call go-install-tool,$(GUM),github.com/charmbracelet/gum,$(GUM_VERSION))
+
+.PHONY: actiongraph
+actiongraph: $(ACTIONGRAPH) ## Download gum locally if necessary.
+$(ACTIONGRAPH): $(LOCALBIN)
+	$(call go-install-tool,$(ACTIONGRAPH),github.com/icio/actiongraph,$(ACTIONGRAPH_VERSION))
+
 # go-install-tool will 'go install' any package with custom target and name of binary, if it doesn't exist
 # $1 - target path with name of binary (ideally with version)
 # $2 - package url which can be installed
