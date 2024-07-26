@@ -12,6 +12,8 @@ SHELL = /usr/bin/env bash -o pipefail
 
 BINARY_NAME=icpctl
 
+DOT := $(shell command -v dot 2> /dev/null)
+
 .PHONY: all
 all: build
 
@@ -71,11 +73,32 @@ rename: gum ## Rename the project
 	./scripts/rename-project.sh $$OLD_NAME github.com/intility/$$NEW_NAME
 
 .PHONY: build-graph
-build-graph: actiongraph ## Generate docs
+build-graph: actiongraph ## Generate build graph
 	@echo "Generating build graph..."
 	@go clean -cache
 	@CGO_ENABLED=0 go build -o $(LOCALBIN)/$(BINARY_NAME) -debug-actiongraph=$(LOCALBIN)/build-graph.json ./cmd/icpctl/main.go
 	@$(ACTIONGRAPH) -f $(LOCALBIN)/build-graph.json top -n 100
+
+Q ?= "**"
+.PHONY: dependency-graph
+ifndef DOT
+dependency-graph: dependency-graph-text ## Generate dependency analysis. Optional Q="<filter>". See gomod graph: https://github.com/Helcaraxan/gomod
+else
+dependency-graph: dependency-graph-svg
+endif
+
+.PHONY: dependency-graph-text
+dependency-graph-text: gomod
+	@echo "Generating dependency graph..." 3>&2 2>&1 1>&3
+	@echo -e '\033[0;33m[NOTE]\033[0m: Graphviz not installed (https://www.graphviz.org/download/). Printing dot file to stdout' 3>&2 2>&1 1>&3
+	@$(GOMOD) graph '$(Q)'
+
+.PHONY: dependency-graph-svg
+dependency-graph-svg: gomod
+	@echo "Generating dependency graph..." 3>&2 2>&1 1>&3
+	$(eval SVG := $(shell mktemp -u).svg)
+	@$(GOMOD) graph '$(Q)' | dot -Tsvg -o $(SVG)
+	open $(SVG)
 
 ##@ Build
 
@@ -142,9 +165,10 @@ GOLANGCI_LINT = $(LOCALBIN)/golangci-lint-$(GOLANGCI_LINT_VERSION)
 GOSEC = $(LOCALBIN)/gosec-$(GOSEC_VERSION)
 GOVULNCHECK = $(LOCALBIN)/govulncheck-$(GOVULNCHECK_VERSION)
 MOCKERY = $(LOCALBIN)/mockery-$(MOCKERY_VERSION)
-VHS= $(LOCALBIN)/vhs
-GUM= $(LOCALBIN)/gum
-ACTIONGRAPH= $(LOCALBIN)/actiongraph-$(ACTIONGRAPH_VERSION)
+VHS = $(LOCALBIN)/vhs-$(VHS_VERSION)
+GUM = $(LOCALBIN)/gum-$(GUM_VERSION)
+ACTIONGRAPH = $(LOCALBIN)/actiongraph-$(ACTIONGRAPH_VERSION)
+GOMOD = $(LOCALBIN)/gomod-$(GOMOD_VERSION)
 
 ## Tool Versions
 TOOLKIT_TOOLS_GEN_VERSION ?= latest
@@ -155,6 +179,7 @@ MOCKERY_VERSION ?= v2.42.1
 VHS_VERSION ?= latest
 GUM_VERSION ?= latest
 ACTIONGRAPH_VERSION ?= latest
+GOMOD_VERSION ?= latest
 
 .PHONY: golangci-lint
 golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
@@ -195,9 +220,14 @@ $(GUM): $(LOCALBIN)
 	$(call go-install-tool,$(GUM),github.com/charmbracelet/gum,$(GUM_VERSION))
 
 .PHONY: actiongraph
-actiongraph: $(ACTIONGRAPH) ## Download gum locally if necessary.
+actiongraph: $(ACTIONGRAPH) ## Download actiongraph locally if necessary.
 $(ACTIONGRAPH): $(LOCALBIN)
 	$(call go-install-tool,$(ACTIONGRAPH),github.com/icio/actiongraph,$(ACTIONGRAPH_VERSION))
+
+.PHONY: gomod
+gomod: $(GOMOD) ## Download godepgraph locally if necessary.
+$(GOMOD): $(LOCALBIN)
+	$(call go-install-tool,$(GOMOD),github.com/Helcaraxan/gomod,$(GOMOD_VERSION))
 
 # go-install-tool will 'go install' any package with custom target and name of binary, if it doesn't exist
 # $1 - target path with name of binary (ideally with version)
