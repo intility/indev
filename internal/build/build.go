@@ -22,7 +22,7 @@ var (
 	//goland:noinspection GoBoolExpressions
 	IsDev = Version == "0.0.0-dev" && !forceProd
 
-	PlatformBaseURI = "https://container-platform-backend.apps.hypershift.intilitycloud.com"
+	PlatformBaseURI = "https://container-platform-backend.apps.intilitycloud.com"
 
 	// SentryDSN is injected in the build from the CI/CD pipeline.
 	// It is disabled by default.
@@ -30,7 +30,7 @@ var (
 
 	// OTELCollectorEndpoint is injected in the build from the CI/CD pipeline.
 	// It is disabled by default.
-	OTELCollectorEndpoint = "https://otlp-collector.apps.hypershift.intilitycloud.com"
+	OTELCollectorEndpoint = "https://otel-collector.apps.intilitycloud.com"
 	OTELCollectorToken    = ""
 
 	AuthPlatformAudience = "api://cd5aff56-575c-4e7e-b68e-3f67fa42eb31/user_impersonation"
