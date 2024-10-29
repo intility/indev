@@ -63,7 +63,7 @@ linters-settings:
     sections:
       - standard
       - default
-      - prefix(github.com/intility/icpctl)
+      - prefix(github.com/intility/idpctl)
   depguard:
     rules:
       prevent_unmaintained_packages:

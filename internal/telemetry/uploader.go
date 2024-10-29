@@ -9,8 +9,8 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	coltracepb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 
-	"github.com/intility/icpctl/internal/env"
-	"github.com/intility/icpctl/internal/ux"
+	"github.com/intility/idpctl/internal/env"
+	"github.com/intility/idpctl/internal/ux"
 )
 
 const uploadTimeout = 5 * time.Second

@@ -1,7 +1,7 @@
 
-# ICPCTL
+# IDPCTL
 
-Minctl is a command-line interface (CLI) tool designed for managing Kubernetes resources efficiently. With Minctl, you can perform a variety of operations such as creating and deleting clusters, deploying and managing applications, and more. It is built with simplicity and ease of use in mind, making Kubernetes operations more accessible.
+`idpctl` is a command-line interface (CLI) tool designed for managing Intility Developer Platform resources. With `idpctl`, you can perform a variety of operations such as creating and deleting clusters, deploying and managing applications, and more. It is built with simplicity and ease of use in mind, making Kubernetes operations more accessible.
 
 ## Features
 
@@ -20,66 +20,66 @@ Before you begin, ensure that you have the following installed:
 
 ### Installation
 
-To install Minctl, follow these steps:
+To install `idpctl`, follow these steps:
 
 1. Clone the repository:
 
     ```sh
-    git clone git@gitlab.intility.com:developer-infrastructure/platform-2.0/icpctl.git
-    cd icpctl
+    git clone git@gitlab.intility.com:developer-infrastructure/platform-2.0/idpctl.git
+    cd idpctl
     ```
 
 2. Build from source:
 
     ```sh
-    go build -o icpctl main.go
+    go build -o idpctl main.go
     ```
 
 3. (Optional) Move the binary to a location in your PATH:
 
     ```sh
-    mv icpctl /usr/local/bin/icpctl
+    mv idpctl /usr/local/bin/idpctl
     ```
 
 ### Usage
 
-Here are some of the commonly used Minctl commands:
+Here are some of the commonly used `idpctl` commands:
 
 - Create a cluster:
     ```sh
-    icpctl cluster create
+    idpctl cluster create
     ```
 
 - List clusters:
     ```sh
-    icpctl cluster list
+    idpctl cluster list
     ```
 
 - Delete a cluster:
     ```sh
-    icpctl cluster delete --name <cluster-name>
+    idpctl cluster delete --name <cluster-name>
     ```
 
 - Deploy an application:
     ```sh
-    icpctl app deploy --path <app-manifest-path>
+    idpctl app deploy --path <app-manifest-path>
     ```
 
 - Delete an application:
     ```sh
-    icpctl app delete --path <app-manifest-path>
+    idpctl app delete --path <app-manifest-path>
     ```
 
 - Forward a port:
     ```sh
-    icpctl app port-forward --deployment <deployment-name>
+    idpctl app port-forward --deployment <deployment-name>
     ```
 
-For a full list of command and options, run `icpctl --help`.
+For a full list of command and options, run `idpctl --help`.
 
 ## Telemetry
 
-Minctl includes a telemetry feature that helps improve the tool by collecting anonymous usage data. 
+`idpctl` includes a telemetry feature that helps improve the tool by collecting anonymous usage data. 
 The telemetry system gathers information such as command usage, performance metrics, and error reports. 
 This data is crucial for identifying common issues, understanding user behavior, and prioritizing new features.
 
@@ -97,7 +97,7 @@ Additionally, data is stored securely and in compliance with relevant data prote
 
 ### Opting Out
 
-Telemetry is enabled by default to help us improve Minctl. However, respecting user choice is paramount, 
+Telemetry is enabled by default to help us improve `idpctl`. However, respecting user choice is paramount, 
 and you can opt-out of telemetry at any time. To disable telemetry, set the environment variable 
 `DO_NOT_TRACK` to `1`.
 
@@ -107,7 +107,7 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 
 ## Acknowledgments
 
-- The `icpctl` team and all contributors
+- The `idpctl` team and all contributors
 - The Go and Kubernetes communities for their tools and libraries
 
 ## Contact

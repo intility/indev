@@ -8,11 +8,11 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/intility/icpctl/internal/redact"
-	"github.com/intility/icpctl/internal/telemetry"
-	"github.com/intility/icpctl/internal/ux"
-	"github.com/intility/icpctl/pkg/client"
-	"github.com/intility/icpctl/pkg/clientset"
+	"github.com/intility/idpctl/internal/redact"
+	"github.com/intility/idpctl/internal/telemetry"
+	"github.com/intility/idpctl/internal/ux"
+	"github.com/intility/idpctl/pkg/client"
+	"github.com/intility/idpctl/pkg/clientset"
 )
 
 var errInvalidOutputFormat = errors.New(`must be one of "wide", "json", "yaml"`)

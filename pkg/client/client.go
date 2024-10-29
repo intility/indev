@@ -11,8 +11,8 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
-	"github.com/intility/icpctl/internal/build"
-	"github.com/intility/icpctl/pkg/authenticator"
+	"github.com/intility/idpctl/internal/build"
+	"github.com/intility/idpctl/pkg/authenticator"
 )
 
 const (

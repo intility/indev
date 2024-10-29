@@ -16,8 +16,8 @@ before:
     - go generate ./...
 
 builds:
-  - id: icpctl
-    main: cmd/icpctl/main.go
+  - id: idpctl
+    main: cmd/idpctl/main.go
     env:
       - CGO_ENABLED=0
     ldflags:
@@ -26,23 +26,23 @@ builds:
       - -X main.commit={{.Commit}}
       - -X main.date={{.CommitDate}}
       - -X main.builtBy=goreleaser"
-      - -X github.com/intility/icpctl/internal/build.Version={{.Version}}
-      - -X github.com/intility/icpctl/internal/build.Commit={{.ShortCommit}}
-      - -X github.com/intility/icpctl/internal/build.CommitDate={{.CommitDate}}
+      - -X github.com/intility/idpctl/internal/build.Version={{.Version}}
+      - -X github.com/intility/idpctl/internal/build.Commit={{.ShortCommit}}
+      - -X github.com/intility/idpctl/internal/build.CommitDate={{.CommitDate}}
       # telemetry
-      - -X github.com/intility/icpctl/internal/build.OTELCollectorEndpoint={{.Env.OTLP_ENDPOINT}}
-      - -X github.com/intility/icpctl/internal/build.OTELCollectorToken={{.Env.OTLP_TOKEN}}
-      - -X github.com/intility/icpctl/internal/build.SentryDSN={{.Env.SENTRY_DSN}}
+      - -X github.com/intility/idpctl/internal/build.OTELCollectorEndpoint={{.Env.OTLP_ENDPOINT}}
+      - -X github.com/intility/idpctl/internal/build.OTELCollectorToken={{.Env.OTLP_TOKEN}}
+      - -X github.com/intility/idpctl/internal/build.SentryDSN={{.Env.SENTRY_DSN}}
       # authentication
-      - -X github.com/intility/icpctl/internal/build.AuthPlatformAudience={{.Env.AUTH_AUDIENCE}}
-      - -X github.com/intility/icpctl/internal/build.AuthAuthority={{.Env.AUTH_AUTHORITY}}
-      - -X github.com/intility/icpctl/internal/build.AuthClientID={{.Env.AUTH_CLIENT_ID}}
-      - -X github.com/intility/icpctl/internal/build.AuthRedirectURI={{.Env.AUTH_REDIRECT_URI}}
+      - -X github.com/intility/idpctl/internal/build.AuthPlatformAudience={{.Env.AUTH_AUDIENCE}}
+      - -X github.com/intility/idpctl/internal/build.AuthAuthority={{.Env.AUTH_AUTHORITY}}
+      - -X github.com/intility/idpctl/internal/build.AuthClientID={{.Env.AUTH_CLIENT_ID}}
+      - -X github.com/intility/idpctl/internal/build.AuthRedirectURI={{.Env.AUTH_REDIRECT_URI}}
       # application
-      - -X github.com/intility/icpctl/internal/build.PlatformBaseURI={{.Env.PLATFORM_BASE_URI}}
+      - -X github.com/intility/idpctl/internal/build.PlatformBaseURI={{.Env.PLATFORM_BASE_URI}}
     mod_timestamp: "{{.CommitTimestamp}}"
     flags: "-trimpath"
-    binary: icpctl
+    binary: idpctl
     goos:
       - linux
       - windows
@@ -56,7 +56,7 @@ gitlab_urls:
 release:
   gitlab:
     owner: "developer-infrastructure/platform-2.0/minato"
-    name: "icpctl" #icpctl
+    name: "idpctl" #idpctl
 
 archives:
   - format: tar.gz
@@ -66,7 +66,7 @@ archives:
         format: zip
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
-      icpctl_
+      idpctl_
       {{- .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
@@ -78,25 +78,25 @@ archives:
       - completions/*
 
 brews:
-  - name: icpctl
+  - name: idpctl
     repository:
       owner: homebrew
       name: tap
       token: "{{ .Env.GITLAB_TOKEN }}"
-    homepage: https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/icpctl
+    homepage: https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/idpctl
     description: "A CLI for managing container platform resources."
     goarm: 6
     goamd64: v1
     directory: Formula
-    url_template: https://gitlab.intility.com/api/v4/projects/{{ .Env.CI_PROJECT_ID }}/packages/generic/icpctl/{{ trimprefix .Tag "v"}}/{{ .ArtifactName }}
+    url_template: https://gitlab.intility.com/api/v4/projects/{{ .Env.CI_PROJECT_ID }}/packages/generic/idpctl/{{ trimprefix .Tag "v"}}/{{ .ArtifactName }}
     url_headers:
       - "Authorization: Basic {{ .Env.DOWNLOADER_BASIC_TOKEN }}"
-    #url_template: "https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/icpctl/-/releases/{{ .Tag }}/downloads/{{ .ArtifactName }}"
+    #url_template: "https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/idpctl/-/releases/{{ .Tag }}/downloads/{{ .ArtifactName }}"
     install: |
-      bin.install "icpctl"
-      bash_completion.install "completions/icpctl.bash" => "icpctl"
-      zsh_completion.install "completions/icpctl.zsh" => "_icpctl"
-      fish_completion.install "completions/icpctl.fish"
+      bin.install "idpctl"
+      bash_completion.install "completions/idpctl.bash" => "idpctl"
+      zsh_completion.install "completions/idpctl.zsh" => "_idpctl"
+      fish_completion.install "completions/idpctl.fish"
 
 changelog:
   sort: asc

@@ -15,8 +15,8 @@ import (
 	coltracepb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/intility/icpctl/internal/telemetry/exporters/tracetransform"
-	"github.com/intility/icpctl/internal/ux"
+	"github.com/intility/idpctl/internal/telemetry/exporters/tracetransform"
+	"github.com/intility/idpctl/internal/ux"
 )
 
 const (
@@ -35,7 +35,7 @@ var _ sdktrace.SpanExporter = (*TraceExporter)(nil)
 
 func NewTraceExporter() (TraceExporter, error) {
 	return TraceExporter{
-		filePath: filepath.Join(xdg.StateHome, "icpctl", "traces"),
+		filePath: filepath.Join(xdg.StateHome, "idpctl", "traces"),
 	}, nil
 }
 

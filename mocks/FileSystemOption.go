@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	credentialstore "github.com/intility/icpctl/pkg/credentialstore"
+	credentialstore "github.com/intility/idpctl/pkg/credentialstore"
 	mock "github.com/stretchr/testify/mock"
 )
 

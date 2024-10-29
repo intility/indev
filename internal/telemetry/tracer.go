@@ -13,9 +13,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
 
-	"github.com/intility/icpctl/internal/build"
-	"github.com/intility/icpctl/internal/env"
-	"github.com/intility/icpctl/internal/telemetry/exporters"
+	"github.com/intility/idpctl/internal/build"
+	"github.com/intility/idpctl/internal/env"
+	"github.com/intility/idpctl/internal/telemetry/exporters"
 )
 
 var tracerKey = struct{}{}

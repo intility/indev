@@ -1,4 +1,4 @@
-module github.com/intility/icpctl
+module github.com/intility/idpctl
 
 go 1.22
 

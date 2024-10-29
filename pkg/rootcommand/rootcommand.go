@@ -3,14 +3,14 @@ package rootcommand
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/intility/icpctl/internal/build"
-	"github.com/intility/icpctl/internal/telemetry"
-	"github.com/intility/icpctl/internal/ux"
-	"github.com/intility/icpctl/pkg/authenticator"
-	"github.com/intility/icpctl/pkg/client"
-	"github.com/intility/icpctl/pkg/clientset"
-	"github.com/intility/icpctl/pkg/commands/account"
-	"github.com/intility/icpctl/pkg/commands/cluster"
+	"github.com/intility/idpctl/internal/build"
+	"github.com/intility/idpctl/internal/telemetry"
+	"github.com/intility/idpctl/internal/ux"
+	"github.com/intility/idpctl/pkg/authenticator"
+	"github.com/intility/idpctl/pkg/client"
+	"github.com/intility/idpctl/pkg/clientset"
+	"github.com/intility/idpctl/pkg/commands/account"
+	"github.com/intility/idpctl/pkg/commands/cluster"
 )
 
 func GetRootCommand() *cobra.Command {
@@ -39,7 +39,7 @@ func getVersionCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
 		Short: "Print the version information",
-		Long:  `Print the version information of icpctl.`,
+		Long:  `Print the version information of idpctl.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			_, span := telemetry.StartSpan(cmd.Context(), "version")
 			defer span.End()

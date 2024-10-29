@@ -13,7 +13,7 @@ build:
   image: golang:${GO_VERSION}
   script:
     - mkdir -p bin
-    - go build -o bin/icpctl cmd/icpctl/main.go
+    - go build -o bin/idpctl cmd/idpctl/main.go
   needs: []
 
 test:

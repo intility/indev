@@ -6,10 +6,10 @@ Set Height 400
 Set Padding 5
 Set TypingSpeed 0.1
 Sleep 2s
-Type "icpctl -h"
+Type "idpctl -h"
 Enter
 Sleep 4s
-Type "icpctl cluster create"
+Type "idpctl cluster create"
 Enter
 Sleep 4s
 Type "my-cluster"
