@@ -84,7 +84,7 @@ brews:
       name: tap
       token: "{{ .Env.GITLAB_TOKEN }}"
     homepage: https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/idpctl
-    description: "A CLI for managing container platform resources."
+    description: "A CLI for managing developer platform resources."
     goarm: 6
     goamd64: v1
     directory: Formula

@@ -21,7 +21,7 @@ func GetRootCommand() *cobra.Command {
 
 	rootCmd := &cobra.Command{
 		Use:   build.AppName,
-		Short: build.AppName + " controls your Intility Container Platform instance.",
+		Short: build.AppName + " controls your Intility Developer Platform instance.",
 		Long:  ``,
 		Run:   showHelp,
 	}
@@ -52,8 +52,8 @@ func getVersionCommand() *cobra.Command {
 func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cluster",
-		Short: "Manage your Intility Container Platform clusters",
-		Long:  `Manage your Intility Container Platform clusters`,
+		Short: "Manage your Intility Developer Platform clusters",
+		Long:  `Manage your Intility Developer Platform clusters`,
 		Run:   showHelp,
 	}
 
@@ -67,8 +67,8 @@ func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 func getAccountCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "account",
-		Short: "Manage your Intility Container Platform account",
-		Long:  `Manage your Intility Container Platform account`,
+		Short: "Manage your Intility Developer Platform account",
+		Long:  `Manage your Intility Developer Platform account`,
 		Run:   showHelp,
 	}
 
