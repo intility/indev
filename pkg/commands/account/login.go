@@ -25,8 +25,8 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "login",
-		Short: "Sign in to Intility Container Platform",
-		Long:  `Sign in to Intility Container Platform using your Intility credentials.`,
+		Short: "Sign in to the Intility Developer Platform",
+		Long:  `Sign in to the Intility Developer Platform using your Intility credentials.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "account.login")
 			defer span.End()
