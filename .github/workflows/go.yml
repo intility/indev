@@ -35,5 +35,6 @@ jobs:
         args: release --clean
         version: 2
       env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TAP_REPO_GITHUB_TOKEN: ${{ secrets.TAP_REPO_GITHUB_TOKEN }}
         DOWNLOADER_GITHUB_TOKEN: ${{ secrets.DOWNLOADER_GITHUB_TOKEN }}
