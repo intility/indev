@@ -10,11 +10,11 @@ import (
 	"github.com/matishsiao/goInfo"
 )
 
-var forceProd, _ = strconv.ParseBool(os.Getenv("IDPCTL_PROD"))
+var forceProd, _ = strconv.ParseBool(os.Getenv("INDEV_PROD"))
 
 // Variables in this file are set via ldflags.
 var (
-	AppName    = "idpctl"
+	AppName    = "indev"
 	Version    = "0.0.0-dev"
 	Commit     = "none"
 	CommitDate = "unknown"
@@ -39,7 +39,7 @@ var (
 	AuthRedirect         = "http://localhost:42069"
 )
 
-// User-presentable names of operating systems supported by idpctl.
+// User-presentable names of operating systems supported by indev.
 const (
 	OSLinux  = "Linux"
 	OSDarwin = "macOS"

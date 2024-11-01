@@ -10,10 +10,10 @@ import (
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache"
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
 
-	"github.com/intility/idpctl/internal/build"
-	"github.com/intility/idpctl/internal/redact"
-	"github.com/intility/idpctl/internal/telemetry"
-	"github.com/intility/idpctl/pkg/tokencache"
+	"github.com/intility/indev/internal/build"
+	"github.com/intility/indev/internal/redact"
+	"github.com/intility/indev/internal/telemetry"
+	"github.com/intility/indev/pkg/tokencache"
 )
 
 var (

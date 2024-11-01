@@ -1,7 +1,7 @@
 
-# IDPCTL
+# Developer Platform CLI
 
-`idpctl` is a command-line interface (CLI) tool designed for managing Intility Developer Platform resources. With `idpctl`, you can perform a variety of operations such as creating and deleting clusters, deploying and managing applications, and more. It is built with simplicity and ease of use in mind, making Kubernetes operations more accessible.
+`indev` is a command-line interface (CLI) tool designed for managing Intility Developer Platform resources. With `indev`, you can perform a variety of operations such as creating and deleting clusters, deploying and managing applications, and more. It is built with simplicity and ease of use in mind, making Kubernetes operations more accessible.
 
 ## Features
 
@@ -20,66 +20,66 @@ Before you begin, ensure that you have the following installed:
 
 ### Installation
 
-To install `idpctl`, follow these steps:
+To install `indev`, follow these steps:
 
 1. Clone the repository:
 
     ```sh
-    git clone git@gitlab.intility.com:developer-infrastructure/platform-2.0/idpctl.git
-    cd idpctl
+    git clone git@gitlab.intility.com:developer-infrastructure/platform-2.0/indev.git
+    cd indev
     ```
 
 2. Build from source:
 
     ```sh
-    go build -o idpctl main.go
+    go build -o indev main.go
     ```
 
 3. (Optional) Move the binary to a location in your PATH:
 
     ```sh
-    mv idpctl /usr/local/bin/idpctl
+    mv indev /usr/local/bin/indev
     ```
 
 ### Usage
 
-Here are some of the commonly used `idpctl` commands:
+Here are some of the commonly used `indev` commands:
 
 - Create a cluster:
     ```sh
-    idpctl cluster create
+    indev cluster create
     ```
 
 - List clusters:
     ```sh
-    idpctl cluster list
+    indev cluster list
     ```
 
 - Delete a cluster:
     ```sh
-    idpctl cluster delete --name <cluster-name>
+    indev cluster delete --name <cluster-name>
     ```
 
 - Deploy an application:
     ```sh
-    idpctl app deploy --path <app-manifest-path>
+    indev app deploy --path <app-manifest-path>
     ```
 
 - Delete an application:
     ```sh
-    idpctl app delete --path <app-manifest-path>
+    indev app delete --path <app-manifest-path>
     ```
 
 - Forward a port:
     ```sh
-    idpctl app port-forward --deployment <deployment-name>
+    indev app port-forward --deployment <deployment-name>
     ```
 
-For a full list of command and options, run `idpctl --help`.
+For a full list of command and options, run `indev --help`.
 
 ## Telemetry
 
-`idpctl` includes a telemetry feature that helps improve the tool by collecting anonymous usage data. 
+`indev` includes a telemetry feature that helps improve the tool by collecting anonymous usage data. 
 The telemetry system gathers information such as command usage, performance metrics, and error reports. 
 This data is crucial for identifying common issues, understanding user behavior, and prioritizing new features.
 
@@ -97,7 +97,7 @@ Additionally, data is stored securely and in compliance with relevant data prote
 
 ### Opting Out
 
-Telemetry is enabled by default to help us improve `idpctl`. However, respecting user choice is paramount, 
+Telemetry is enabled by default to help us improve `indev`. However, respecting user choice is paramount, 
 and you can opt-out of telemetry at any time. To disable telemetry, set the environment variable 
 `DO_NOT_TRACK` to `1`.
 
@@ -107,7 +107,7 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 
 ## Acknowledgments
 
-- The `idpctl` team and all contributors
+- The `indev` team and all contributors
 - The Go and Kubernetes communities for their tools and libraries
 
 ## Contact

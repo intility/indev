@@ -5,11 +5,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/intility/idpctl/internal/redact"
-	"github.com/intility/idpctl/internal/telemetry"
-	"github.com/intility/idpctl/internal/ux"
-	"github.com/intility/idpctl/pkg/authenticator"
-	"github.com/intility/idpctl/pkg/clientset"
+	"github.com/intility/indev/internal/redact"
+	"github.com/intility/indev/internal/telemetry"
+	"github.com/intility/indev/internal/ux"
+	"github.com/intility/indev/pkg/authenticator"
+	"github.com/intility/indev/pkg/clientset"
 )
 
 func NewShowCommand(set clientset.ClientSet) *cobra.Command {

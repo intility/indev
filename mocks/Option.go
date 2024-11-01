@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	tokencache "github.com/intility/idpctl/pkg/tokencache"
+	tokencache "github.com/intility/indev/pkg/tokencache"
 	mock "github.com/stretchr/testify/mock"
 )
 

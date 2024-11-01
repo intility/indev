@@ -8,7 +8,7 @@ import (
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache"
 	"github.com/adrg/xdg"
 
-	"github.com/intility/idpctl/pkg/credentialstore"
+	"github.com/intility/indev/pkg/credentialstore"
 )
 
 type TokenCache struct {
@@ -18,7 +18,7 @@ type TokenCache struct {
 type Option func(*TokenCache)
 
 func New(options ...Option) *TokenCache {
-	cacheFilePath := filepath.Join(xdg.DataHome, "idpctl", "msal.cache")
+	cacheFilePath := filepath.Join(xdg.DataHome, "indev", "msal.cache")
 
 	tc := &TokenCache{
 		store: credentialstore.NewFilesystemCredentialStore(cacheFilePath),

@@ -30,7 +30,7 @@ for file in "${file_paths[@]}"; do
     sed -i '' "s|$OLD_BASE_NAME|$NEW_BASE_NAME|g" "$file"
 done
 
-# Rename BINARY_NAME=idpctl to BINARY_NAME=NEW_BIN_NAME where NEW_BIN_NAME is the last segment from NEW_NAME delimited by "/"
+# Rename BINARY_NAME=indev to BINARY_NAME=NEW_BIN_NAME where NEW_BIN_NAME is the last segment from NEW_NAME delimited by "/"
 sed -i '' "s|$OLD_BASE_NAME|$NEW_BASE_NAME|g" Makefile
 sed -i '' "s|$OLD_BASE_NAME|$NEW_BASE_NAME|g" .gitlab-ci.yml
 
