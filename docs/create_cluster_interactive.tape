@@ -6,10 +6,10 @@ Set Height 400
 Set Padding 5
 Set TypingSpeed 0.1
 Sleep 2s
-Type "idpctl -h"
+Type "indev -h"
 Enter
 Sleep 4s
-Type "idpctl cluster create"
+Type "indev cluster create"
 Enter
 Sleep 4s
 Type "my-cluster"

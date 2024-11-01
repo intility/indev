@@ -10,7 +10,7 @@ endif
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
 
-BINARY_NAME=idpctl
+BINARY_NAME=indev
 
 DOT := $(shell command -v dot 2> /dev/null)
 
@@ -76,7 +76,7 @@ rename: gum ## Rename the project
 build-graph: actiongraph ## Generate build graph
 	@echo "Generating build graph..."
 	@go clean -cache
-	@CGO_ENABLED=0 go build -o $(LOCALBIN)/$(BINARY_NAME) -debug-actiongraph=$(LOCALBIN)/build-graph.json ./cmd/idpctl/main.go
+	@CGO_ENABLED=0 go build -o $(LOCALBIN)/$(BINARY_NAME) -debug-actiongraph=$(LOCALBIN)/build-graph.json ./cmd/indev/main.go
 	@$(ACTIONGRAPH) -f $(LOCALBIN)/build-graph.json top -n 100
 
 Q ?= "**"
@@ -104,11 +104,11 @@ dependency-graph-svg: gomod
 
 .PHONY: build
 build: fmt vet ## Build the code generator.
-	CGO_ENABLED=0 go build -o $(LOCALBIN)/$(BINARY_NAME) ./cmd/idpctl/main.go
+	CGO_ENABLED=0 go build -o $(LOCALBIN)/$(BINARY_NAME) ./cmd/indev/main.go
 
 .PHONY: run
 run: fmt vet check-env-vars ## Run the example app.
-	go run ./cmd/idpctl/main.go
+	go run ./cmd/indev/main.go
 
 .PHONY: generate
 generate: ## Generate code.

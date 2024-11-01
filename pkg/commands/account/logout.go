@@ -5,9 +5,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/intility/idpctl/internal/telemetry"
-	"github.com/intility/idpctl/pkg/clientset"
-	"github.com/intility/idpctl/pkg/tokencache"
+	"github.com/intility/indev/internal/telemetry"
+	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/tokencache"
 )
 
 func NewLogoutCommand(set clientset.ClientSet) *cobra.Command {

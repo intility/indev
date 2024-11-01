@@ -5,7 +5,7 @@ import (
 	"os/user"
 	"strconv"
 
-	"github.com/intility/idpctl/internal/build"
+	"github.com/intility/indev/internal/build"
 )
 
 const (

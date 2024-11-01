@@ -12,11 +12,11 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/term"
 
-	"github.com/intility/idpctl/internal/build"
-	"github.com/intility/idpctl/internal/redact"
-	"github.com/intility/idpctl/internal/telemetry"
-	"github.com/intility/idpctl/internal/ux"
-	"github.com/intility/idpctl/pkg/authenticator"
+	"github.com/intility/indev/internal/build"
+	"github.com/intility/indev/internal/redact"
+	"github.com/intility/indev/internal/telemetry"
+	"github.com/intility/indev/internal/ux"
+	"github.com/intility/indev/pkg/authenticator"
 )
 
 const (

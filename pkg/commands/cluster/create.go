@@ -8,12 +8,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/intility/idpctl/internal/redact"
-	"github.com/intility/idpctl/internal/telemetry"
-	"github.com/intility/idpctl/internal/ux"
-	"github.com/intility/idpctl/internal/wizard"
-	"github.com/intility/idpctl/pkg/client"
-	"github.com/intility/idpctl/pkg/clientset"
+	"github.com/intility/indev/internal/redact"
+	"github.com/intility/indev/internal/telemetry"
+	"github.com/intility/indev/internal/ux"
+	"github.com/intility/indev/internal/wizard"
+	"github.com/intility/indev/pkg/client"
+	"github.com/intility/indev/pkg/clientset"
 )
 
 const (

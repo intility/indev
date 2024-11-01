@@ -14,10 +14,10 @@ import (
 
 	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
 
-	"github.com/intility/idpctl/internal/telemetry"
-	"github.com/intility/idpctl/internal/telemetry/exporters"
-	"github.com/intility/idpctl/internal/ux"
-	"github.com/intility/idpctl/pkg/rootcommand"
+	"github.com/intility/indev/internal/telemetry"
+	"github.com/intility/indev/internal/telemetry/exporters"
+	"github.com/intility/indev/internal/ux"
+	"github.com/intility/indev/pkg/rootcommand"
 )
 
 const uploadTelemetryCommand = "upload-telemetry"

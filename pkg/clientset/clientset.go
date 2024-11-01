@@ -9,9 +9,9 @@ import (
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
 	"github.com/spf13/cobra"
 
-	"github.com/intility/idpctl/internal/build"
-	"github.com/intility/idpctl/internal/telemetry"
-	"github.com/intility/idpctl/pkg/client"
+	"github.com/intility/indev/internal/build"
+	"github.com/intility/indev/internal/telemetry"
+	"github.com/intility/indev/pkg/client"
 )
 
 var errNotAuthenticatedPreHook = errors.New("you need to sign in before executing this operation")

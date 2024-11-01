@@ -7,6 +7,6 @@ filename: "{{.MockName}}.go"
 dir: "mocks"
 outpkg: "mocks"
 packages:
-  github.com/intility/idpctl/pkg/credentialstore:
-  github.com/intility/idpctl/pkg/tokencache:
+  github.com/intility/indev/pkg/credentialstore:
+  github.com/intility/indev/pkg/tokencache:
   github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache:
