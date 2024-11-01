@@ -9,9 +9,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
-jobs:
+permissions:
+  contents: write
 
-  build:
+jobs:
+  build, test, release:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -32,3 +34,6 @@ jobs:
       with:
         args: release --clean
         version: 2
+      env:
+        TAP_REPO_GITHUB_TOKEN: ${{ secrets.TAP_REPO_GITHUB_TOKEN }}
+        DOWNLOADER_GITHUB_TOKEN: ${{ secrets.DOWNLOADER_GITHUB_TOKEN }}
