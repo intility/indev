@@ -9,11 +9,9 @@ Sleep 2s
 Type "indev -h"
 Enter
 Sleep 4s
-Type "indev cluster create"
+Type "indev cluster create -n my-cluster --nodes 2 --preset minimal"
 Enter
-Sleep 4s
-Type "my-cluster"
-Enter
-Sleep 1s
+Sleep 2s
+Type "indev cluster list"
 Enter
 Sleep 5s
