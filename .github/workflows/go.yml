@@ -29,3 +29,5 @@ jobs:
 
     - name: GoReleaser Action
       uses: goreleaser/goreleaser-action@v5.1.0
+      with:
+        args: release --clean
