@@ -40,3 +40,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TAP_REPO_GITHUB_TOKEN: ${{ secrets.TAP_REPO_GITHUB_TOKEN }}
         DOWNLOADER_GITHUB_TOKEN: ${{ secrets.DOWNLOADER_GITHUB_TOKEN }}
+        OTLP_ENDPOINT: ${{ vars.OTLP_ENDPOINT }}
+        OTLP_TOKEN: ${{ vars.OTLP_TOKEN }}
+        SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+        AUTH_AUDIENCE: ${{ vars.AUTH_AUDIENCE }}
+        AUTH_AUTHORITY: ${{ vars.AUTH_AUTHORITY }}
+        AUTH_CLIENT_ID: ${{ vars.AUTH_CLIENT_ID }}
+        AUTH_REDIRECT_URI: ${{ vars.AUTH_REDIRECT_URI }}
+        PLATFORM_BASE_URI: ${{ vars.PLATFORM_BASE_URI }}
