@@ -77,7 +77,7 @@ brews:
     repository:
       owner: intility
       name: homebrew-tap
-      token: 'Authorization: bearer #{ENV["TAP_REPO_GITHUB_TOKEN"]}'
+      token: "{{ .Env.TAP_REPO_GITHUB_TOKEN }}"
     homepage: https://developers.intility.com
     description: "A CLI for managing developer platform resources."
     goarm: 6
