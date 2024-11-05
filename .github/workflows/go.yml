@@ -35,6 +35,8 @@ jobs:
       with:
         app-id: ${{ vars.HOMEBREW_TAP_APP_ID }}
         private-key: ${{ secrets.HOMEBREW_TAP_APP_PRIVATE_KEY }}
+        owner: intility
+        repositories: homebrew-tap
 
     - name: GoReleaser Action
       uses: goreleaser/goreleaser-action@v5.1.0
