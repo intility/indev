@@ -29,6 +29,13 @@ jobs:
     - name: Test
       run: go test ./...
 
+    - name: Generate GitHub app token for Homebrew Tap App
+      id: generate-app-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ vars.HOMEBREW_TAP_APP_ID }}
+        private-key: ${{ secrets.HOMEBREW_TAP_APP_PRIVATE_KEY }}
+
     - name: GoReleaser Action
       uses: goreleaser/goreleaser-action@v5.1.0
       with:
@@ -36,7 +43,7 @@ jobs:
         version: 2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TAP_REPO_GITHUB_TOKEN: ${{ secrets.TAP_REPO_GITHUB_TOKEN }}
+        TAP_REPO_GITHUB_TOKEN: ${{ steps.generate-app-token.outputs.token }}
         DOWNLOADER_GITHUB_TOKEN: ${{ secrets.DOWNLOADER_GITHUB_TOKEN }}
         OTLP_ENDPOINT: ${{ vars.OTLP_ENDPOINT }}
         OTLP_TOKEN: ${{ vars.OTLP_TOKEN }}
