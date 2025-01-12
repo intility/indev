@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	maxCount     = 20
+	maxCount     = 8
 	minCount     = 2
 	suffixLength = 6
 )
@@ -27,7 +27,7 @@ var (
 	errCancelledByUser  = redact.Errorf("cancelled by user")
 	errEmptyName        = redact.Errorf("cluster name cannot be empty")
 	errInvalidPreset    = redact.Errorf("invalid node preset: preset must be one of minimal, balanced, performance")
-	errInvalidNodeCount = redact.Errorf("invalid node count: count must be between 2 and 20")
+	errInvalidNodeCount = redact.Errorf("invalid node count: count must be between %d and %d", minCount, maxCount)
 )
 
 type CreateOptions struct {
