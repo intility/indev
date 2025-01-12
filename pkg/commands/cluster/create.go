@@ -3,6 +3,7 @@ package cluster
 import (
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"slices"
 	"strconv"
 
@@ -17,8 +18,9 @@ import (
 )
 
 const (
-	maxCount = 20
-	minCount = 2
+	maxCount     = 20
+	minCount     = 2
+	suffixLength = 6
 )
 
 var (
@@ -67,7 +69,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 			cmd.SilenceUsage = true
 
 			_, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
-				Name: options.Name,
+				Name: options.Name + "-" + generateSuffix(),
 				NodePools: []client.NodePool{
 					{
 						Preset:    options.Preset,
@@ -159,4 +161,15 @@ func validateOptions(options CreateOptions) error {
 	}
 
 	return nil
+}
+
+func generateSuffix() string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
+
+	suffix := make([]rune, suffixLength)
+	for i := range suffix {
+		suffix[i] = letters[rand.IntN(len(letters))]
+	}
+
+	return string(suffix)
 }
