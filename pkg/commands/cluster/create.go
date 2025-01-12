@@ -68,8 +68,9 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 			// inputs validated, assume correct usage
 			cmd.SilenceUsage = true
 
+			clusterName := options.Name + "-" + generateSuffix()
 			_, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
-				Name: options.Name + "-" + generateSuffix(),
+				Name: clusterName,
 				NodePools: []client.NodePool{
 					{
 						Preset:    options.Preset,
@@ -81,7 +82,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "cluster created\n")
+			ux.Fsuccess(cmd.OutOrStdout(), "created cluster: %s\n", clusterName)
 
 			return nil
 		},
