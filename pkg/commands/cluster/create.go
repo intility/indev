@@ -3,6 +3,7 @@ package cluster
 import (
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"slices"
 	"strconv"
 
@@ -17,15 +18,16 @@ import (
 )
 
 const (
-	maxCount = 20
-	minCount = 2
+	maxCount     = 8
+	minCount     = 2
+	suffixLength = 6
 )
 
 var (
 	errCancelledByUser  = redact.Errorf("cancelled by user")
 	errEmptyName        = redact.Errorf("cluster name cannot be empty")
 	errInvalidPreset    = redact.Errorf("invalid node preset: preset must be one of minimal, balanced, performance")
-	errInvalidNodeCount = redact.Errorf("invalid node count: count must be between 2 and 20")
+	errInvalidNodeCount = redact.Errorf("invalid node count: count must be between %d and %d", minCount, maxCount)
 )
 
 type CreateOptions struct {
@@ -66,8 +68,9 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 			// inputs validated, assume correct usage
 			cmd.SilenceUsage = true
 
+			clusterName := options.Name + "-" + generateSuffix()
 			_, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
-				Name: options.Name,
+				Name: clusterName,
 				NodePools: []client.NodePool{
 					{
 						Preset:    options.Preset,
@@ -79,7 +82,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "cluster created\n")
+			ux.Fsuccess(cmd.OutOrStdout(), "created cluster: %s\n", clusterName)
 
 			return nil
 		},
@@ -159,4 +162,15 @@ func validateOptions(options CreateOptions) error {
 	}
 
 	return nil
+}
+
+func generateSuffix() string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
+
+	suffix := make([]rune, suffixLength)
+	for i := range suffix {
+		suffix[i] = letters[rand.IntN(len(letters))]
+	}
+
+	return string(suffix)
 }
