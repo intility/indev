@@ -8,7 +8,6 @@ on:
     types: [published]
   workflow_dispatch:
 
-
 permissions:
   contents: write
 
@@ -16,42 +15,42 @@ jobs:
   build-test-release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.22'
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.24.2"
 
-    - name: Build
-      run: go build -o bin/indev cmd/indev/main.go
+      - name: Build
+        run: go build -o bin/indev cmd/indev/main.go
 
-    - name: Test
-      run: go test ./...
+      - name: Test
+        run: go test ./...
 
-    - name: Generate GitHub app token for Homebrew Tap App
-      id: generate-app-token
-      uses: actions/create-github-app-token@v1
-      with:
-        app-id: ${{ vars.HOMEBREW_TAP_APP_ID }}
-        private-key: ${{ secrets.HOMEBREW_TAP_APP_PRIVATE_KEY }}
-        owner: intility
-        repositories: homebrew-tap
+      - name: Generate GitHub app token for Homebrew Tap App
+        id: generate-app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.HOMEBREW_TAP_APP_ID }}
+          private-key: ${{ secrets.HOMEBREW_TAP_APP_PRIVATE_KEY }}
+          owner: intility
+          repositories: homebrew-tap
 
-    - name: GoReleaser Action
-      uses: goreleaser/goreleaser-action@v5.1.0
-      with:
-        args: release --clean
-        version: 2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TAP_REPO_GITHUB_TOKEN: ${{ steps.generate-app-token.outputs.token }}
-        DOWNLOADER_GITHUB_TOKEN: ${{ secrets.DOWNLOADER_GITHUB_TOKEN }}
-        OTLP_ENDPOINT: ${{ vars.OTLP_ENDPOINT }}
-        OTLP_TOKEN: ${{ vars.OTLP_TOKEN }}
-        SENTRY_DSN: ${{ vars.SENTRY_DSN }}
-        AUTH_AUDIENCE: ${{ vars.AUTH_AUDIENCE }}
-        AUTH_AUTHORITY: ${{ vars.AUTH_AUTHORITY }}
-        AUTH_CLIENT_ID: ${{ vars.AUTH_CLIENT_ID }}
-        AUTH_REDIRECT_URI: ${{ vars.AUTH_REDIRECT_URI }}
-        PLATFORM_BASE_URI: ${{ vars.PLATFORM_BASE_URI }}
+      - name: GoReleaser Action
+        uses: goreleaser/goreleaser-action@v5.1.0
+        with:
+          args: release --clean
+          version: 2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAP_REPO_GITHUB_TOKEN: ${{ steps.generate-app-token.outputs.token }}
+          DOWNLOADER_GITHUB_TOKEN: ${{ secrets.DOWNLOADER_GITHUB_TOKEN }}
+          OTLP_ENDPOINT: ${{ vars.OTLP_ENDPOINT }}
+          OTLP_TOKEN: ${{ vars.OTLP_TOKEN }}
+          SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+          AUTH_AUDIENCE: ${{ vars.AUTH_AUDIENCE }}
+          AUTH_AUTHORITY: ${{ vars.AUTH_AUTHORITY }}
+          AUTH_CLIENT_ID: ${{ vars.AUTH_CLIENT_ID }}
+          AUTH_REDIRECT_URI: ${{ vars.AUTH_REDIRECT_URI }}
+          PLATFORM_BASE_URI: ${{ vars.PLATFORM_BASE_URI }}
