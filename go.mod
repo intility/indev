@@ -2,8 +2,6 @@ module github.com/intility/indev
 
 go 1.24.2
 
-toolchain go1.24.2
-
 require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.2
 	github.com/adrg/xdg v0.5.3
