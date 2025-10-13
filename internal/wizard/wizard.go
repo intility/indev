@@ -228,6 +228,7 @@ func NewWizard(inputs []Input) *Wizard {
 		t = textinput.New()
 		t.Cursor.Style = m.cursorStyle
 		t.CharLimit = 32
+		t.Width = 50 // Set a reasonable width for the input field
 
 		t.Placeholder = inputs[i].Placeholder
 

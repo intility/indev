@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/rand/v2"
@@ -68,13 +69,21 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 			// inputs validated, assume correct usage
 			cmd.SilenceUsage = true
 
+			// Fetch SSO provisioner
+			ssoProvisioner, err := selectSSOProvisioner(ctx, set.PlatformClient, cmd.OutOrStdout())
+			if err != nil {
+				return redact.Errorf("could not select SSO provisioner: %w", redact.Safe(err))
+			}
+
 			clusterName := options.Name + "-" + generateSuffix()
+			replicas := options.NodeCount
 			_, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
-				Name: clusterName,
+				Name:           clusterName,
+				SSOProvisioner: ssoProvisioner,
 				NodePools: []client.NodePool{
 					{
-						Preset:    options.Preset,
-						NodeCount: options.NodeCount,
+						Preset:   options.Preset,
+						Replicas: &replicas,
 					},
 				},
 			})
@@ -173,4 +182,31 @@ func generateSuffix() string {
 	}
 
 	return string(suffix)
+}
+
+func selectSSOProvisioner(ctx context.Context, platformClient client.Client, out interface{ Write([]byte) (int, error) }) (string, error) {
+	instances, err := platformClient.ListIntegrationInstances(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to list integration instances: %w", err)
+	}
+
+	// Filter for EntraID type
+	var provisioners []client.IntegrationInstance
+	for _, instance := range instances {
+		if instance.Type == "EntraID" {
+			provisioners = append(provisioners, instance)
+		}
+	}
+
+	switch len(provisioners) {
+	case 0:
+		return "", redact.Errorf("no SSO provisioner configured for your organization")
+	case 1:
+		ux.Fprint(out, "Using SSO provisioner: %s\n", provisioners[0].Name)
+		return provisioners[0].ID, nil
+	default:
+		// For now, auto-select the first one. Future: add wizard step
+		ux.Fprint(out, "Using SSO provisioner: %s\n", provisioners[0].Name)
+		return provisioners[0].ID, nil
+	}
 }

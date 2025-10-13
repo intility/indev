@@ -27,8 +27,13 @@ type ClusterClient interface {
 	DeleteCluster(ctx context.Context, name string) error
 }
 
+type IntegrationClient interface {
+	ListIntegrationInstances(ctx context.Context) ([]IntegrationInstance, error)
+}
+
 type Client interface {
 	ClusterClient
+	IntegrationClient
 }
 
 type RestClientOption func(*RestClient)

@@ -25,13 +25,21 @@ type StatusDeployment struct {
 type ClusterList []Cluster
 
 type NewClusterRequest struct {
-	Name      string    `json:"name"`
-	NodePools NodePools `json:"nodepools,omitempty"`
+	Name           string    `json:"name"`
+	SSOProvisioner string    `json:"ssoProvisioner"`
+	NodePools      NodePools `json:"nodepools,omitempty"`
+	Version        string    `json:"version,omitempty"`
+	Environment    string    `json:"environment,omitempty"`
+	PullSecretRef  *string   `json:"pullSecretRef,omitempty"`
 }
 
 type NodePools []NodePool
 
 type NodePool struct {
-	Preset    string `json:"preset,omitempty"`
-	NodeCount int    `json:"nodecount,omitempty"`
+	Name               string  `json:"name,omitempty"`
+	Preset             string  `json:"preset,omitempty"`
+	Replicas           *int    `json:"replicas,omitempty"`
+	AutoscalingEnabled bool    `json:"autoscalingEnabled,omitempty"`
+	MinCount           *int    `json:"minCount,omitempty"`
+	MaxCount           *int    `json:"maxCount,omitempty"`
 }
