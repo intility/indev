@@ -29,7 +29,7 @@ func main() {
 	if len(args) == 1 && args[0] == uploadTelemetryCommand {
 		err := uploadTelemetry(context.Background())
 		if err != nil {
-			ux.Ferror(os.Stderr, err.Error()+"\n")
+			ux.Ferror(os.Stderr, "%s\n", err.Error())
 			os.Exit(1)
 		}
 
@@ -78,7 +78,7 @@ func run(args []string) error {
 			ux.Fprint(cmd.OutOrStdout(), "Operation was canceled.")
 		default:
 			span.RecordError(err)
-			ux.Ferror(cmd.ErrOrStderr(), err.Error()+"\n")
+			ux.Ferror(cmd.ErrOrStderr(), "%s\n", err.Error())
 		}
 	}
 

@@ -44,7 +44,7 @@ func getVersionCommand() *cobra.Command {
 			_, span := telemetry.StartSpan(cmd.Context(), "version")
 			defer span.End()
 
-			ux.Fprint(cmd.OutOrStdout(), build.NameVersionString()+"\n")
+			ux.Fprint(cmd.OutOrStdout(), "%s\n", build.NameVersionString())
 		},
 	}
 }

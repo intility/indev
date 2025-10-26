@@ -68,7 +68,7 @@ func printClusterList(writer io.Writer, format outputFormat, clusters client.Clu
 			}
 		})
 
-		ux.Fprint(writer, table.String())
+		ux.Fprint(writer, "%s", table.String())
 
 		return nil
 	case "json":
@@ -88,7 +88,7 @@ func printClusterList(writer io.Writer, format outputFormat, clusters client.Clu
 			}
 		})
 
-		ux.Fprint(writer, table.String())
+		ux.Fprint(writer, "%s", table.String())
 
 		return nil
 	}

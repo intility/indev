@@ -36,10 +36,10 @@ type NewClusterRequest struct {
 type NodePools []NodePool
 
 type NodePool struct {
-	Name               string  `json:"name,omitempty"`
-	Preset             string  `json:"preset,omitempty"`
-	Replicas           *int    `json:"replicas,omitempty"`
-	AutoscalingEnabled bool    `json:"autoscalingEnabled,omitempty"`
-	MinCount           *int    `json:"minCount,omitempty"`
-	MaxCount           *int    `json:"maxCount,omitempty"`
+	Name               string `json:"name,omitempty"`
+	Preset             string `json:"preset,omitempty"`
+	Replicas           *int   `json:"replicas,omitempty"`
+	AutoscalingEnabled bool   `json:"autoscalingEnabled,omitempty"`
+	MinCount           *int   `json:"minCount,omitempty"`
+	MaxCount           *int   `json:"maxCount,omitempty"`
 }
