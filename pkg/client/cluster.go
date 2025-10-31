@@ -1,9 +1,13 @@
 package client
 
 type Cluster struct {
+	ID         string        `json:"id"`
 	Name       string        `json:"name"`
+	Version    string        `json:"version"`
 	ConsoleURL string        `json:"consoleUrl"`
+	NodePools  NodePools     `json:"nodePools"`
 	Status     ClusterStatus `json:"status"`
+	Roles      []string      `json:"roles"`
 }
 
 type ClusterStatus struct {
@@ -36,10 +40,17 @@ type NewClusterRequest struct {
 type NodePools []NodePool
 
 type NodePool struct {
-	Name               string `json:"name,omitempty"`
-	Preset             string `json:"preset,omitempty"`
-	Replicas           *int   `json:"replicas,omitempty"`
-	AutoscalingEnabled bool   `json:"autoscalingEnabled,omitempty"`
-	MinCount           *int   `json:"minCount,omitempty"`
-	MaxCount           *int   `json:"maxCount,omitempty"`
+	ID                 string            `json:"id,omitempty"`
+	Name               string            `json:"name,omitempty"`
+	Preset             string            `json:"preset,omitempty"`
+	Replicas           *int              `json:"replicas,omitempty"`
+	Compute            *ComputeResources `json:"compute,omitempty"`
+	AutoscalingEnabled bool              `json:"autoscalingEnabled,omitempty"`
+	MinCount           *int              `json:"minCount,omitempty"`
+	MaxCount           *int              `json:"maxCount,omitempty"`
+}
+
+type ComputeResources struct {
+	Cores  int    `json:"cores"`
+	Memory string `json:"memory"`
 }

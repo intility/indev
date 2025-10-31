@@ -23,6 +23,7 @@ const (
 type ClusterClient interface {
 	ListClusters(ctx context.Context) (ClusterList, error)
 	GetCluster(ctx context.Context, name string) (*Cluster, error)
+	GetClusterStatus(ctx context.Context, clusterID string) (*Cluster, error)
 	CreateCluster(ctx context.Context, request NewClusterRequest) (*Cluster, error)
 	DeleteCluster(ctx context.Context, name string) error
 }
@@ -138,6 +139,20 @@ func (c *RestClient) CreateCluster(ctx context.Context, request NewClusterReques
 
 func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, error) {
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters/"+name, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var cluster Cluster
+	if err = doRequest(c.httpClient, req, &cluster); err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	return &cluster, nil
+}
+
+func (c *RestClient) GetClusterStatus(ctx context.Context, clusterID string) (*Cluster, error) {
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters/"+clusterID+"/status", nil)
 	if err != nil {
 		return nil, err
 	}
