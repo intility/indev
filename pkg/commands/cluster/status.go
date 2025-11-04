@@ -19,15 +19,21 @@ func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:     "status",
+		Use:     "status [name]",
 		Short:   "Show detailed status of a cluster",
 		Long:    `Display comprehensive status information for a specific cluster, including node pools, deployment status, and resources.`,
+		Args:    cobra.MaximumNArgs(1),
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.status")
 			defer span.End()
 
 			cmd.SilenceUsage = true
+
+			// If positional argument is provided, use it (takes precedence)
+			if len(args) > 0 {
+				clusterName = args[0]
+			}
 
 			if clusterName == "" {
 				return errEmptyName
