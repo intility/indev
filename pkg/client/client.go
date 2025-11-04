@@ -165,8 +165,8 @@ func (c *RestClient) GetClusterStatus(ctx context.Context, clusterID string) (*C
 	return &cluster, nil
 }
 
-func (c *RestClient) DeleteCluster(ctx context.Context, name string) error {
-	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/clusters/"+name, nil)
+func (c *RestClient) DeleteCluster(ctx context.Context, id string) error {
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/clusters/"+id, nil)
 	if err != nil {
 		return err
 	}
