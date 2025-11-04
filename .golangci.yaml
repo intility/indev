@@ -17,10 +17,10 @@ linters:
     - error
     - format
     - import
-#    - metalinter #slow
+    #    - metalinter #slow
     - module
     - performance
-#    - sql
+    #    - sql
     - style
     - test
     - unused
@@ -31,7 +31,7 @@ linters-settings:
     # Specifying any rule explicitly will disable the default-enabled rules.
     # Manually specify the defaults along with `context-as-argument`.
     rules:
-    # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md
+      # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md
       - name: argument-limit
         arguments: [4]
       - name: bare-return
@@ -104,6 +104,8 @@ issues:
   exclude-dirs:
     - bin
     - vendor
+    - mocks
+    - internal/telemetry
     - .codecov.yml
     - .coveralls.yml
     - .git

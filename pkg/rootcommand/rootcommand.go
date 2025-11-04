@@ -20,10 +20,11 @@ func GetRootCommand() *cobra.Command {
 	}
 
 	rootCmd := &cobra.Command{
-		Use:   build.AppName,
-		Short: build.AppName + " controls your Intility Developer Platform instance.",
-		Long:  ``,
-		Run:   showHelp,
+		Use:           build.AppName,
+		Short:         build.AppName + " controls your Intility Developer Platform instance.",
+		Long:          ``,
+		Run:           showHelp,
+		SilenceErrors: true,
 	}
 
 	rootCmd.AddCommand(getVersionCommand())
@@ -44,7 +45,7 @@ func getVersionCommand() *cobra.Command {
 			_, span := telemetry.StartSpan(cmd.Context(), "version")
 			defer span.End()
 
-			ux.Fprint(cmd.OutOrStdout(), build.NameVersionString()+"\n")
+			ux.Fprint(cmd.OutOrStdout(), "%s\n", build.NameVersionString())
 		},
 	}
 }
@@ -59,7 +60,9 @@ func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 
 	cmd.AddCommand(cluster.NewCreateCommand(set))
 	cmd.AddCommand(cluster.NewDeleteCommand(set))
+	cmd.AddCommand(cluster.NewGetCommand(set))
 	cmd.AddCommand(cluster.NewListCommand(set))
+	cmd.AddCommand(cluster.NewStatusCommand(set))
 
 	return cmd
 }

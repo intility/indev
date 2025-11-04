@@ -33,7 +33,7 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not delete cluster: %w", redact.Safe(err))
 			}
 
-			ux.Fprint(cmd.OutOrStdout(), clusterName+"\n")
+			ux.Fprint(cmd.OutOrStdout(), "%s\n", clusterName)
 
 			return nil
 		},

@@ -3,6 +3,7 @@ package cluster
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/spf13/cobra"
@@ -62,13 +63,16 @@ func printClusterList(writer io.Writer, format outputFormat, clusters client.Clu
 		table := ux.TableFromObjects(clusters, func(cluster client.Cluster) []ux.Row {
 			return []ux.Row{
 				ux.NewRow("Name", cluster.Name),
+				ux.NewRow("Version", cluster.Version),
 				ux.NewRow("Console URL", cluster.ConsoleURL),
+				ux.NewRow("Node Pools", nodePoolSummary(cluster)),
 				ux.NewRow("Status", statusString(cluster)),
 				ux.NewRow("Status Details", statusMessage(cluster)),
+				ux.NewRow("Roles", rolesString(cluster)),
 			}
 		})
 
-		ux.Fprint(writer, table.String())
+		ux.Fprint(writer, "%s", table.String())
 
 		return nil
 	case "json":
@@ -84,11 +88,13 @@ func printClusterList(writer io.Writer, format outputFormat, clusters client.Clu
 		table := ux.TableFromObjects(clusters, func(cluster client.Cluster) []ux.Row {
 			return []ux.Row{
 				ux.NewRow("Name", cluster.Name),
-				ux.NewRow("Console URL", cluster.ConsoleURL),
+				ux.NewRow("Version", cluster.Version),
+				ux.NewRow("Status", statusString(cluster)),
+				ux.NewRow("Node Pools", nodePoolSummary(cluster)),
 			}
 		})
 
-		ux.Fprint(writer, table.String())
+		ux.Fprint(writer, "%s", table.String())
 
 		return nil
 	}
@@ -144,4 +150,26 @@ func (o *outputFormat) Set(value string) error {
 
 func (o *outputFormat) Type() string {
 	return "outputFormat"
+}
+
+func nodePoolSummary(cluster client.Cluster) string {
+	if len(cluster.NodePools) == 0 {
+		return "0"
+	}
+
+	totalNodes := 0
+	for _, pool := range cluster.NodePools {
+		if pool.Replicas != nil {
+			totalNodes += *pool.Replicas
+		}
+	}
+
+	return fmt.Sprintf("%d pool(s), %d node(s)", len(cluster.NodePools), totalNodes)
+}
+
+func rolesString(cluster client.Cluster) string {
+	if len(cluster.Roles) == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%v", cluster.Roles)
 }
