@@ -2,6 +2,7 @@ package account
 
 import (
 	"errors"
+	"slices"
 
 	"github.com/spf13/cobra"
 
@@ -33,13 +34,32 @@ func NewShowCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not get account information: %w", err)
 			}
 
+			me, err := set.PlatformClient.GetMe(cmd.Context())
+			if err != nil {
+				return redact.Errorf("could not get user information from Me endpoint: %w", redact.Safe(err))
+			}
+
+			role := getOrganizationalRole(me.OrganizationRoles)
+
 			ux.Fprint(cmd.OutOrStdout(), "Account information\n")
 			ux.Fprint(cmd.OutOrStdout(), "Username: %s\n", account.PreferredUsername)
 			ux.Fprint(cmd.OutOrStdout(), "Realm: %s\n", account.Realm)
+			ux.Fprint(cmd.OutOrStdout(), "Organization: %s\n", me.OrganizationName)
+			ux.Fprint(cmd.OutOrStdout(), "Organization Role: %s\n", role)
 
 			return nil
 		},
 	}
 
 	return cmd
+}
+
+func getOrganizationalRole(roles []string) string {
+	if slices.Contains(roles, "owner") {
+		return "Admin"
+	}
+	if slices.Contains(roles, "member") {
+		return "Member"
+	}
+	return "Unknown"
 }
