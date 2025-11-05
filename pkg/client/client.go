@@ -32,9 +32,14 @@ type IntegrationClient interface {
 	ListIntegrationInstances(ctx context.Context) ([]IntegrationInstance, error)
 }
 
+type MeClient interface {
+	GetMe(ctx context.Context) (Me, error)
+}
+
 type Client interface {
 	ClusterClient
 	IntegrationClient
+	MeClient
 }
 
 type RestClientOption func(*RestClient)
