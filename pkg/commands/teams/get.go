@@ -61,7 +61,7 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 
 			members, err := set.PlatformClient.GetTeamMembers(ctx, team.ID)
 			if err != nil {
-				return redact.Errorf("could not get members from team %w", redact.Safe(err))
+				return redact.Errorf("could not get members from team: %w", redact.Safe(err))
 			}
 
 			if err = printTeamDetails(cmd.OutOrStdout(), team, members); err != nil {
