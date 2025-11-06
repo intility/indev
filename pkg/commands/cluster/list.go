@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 
@@ -14,12 +13,11 @@ import (
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/outputformat"
 )
 
-var errInvalidOutputFormat = errors.New(`must be one of "wide", "json", "yaml"`)
-
 func NewListCommand(set clientset.ClientSet) *cobra.Command {
-	output := outputFormat("")
+	output := outputformat.Format("")
 	// clusterListCmd represents the list command.
 	cmd := &cobra.Command{
 		Use:     "list",
@@ -55,7 +53,7 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
-func printClusterList(writer io.Writer, format outputFormat, clusters client.ClusterList) error {
+func printClusterList(writer io.Writer, format outputformat.Format, clusters client.ClusterList) error {
 	var err error
 
 	switch format {
@@ -124,32 +122,6 @@ func statusString(cluster client.Cluster) string {
 
 func statusMessage(cluster client.Cluster) string {
 	return cluster.Status.Ready.Message
-}
-
-type OutputFormat interface {
-	String() string
-	Set(val string) error
-	Type() string
-}
-
-type outputFormat string
-
-func (o *outputFormat) String() string {
-	return string(*o)
-}
-
-func (o *outputFormat) Set(value string) error {
-	switch value {
-	case "wide", "json", "yaml":
-		*o = outputFormat(value)
-		return nil
-	default:
-		return errInvalidOutputFormat
-	}
-}
-
-func (o *outputFormat) Type() string {
-	return "outputFormat"
 }
 
 func nodePoolSummary(cluster client.Cluster) string {

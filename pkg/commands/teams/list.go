@@ -2,7 +2,6 @@ package teams
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"sort"
 	"strings"
@@ -15,12 +14,11 @@ import (
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/outputformat"
 )
 
-var errInvalidOutputFormat = errors.New(`must be one of "wide", "json", "yaml"`)
-
 func NewListCommand(set clientset.ClientSet) *cobra.Command {
-	output := outputFormat("")
+	output := outputformat.Format("")
 	cmd := &cobra.Command{
 		Use:     "list",
 		Short:   "List all teams",
@@ -55,7 +53,7 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
-func printTeamsList(writer io.Writer, format outputFormat, teams []client.Team) error {
+func printTeamsList(writer io.Writer, format outputformat.Format, teams []client.Team) error {
 	var err error
 
 	sort.Slice(teams, func(i, j int) bool {
@@ -101,30 +99,4 @@ func printTeamsList(writer io.Writer, format outputFormat, teams []client.Team) 
 	}
 
 	return nil
-}
-
-type OutputFormat interface {
-	String() string
-	Set(val string) error
-	Type() string
-}
-
-type outputFormat string
-
-func (o *outputFormat) String() string {
-	return string(*o)
-}
-
-func (o *outputFormat) Set(value string) error {
-	switch value {
-	case "wide", "json", "yaml":
-		*o = outputFormat(value)
-		return nil
-	default:
-		return errInvalidOutputFormat
-	}
-}
-
-func (o *outputFormat) Type() string {
-	return "outputFormat"
 }
