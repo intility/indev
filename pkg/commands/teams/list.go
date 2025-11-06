@@ -75,8 +75,6 @@ func printTeamsList(writer io.Writer, format outputFormat, teams []client.Team) 
 		})
 
 		ux.Fprint(writer, "%s", table.String())
-
-		return nil
 	case "json":
 		enc := json.NewEncoder(writer)
 		enc.SetIndent("", "  ")
@@ -96,9 +94,6 @@ func printTeamsList(writer io.Writer, format outputFormat, teams []client.Team) 
 		})
 
 		ux.Fprint(writer, "%s", table.String())
-
-		return nil
-
 	}
 
 	if err != nil {
