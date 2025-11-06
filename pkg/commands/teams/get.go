@@ -97,10 +97,10 @@ func printTeamDetails(writer io.Writer, team *client.Team, members []client.Team
 }
 
 func getTeamRole(roles []client.MemberRole) string {
-	if slices.Contains(roles, "owner") {
+	if slices.Contains(roles, client.MemberRoleOwner) {
 		return "Owner"
 	}
-	if slices.Contains(roles, "member") {
+	if slices.Contains(roles, client.MemberRoleMember) {
 		return "Member"
 	}
 	if len(roles) == 0 {
