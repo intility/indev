@@ -38,6 +38,7 @@ type MeClient interface {
 
 type TeamsClient interface {
 	ListTeams(ctx context.Context) ([]Team, error)
+	GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error)
 }
 
 type Client interface {
