@@ -36,10 +36,16 @@ type MeClient interface {
 	GetMe(ctx context.Context) (Me, error)
 }
 
+type TeamsClient interface {
+	ListTeams(ctx context.Context) ([]Team, error)
+	GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error)
+}
+
 type Client interface {
 	ClusterClient
 	IntegrationClient
 	MeClient
+	TeamsClient
 }
 
 type RestClientOption func(*RestClient)

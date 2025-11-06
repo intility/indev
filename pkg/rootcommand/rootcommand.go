@@ -11,6 +11,7 @@ import (
 	"github.com/intility/indev/pkg/clientset"
 	"github.com/intility/indev/pkg/commands/account"
 	"github.com/intility/indev/pkg/commands/cluster"
+	"github.com/intility/indev/pkg/commands/teams"
 )
 
 func GetRootCommand() *cobra.Command {
@@ -32,6 +33,7 @@ func GetRootCommand() *cobra.Command {
 	rootCmd.AddCommand(account.NewLogoutCommand(clients))
 	rootCmd.AddCommand(getClusterCommand(clients))
 	rootCmd.AddCommand(getAccountCommand(clients))
+	rootCmd.AddCommand(getTeamsCommand(clients))
 
 	return rootCmd
 }
@@ -76,6 +78,20 @@ func getAccountCommand(set clientset.ClientSet) *cobra.Command {
 	}
 
 	cmd.AddCommand(account.NewShowCommand(set))
+
+	return cmd
+}
+
+func getTeamsCommand(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "team",
+		Short: "Manage Intility Developer Platform teams",
+		Long:  "Manage Intility Developer Platform teams",
+		Run:   showHelp,
+	}
+
+	cmd.AddCommand(teams.NewListCommand(set))
+	cmd.AddCommand(teams.NewGetCommand(set))
 
 	return cmd
 }
