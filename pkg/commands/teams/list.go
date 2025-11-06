@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -56,6 +57,11 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 
 func printTeamsList(writer io.Writer, format outputFormat, teams []client.Team) error {
 	var err error
+
+	sort.Slice(teams, func(i, j int) bool {
+		// list teams where authenticated user has membership first
+		return strings.Join(teams[i].Role, ",") > strings.Join(teams[j].Role, ",")
+	})
 
 	switch format {
 	case "wide":
