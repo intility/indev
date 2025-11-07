@@ -41,11 +41,16 @@ type TeamsClient interface {
 	GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error)
 }
 
+type UserClient interface {
+	ListUsers(ctx context.Context) ([]User, error)
+}
+
 type Client interface {
 	ClusterClient
 	IntegrationClient
 	MeClient
 	TeamsClient
+	UserClient
 }
 
 type RestClientOption func(*RestClient)
