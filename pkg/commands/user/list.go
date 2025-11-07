@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"io"
+	"slices"
 	"sort"
 	"strings"
 
@@ -56,10 +57,7 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 func printUsersList(writer io.Writer, format outputformat.Format, users []client.User) error {
 	var err error
 
-	sort.Slice(users, func(i, j int) bool {
-		// list users with owner role first
-		return strings.Join(users[i].Roles, ",") > strings.Join(users[j].Roles, ",")
-	})
+	sortUsersByOwnerThenName(users)
 
 	switch format {
 	case "wide":
@@ -99,4 +97,16 @@ func printUsersList(writer io.Writer, format outputformat.Format, users []client
 	}
 
 	return nil
+}
+
+func sortUsersByOwnerThenName(users []client.User) {
+	sort.Slice(users, func(i, j int) bool {
+		hasOwnerI := slices.Contains(users[i].Roles, "owner")
+		hasOwnerJ := slices.Contains(users[j].Roles, "owner")
+
+		if hasOwnerI != hasOwnerJ {
+			return hasOwnerI // Owners first
+		}
+		return users[i].Name < users[j].Name // Then by name
+	})
 }
