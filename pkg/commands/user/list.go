@@ -65,7 +65,7 @@ func printUsersList(writer io.Writer, format outputformat.Format, users []client
 	case "wide":
 		table := ux.TableFromObjects(users, func(user client.User) []ux.Row {
 			return []ux.Row{
-				ux.NewRow("Id", user.ID.String()),
+				ux.NewRow("Id", user.ID),
 				ux.NewRow("Name", user.Name),
 				ux.NewRow("UPN", user.UPN),
 				ux.NewRow("Role", strings.Join(user.Roles, ",")),

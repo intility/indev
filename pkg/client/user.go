@@ -3,15 +3,13 @@ package client
 import (
 	"context"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 type User struct {
-	ID    uuid.UUID `json:"id"`
-	Name  string    `json:"name"`
-	UPN   string    `json:"upn"`
-	Roles []string  `json:"roles"`
+	ID    string   `json:"id"`
+	Name  string   `json:"name"`
+	UPN   string   `json:"upn"`
+	Roles []string `json:"roles"`
 }
 
 func (c *RestClient) ListUsers(ctx context.Context) ([]User, error) {
