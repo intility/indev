@@ -1,6 +1,9 @@
 package ux
 
-import "strings"
+import (
+	"strings"
+	"unicode/utf8"
+)
 
 type Table struct {
 	Header []string
@@ -55,19 +58,22 @@ func (t *Table) calculateColumnWidths() map[int]int {
 	// calculate the longest string in each column
 	for i, row := range t.Rows {
 		for j, cell := range row {
-			if len(cell) > colWidths[j] {
-				colWidths[j] = len(cell)
+			cellWidth := utf8.RuneCountInString(cell)
+			if cellWidth > colWidths[j] {
+				colWidths[j] = cellWidth
 			}
 
-			if len(t.Header[j]) > colWidths[j] {
-				colWidths[j] = len(t.Header[j])
+			headerWidth := utf8.RuneCountInString(t.Header[j])
+			if headerWidth > colWidths[j] {
+				colWidths[j] = headerWidth
 			}
 		}
 
 		if i == 0 {
 			for j, header := range t.Header {
-				if len(header) > colWidths[j] {
-					colWidths[j] = len(header)
+				headerWidth := utf8.RuneCountInString(header)
+				if headerWidth > colWidths[j] {
+					colWidths[j] = headerWidth
 				}
 			}
 		}
@@ -85,7 +91,8 @@ func (t *Table) String() string {
 	// print padded cells
 	for i, header := range t.Header {
 		s += header + " "
-		s += strings.Repeat(" ", longestInCol[i]-len(header)) + "\t"
+		headerWidth := utf8.RuneCountInString(header)
+		s += strings.Repeat(" ", longestInCol[i]-headerWidth) + "\t"
 	}
 
 	s += "\n"
@@ -93,7 +100,8 @@ func (t *Table) String() string {
 	for _, row := range t.Rows {
 		for i, cell := range row {
 			s += cell + " "
-			s += strings.Repeat(" ", longestInCol[i]-len(cell)) + "\t"
+			cellWidth := utf8.RuneCountInString(cell)
+			s += strings.Repeat(" ", longestInCol[i]-cellWidth) + "\t"
 		}
 
 		s += "\n"
