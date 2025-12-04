@@ -1,7 +1,9 @@
 package client
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -33,6 +35,11 @@ type TeamMember struct {
 	Roles   []MemberRole `json:"roles"`
 }
 
+type NewTeamRequest struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 func (c *RestClient) ListTeams(ctx context.Context) ([]Team, error) {
 	var teams []Team
 
@@ -61,4 +68,23 @@ func (c *RestClient) GetTeamMembers(ctx context.Context, teamId string) ([]TeamM
 	}
 
 	return members, nil
+}
+
+func (c *RestClient) CreateTeam(ctx context.Context, request NewTeamRequest) (*Team, error) {
+	body, err := json.Marshal(request)
+	if err != nil {
+		return nil, fmt.Errorf("could not marshal request: %w", err)
+	}
+
+	req, err := c.createAuthenticatedRequest(ctx, "POST", c.baseURI+"/api/v1/teams", bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	var team Team
+	if err = doRequest(c.httpClient, req, &team); err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	return &team, nil
 }

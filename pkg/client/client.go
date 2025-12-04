@@ -39,6 +39,7 @@ type MeClient interface {
 type TeamsClient interface {
 	ListTeams(ctx context.Context) ([]Team, error)
 	GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error)
+	CreateTeam(ctx context.Context, request NewTeamRequest) (*Team, error)
 }
 
 type UserClient interface {
