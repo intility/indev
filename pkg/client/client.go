@@ -40,6 +40,7 @@ type TeamsClient interface {
 	ListTeams(ctx context.Context) ([]Team, error)
 	GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error)
 	CreateTeam(ctx context.Context, request NewTeamRequest) (*Team, error)
+	DeleteTeam(ctx context.Context, request DeleteTeamRequest) error
 }
 
 type UserClient interface {

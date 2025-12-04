@@ -95,6 +95,7 @@ func getTeamsCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.AddCommand(teams.NewListCommand(set))
 	cmd.AddCommand(teams.NewGetCommand(set))
 	cmd.AddCommand(teams.NewCreateCommand(set))
+	cmd.AddCommand(teams.NewDeleteCommand(set))
 
 	return cmd
 }
