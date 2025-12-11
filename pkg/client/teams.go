@@ -30,6 +30,29 @@ const (
 	MemberRoleMember MemberRole = "member"
 )
 
+// String returns the string representation of MemberRole.
+func (mr MemberRole) String() string {
+	return string(mr)
+}
+
+// IsValid checks if the MemberRole is valid.
+func (mr MemberRole) IsValid() bool {
+	switch mr {
+	case MemberRoleOwner, MemberRoleMember:
+		return true
+	default:
+		return false
+	}
+}
+
+// GetMemberRoleValues returns a slice of valid MemberRole values.
+func GetMemberRoleValues() []string {
+	return []string{
+		string(MemberRoleOwner),
+		string(MemberRoleMember),
+	}
+}
+
 type TeamMember struct {
 	Subject Subject      `json:"subject"`
 	Roles   []MemberRole `json:"roles"`
@@ -42,6 +65,16 @@ type NewTeamRequest struct {
 
 type DeleteTeamRequest struct {
 	TeamId string `json:"teamId"`
+}
+
+type AddMemberSubject struct {
+	Type string `json:"type"`
+	ID   string `json:"id"`
+}
+
+type AddTeamMemberRequest struct {
+	Roles   []MemberRole     `json:"roles"`
+	Subject AddMemberSubject `json:"subject"`
 }
 
 func (c *RestClient) ListTeams(ctx context.Context) ([]Team, error) {
@@ -100,6 +133,24 @@ func (c *RestClient) DeleteTeam(ctx context.Context, request DeleteTeamRequest) 
 	}
 
 	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/teams/"+request.TeamId, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	if err = doRequest[any](c.httpClient, req, nil); err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	return nil
+}
+
+func (c *RestClient) AddTeamMember(ctx context.Context, teamId string, request []AddTeamMemberRequest) error {
+	body, err := json.Marshal(request)
+	if err != nil {
+		return fmt.Errorf("could not marshal request: %w", err)
+	}
+
+	req, err := c.createAuthenticatedRequest(ctx, "POST", c.baseURI+"/api/v1/teams/"+teamId+"/members", bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
