@@ -161,3 +161,16 @@ func (c *RestClient) AddTeamMember(ctx context.Context, teamId string, request [
 
 	return nil
 }
+
+func (c *RestClient) RemoveTeamMember(ctx context.Context, teamId string, memberId string) error {
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/teams/"+teamId+"/members/"+memberId, nil)
+	if err != nil {
+		return err
+	}
+
+	if err = doRequest[any](c.httpClient, req, nil); err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	return nil
+}

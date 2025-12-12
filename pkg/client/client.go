@@ -45,6 +45,7 @@ type TeamsClient interface {
 
 type MemberClient interface {
 	AddTeamMember(ctx context.Context, teamId string, request []AddTeamMemberRequest) error
+	RemoveTeamMember(ctx context.Context, teamId string, memberId string) error
 }
 
 type UserClient interface {

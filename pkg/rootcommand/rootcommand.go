@@ -112,6 +112,7 @@ func getMemberCommand(set clientset.ClientSet) *cobra.Command {
 	}
 
 	cmd.AddCommand(member.NewAddCommand(set))
+	cmd.AddCommand(member.NewRemoveCommand(set))
 
 	return cmd
 }
