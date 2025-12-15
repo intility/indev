@@ -1,6 +1,8 @@
 package teams
 
 import (
+	"strings"
+
 	"github.com/spf13/cobra"
 
 	"github.com/intility/indev/internal/redact"
@@ -38,7 +40,7 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 
 			var team *client.Team
 			for _, t := range teams {
-				if t.Name == teamName {
+				if strings.EqualFold(t.Name, teamName) {
 					team = &t
 					break
 				}
