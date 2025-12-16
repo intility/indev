@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"io"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -48,7 +49,7 @@ func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
 			// Find the cluster with the matching name
 			var cluster *client.Cluster
 			for _, c := range clusters {
-				if c.Name == clusterName {
+				if strings.EqualFold(c.Name, clusterName) {
 					cluster = &c
 					break
 				}
