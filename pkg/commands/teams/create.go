@@ -43,7 +43,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 
 			var err error
 
-			err = validateOptions(options)
+			err = validateCreateOptions(options)
 			if err != nil {
 				return err
 			}
@@ -71,7 +71,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
-func validateOptions(options CreateOptions) error {
+func validateCreateOptions(options CreateOptions) error {
 	if options.Name == "" {
 		return errEmptyName
 	}
