@@ -127,12 +127,7 @@ func (c *RestClient) CreateTeam(ctx context.Context, request NewTeamRequest) (*T
 }
 
 func (c *RestClient) DeleteTeam(ctx context.Context, request DeleteTeamRequest) error {
-	body, err := json.Marshal(request)
-	if err != nil {
-		return fmt.Errorf("could not marshal request: %w", err)
-	}
-
-	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/teams/"+request.TeamId, bytes.NewReader(body))
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/teams/"+request.TeamId, nil)
 	if err != nil {
 		return err
 	}
