@@ -3,6 +3,7 @@ package teams
 import (
 	"io"
 	"slices"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -49,7 +50,7 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 			// Find the team with the matching name
 			var team *client.Team
 			for _, c := range teams {
-				if c.Name == teamName {
+				if strings.EqualFold(c.Name, teamName) {
 					team = &c
 					break
 				}
