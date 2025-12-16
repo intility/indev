@@ -41,7 +41,7 @@ func NewAddCommand(set clientset.ClientSet) *cobra.Command {
 			defer span.End()
 
 			var err error
-			err = validateOptions(options)
+			err = validateAddOptions(options)
 			if err != nil {
 				return err
 			}
@@ -104,7 +104,7 @@ func NewAddCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
-func validateOptions(options AddMemberOptions) error {
+func validateAddOptions(options AddMemberOptions) error {
 	if options.TeamId == "" && options.Team == "" {
 		return errTeamRequired
 	}
