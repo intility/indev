@@ -39,6 +39,13 @@ type MeClient interface {
 type TeamsClient interface {
 	ListTeams(ctx context.Context) ([]Team, error)
 	GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error)
+	CreateTeam(ctx context.Context, request NewTeamRequest) (*Team, error)
+	DeleteTeam(ctx context.Context, request DeleteTeamRequest) error
+}
+
+type MemberClient interface {
+	AddTeamMember(ctx context.Context, teamId string, request []AddTeamMemberRequest) error
+	RemoveTeamMember(ctx context.Context, teamId string, memberId string) error
 }
 
 type UserClient interface {
@@ -51,6 +58,7 @@ type Client interface {
 	MeClient
 	TeamsClient
 	UserClient
+	MemberClient
 }
 
 type RestClientOption func(*RestClient)

@@ -12,6 +12,7 @@ import (
 	"github.com/intility/indev/pkg/commands/account"
 	"github.com/intility/indev/pkg/commands/cluster"
 	"github.com/intility/indev/pkg/commands/teams"
+	"github.com/intility/indev/pkg/commands/teams/member"
 	"github.com/intility/indev/pkg/commands/user"
 )
 
@@ -94,6 +95,24 @@ func getTeamsCommand(set clientset.ClientSet) *cobra.Command {
 
 	cmd.AddCommand(teams.NewListCommand(set))
 	cmd.AddCommand(teams.NewGetCommand(set))
+	cmd.AddCommand(teams.NewCreateCommand(set))
+	cmd.AddCommand(teams.NewDeleteCommand(set))
+
+	cmd.AddCommand(getMemberCommand(set))
+
+	return cmd
+}
+
+func getMemberCommand(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "member",
+		Short: "Manage Intility Developer Platform team members",
+		Long:  "Manage Intility Developer Platform team members",
+		Run:   showHelp,
+	}
+
+	cmd.AddCommand(member.NewAddCommand(set))
+	cmd.AddCommand(member.NewRemoveCommand(set))
 
 	return cmd
 }
