@@ -67,6 +67,8 @@ func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.AddCommand(cluster.NewDeleteCommand(set))
 	cmd.AddCommand(cluster.NewGetCommand(set))
 	cmd.AddCommand(cluster.NewListCommand(set))
+	cmd.AddCommand(cluster.NewLoginCommand(set))
+	cmd.AddCommand(cluster.NewOpenCommand(set))
 	cmd.AddCommand(cluster.NewStatusCommand(set))
 
 	return cmd
