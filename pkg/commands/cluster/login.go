@@ -76,8 +76,7 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("oc command not found. Please install the OpenShift CLI: https://developers.intility.com/docs/getting-started/first-steps/deploy-first-application/?h=oc#install-openshift-cli")
 			}
 
-			ux.Fprint(cmd.OutOrStdout(), "Logging in to cluster %s...\n", clusterName)
-			ux.Fprint(cmd.OutOrStdout(), "API URL: %s\n\n", apiURL)
+			ux.Fprint(cmd.OutOrStdout(), "Logging in to cluster %s...\n\n", clusterName)
 
 			// Execute oc login with web authentication
 			ocCmd := exec.CommandContext(ctx, "oc", "login", "-w", apiURL)
