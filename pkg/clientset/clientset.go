@@ -104,3 +104,19 @@ func fqcn(cmd *cobra.Command) string {
 
 	return name
 }
+
+// GetTenantID extracts the tenant ID from the current account's HomeAccountID.
+// The HomeAccountID format is "<oid>.<tid>" where tid is the tenant ID.
+func (c *ClientSet) GetTenantID(ctx context.Context) (string, error) {
+	account, err := c.Authenticator.GetCurrentAccount(ctx)
+	if err != nil {
+		return "", fmt.Errorf("could not get current account: %w", err)
+	}
+
+	parts := strings.Split(account.HomeAccountID, ".")
+	if len(parts) < 2 {
+		return "", fmt.Errorf("invalid HomeAccountID format: %s", account.HomeAccountID)
+	}
+
+	return parts[1], nil
+}
