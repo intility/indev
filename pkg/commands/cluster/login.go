@@ -23,10 +23,10 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "login [name]",
-		Short: "Login to a cluster using oc",
-		Long:  `Login to a cluster using the OpenShift CLI (oc). Opens a browser for OAuth authentication.`,
-		Args:  cobra.MaximumNArgs(1),
+		Use:     "login [name]",
+		Short:   "Login to a cluster using oc",
+		Long:    `Login to a cluster using the OpenShift CLI (oc). Opens a browser for OAuth authentication.`,
+		Args:    cobra.MaximumNArgs(1),
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.login")
@@ -73,7 +73,7 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 
 			// Check if oc is installed
 			if _, err := exec.LookPath("oc"); err != nil {
-				return redact.Errorf("oc command not found. Please install the OpenShift CLI: https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/getting-started-cli.html")
+				return redact.Errorf("oc command not found. Please install the OpenShift CLI: https://developers.intility.com/docs/getting-started/first-steps/deploy-first-application/?h=oc#install-openshift-cli")
 			}
 
 			ux.Fprint(cmd.OutOrStdout(), "Logging in to cluster %s...\n", clusterName)
