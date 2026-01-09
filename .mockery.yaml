@@ -9,4 +9,5 @@ outpkg: "mocks"
 packages:
   github.com/intility/indev/pkg/credentialstore:
   github.com/intility/indev/pkg/tokencache:
+  github.com/intility/indev/pkg/client:
   github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache:
