@@ -83,14 +83,10 @@ brews:
     goarm: 6
     goamd64: v1
     directory: Formula
-    # url_template: https://gitlab.intility.com/api/v4/projects/{{ .Env.CI_PROJECT_ID }}/packages/generic/indev/{{ trimprefix .Tag "v"}}/{{ .ArtifactName }}
     url_template: "https://github.com/intility/indev/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     url_headers:
       - "Accept: application/octet-stream"
       - 'Authorization: bearer #{ENV["DOWNLOADER_GITHUB_TOKEN"]}'
-    # url_headers:
-    #   - "Authorization: Basic {{ .Env.DOWNLOADER_BASIC_TOKEN }}"
-    #url_template: "https://gitlab.intility.com/developer-infrastructure/platform-2.0/minato/indev/-/releases/{{ .Tag }}/downloads/{{ .ArtifactName }}"
     install: |
       bin.install "indev"
       bash_completion.install "completions/indev.bash" => "indev"
