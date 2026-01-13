@@ -72,7 +72,7 @@ archives:
       - README*
       - completions/*
 
-brews:
+homebrew_casks:
   - name: indev
     repository:
       owner: intility
@@ -80,18 +80,24 @@ brews:
       token: "{{ .Env.TAP_REPO_GITHUB_TOKEN }}"
     homepage: https://developers.intility.com
     description: "A CLI for managing developer platform resources."
-    goarm: 6
-    goamd64: v1
-    directory: Formula
-    url_template: "https://github.com/intility/indev/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    url_headers:
-      - "Accept: application/octet-stream"
-      - 'Authorization: bearer #{ENV["DOWNLOADER_GITHUB_TOKEN"]}'
-    install: |
-      bin.install "indev"
-      bash_completion.install "completions/indev.bash" => "indev"
-      zsh_completion.install "completions/indev.zsh" => "_indev"
-      fish_completion.install "completions/indev.fish"
+    directory: Casks
+    url:
+      template: "https://github.com/intility/indev/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+      headers:
+        - "Accept: application/octet-stream"
+        - 'Authorization: bearer #{ENV["DOWNLOADER_GITHUB_TOKEN"]}'
+    binaries:
+      - indev
+    completions:
+      bash: completions/indev.bash
+      zsh: completions/indev.zsh
+      fish: completions/indev.fish
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/indev"]
+          end
 
 changelog:
   sort: asc
