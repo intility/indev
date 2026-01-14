@@ -40,6 +40,14 @@ cd indev
 go build -o indev ./cmd/indev
 ```
 
+## Prerequisites
+
+Some commands require additional tools to be installed:
+
+| Command | Requirement |
+|---------|-------------|
+| `indev cluster login` | [OpenShift CLI (oc)](https://developers.intility.com/docs/getting-started/first-steps/deploy-first-application/?h=oc#install-openshift-cli) |
+
 ## Usage
 
 ### Authentication
@@ -102,7 +110,7 @@ Check cluster status:
 indev cluster status --name <cluster-name>
 ```
 
-Log in to a cluster (configure kubectl):
+Log in to a cluster (requires `oc`):
 
 ```sh
 indev cluster login --name <cluster-name>
