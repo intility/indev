@@ -1,120 +1,181 @@
-# Developer Platform CLI
+<p align="center">
+  <img src="assets/idp-logo.svg" alt="indev logo" width="100">
+  <h1 align="center">indev</h1>
+</p>
 
-`indev` is a command-line interface (CLI) tool designed for managing Intility Developer Platform resources. With `indev`, you can perform a variety of operations such as creating and deleting clusters, deploying and managing applications, and more. It is built with simplicity and ease of use in mind, making Kubernetes operations more accessible.
+<p align="center">
+  A command-line interface for managing Intility Developer Platform resources.
+</p>
 
-## Features
+<p align="center">
+  <a href="https://github.com/intility/indev/releases"><img src="https://img.shields.io/github/v/release/intility/indev" alt="GitHub Release"></a>
+<img src="https://img.shields.io/badge/go-%3E%3D1.25-blue" alt="Go Version">
+</p>
 
-- Create and delete Kubernetes clusters with ease
-- Deploy applications to a Kubernetes cluster
-- Delete application resources from a cluster
-- Forward ports from Kubernetes deployments
-- Generate Kubernetes manifests for deployments, services, Dockerfiles, and network policies
+<p align="center">
+<a href="https://github.com/intility/indev/actions/workflows/ci.yml"><img src="https://github.com/intility/indev/actions/workflows/ci.yml/badge.svg?branch=main" alt="Build Status"></a>
+</p>
 
-## Getting Started
+---
 
-Before you begin, ensure that you have the following installed:
+## Installation
 
-- Docker
-- `kubectl` command-line tool
-- Go (1.24.2 or higher)
+### Homebrew (macOS)
 
-### Installation
+```sh
+brew install intility/tap/indev
+```
 
-To install `indev`, follow these steps:
+### Windows / Linux
 
-1. Clone the repository:
+Download the latest release for your platform from the [GitHub Releases](https://github.com/intility/indev/releases) page. Extract the archive and add the binary to your PATH.
 
-   ```sh
-   git clone git@gitlab.intility.com:developer-infrastructure/platform-2.0/indev.git
-   cd indev
-   ```
+### From Source
 
-2. Build from source:
+Requires Go 1.25 or higher.
 
-   ```sh
-   go build -o indev main.go
-   ```
+```sh
+git clone https://github.com/intility/indev.git
+cd indev
+go build -o indev ./cmd/indev
+```
 
-3. (Optional) Move the binary to a location in your PATH:
+## Prerequisites
 
-   ```sh
-   mv indev /usr/local/bin/indev
-   ```
+Some commands require additional tools to be installed:
 
-### Usage
+| Command | Requirement |
+|---------|-------------|
+| `indev cluster login` | [OpenShift CLI (oc)](https://developers.intility.com/docs/getting-started/first-steps/deploy-first-application/?h=oc#install-openshift-cli) |
 
-Here are some of the commonly used `indev` commands:
+## Usage
 
-- Create a cluster:
+### Authentication
 
-  ```sh
-  indev cluster create
-  ```
+Log in to the Intility Developer Platform:
 
-- List clusters:
+```sh
+indev login
+```
 
-  ```sh
-  indev cluster list
-  ```
+Log out:
 
-- Delete a cluster:
+```sh
+indev logout
+```
 
-  ```sh
-  indev cluster delete --name <cluster-name>
-  ```
+View your account information:
 
-- Deploy an application:
+```sh
+indev account show
+```
 
-  ```sh
-  indev app deploy --path <app-manifest-path>
-  ```
+### Cluster Management
 
-- Delete an application:
+Create a new Kubernetes cluster:
 
-  ```sh
-  indev app delete --path <app-manifest-path>
-  ```
+```sh
+indev cluster create
+```
 
-- Forward a port:
-  ```sh
-  indev app port-forward --deployment <deployment-name>
-  ```
+You can also specify options directly:
 
-For a full list of command and options, run `indev --help`.
+```sh
+indev cluster create --name my-cluster --preset balanced --nodes 4
+```
+
+With autoscaling enabled:
+
+```sh
+indev cluster create --name my-cluster --preset performance --enable-autoscaling --min-nodes 2 --max-nodes 6
+```
+
+Available node presets: `minimal`, `balanced`, `performance`
+
+List your clusters:
+
+```sh
+indev cluster list
+```
+
+Get details for a specific cluster:
+
+```sh
+indev cluster get --name <cluster-name>
+```
+
+Check cluster status:
+
+```sh
+indev cluster status --name <cluster-name>
+```
+
+Log in to a cluster (requires `oc`):
+
+```sh
+indev cluster login --name <cluster-name>
+```
+
+Open the cluster in the web console:
+
+```sh
+indev cluster open --name <cluster-name>
+```
+
+Delete a cluster:
+
+```sh
+indev cluster delete --name <cluster-name>
+```
+
+### Team Management
+
+List teams:
+
+```sh
+indev team list
+```
+
+Create a new team:
+
+```sh
+indev team create --name <team-name>
+```
+
+Add a member to a team:
+
+```sh
+indev team member add --team <team-name> --user <user-email>
+```
+
+Remove a member from a team:
+
+```sh
+indev team member remove --team <team-name> --user <user-email>
+```
+
+### User Management
+
+List users:
+
+```sh
+indev user list
+```
+
+### Shell Completions
+
+Shell completions are installed automatically via Homebrew. For manual installation, run `indev completion --help` for instructions.
 
 ## Telemetry
 
-`indev` includes a telemetry feature that helps improve the tool by collecting anonymous usage data.
-The telemetry system gathers information such as command usage, performance metrics, and error reports.
-This data is crucial for identifying common issues, understanding user behavior, and prioritizing new features.
+`indev` collects anonymous usage data to help improve the tool. This includes command usage, performance metrics, and error reports. No personally identifiable information is collected.
 
-### What We Collect
+To opt out, set the environment variable:
 
-- Command usage: Which commands are run, along with flag usage.
-- Performance metrics: Response times for commands and other performance-related metrics.
-- Error reports: Unhandled errors or exceptions that occur during the use of the tool.
-
-### Anonymity and Privacy
-
-We are fully committed to ensuring user privacy and anonymity.
-The telemetry system only collects non-personally identifiable information.
-Additionally, data is stored securely and in compliance with relevant data protection regulations.
-
-### Opting Out
-
-Telemetry is enabled by default to help us improve `indev`. However, respecting user choice is paramount,
-and you can opt-out of telemetry at any time. To disable telemetry, set the environment variable
-`DO_NOT_TRACK` to `1`.
+```sh
+export DO_NOT_TRACK=1
+```
 
 ## Contributing
 
-Contributions are welcome! Feel free to open an issue or submit a pull request.
-
-## Acknowledgments
-
-- The `indev` team and all contributors
-- The Go and Kubernetes communities for their tools and libraries
-
-## Contact
-
-For questions or support, please contact Developer Infrastructure.
+This project is not currently accepting external contributions. However, we welcome feedback from the community. If you encounter a bug or have a feature request, please [open an issue](https://github.com/intility/indev/issues).
