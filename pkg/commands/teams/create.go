@@ -1,6 +1,8 @@
 package teams
 
 import (
+	"regexp"
+
 	"github.com/spf13/cobra"
 
 	"github.com/intility/indev/internal/redact"
@@ -13,6 +15,7 @@ import (
 const (
 	maxNameLength        = 50
 	minNameLength        = 3
+	validNameRegex       = "^[a-zA-Z0-9]+([-_ ]{0,1}[a-zA-Z0-9])+$"
 	maxDescriptionLength = 100
 	minDescriptionLength = 1
 )
@@ -22,6 +25,7 @@ var (
 	errEmptyDescription  = redact.Errorf("team description cannot be empty")
 	errInvalidNameLength = redact.Errorf("team name must be between %d and %d characters long", minNameLength, maxNameLength)
 	errInvalidDescLength = redact.Errorf("team description must be between %d and %d characters long", minDescriptionLength, maxDescriptionLength)
+	errInvalidNameFormat = redact.Errorf("team name must match the pattern %s", validNameRegex)
 )
 
 type CreateOptions struct {
@@ -74,6 +78,10 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 func validateCreateOptions(options CreateOptions) error {
 	if options.Name == "" {
 		return errEmptyName
+	}
+
+	if matched, err := regexp.MatchString(validNameRegex, options.Name); err != nil || !matched {
+		return errInvalidNameFormat
 	}
 
 	if options.Description == "" {
