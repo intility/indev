@@ -27,6 +27,7 @@ type ClusterClient interface {
 	CreateCluster(ctx context.Context, request NewClusterRequest) (*Cluster, error)
 	DeleteCluster(ctx context.Context, name string) error
 	GetClusterMembers(ctx context.Context, clusterID string) ([]ClusterMember, error)
+	AddClusterMember(ctx context.Context, clusterID string, request []AddClusterMemberRequest) error
 }
 
 type IntegrationClient interface {
@@ -216,4 +217,23 @@ func (c *RestClient) GetClusterMembers(ctx context.Context, clusterID string) ([
 	}
 
 	return members, nil
+}
+
+func (c *RestClient) AddClusterMember(ctx context.Context, clusterID string, request []AddClusterMemberRequest) error {
+	payload := AddClusterMembersPayload{Values: request}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("could not marshal request: %w", err)
+	}
+
+	req, err := c.createAuthenticatedRequest(ctx, "POST", c.baseURI+"/api/v1/clusters/"+clusterID+"/members", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	if err = doRequest[any](c.httpClient, req, nil); err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	return nil
 }
