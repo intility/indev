@@ -1,7 +1,6 @@
 package access
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"strings"
@@ -70,33 +69,6 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.Flags().VarP(&output, "output", "o", "Output format (wide, json, yaml)")
 
 	return cmd
-}
-
-func resolveClusterID(ctx context.Context, set clientset.ClientSet, clusterName, clusterID string) (string, error) {
-	// If cluster ID is provided directly, use it
-	if clusterID != "" {
-		return clusterID, nil
-	}
-
-	// If no cluster name provided, return error
-	if clusterName == "" {
-		return "", redact.Errorf("cluster name or ID is required")
-	}
-
-	// List clusters to find the one by name
-	clusters, err := set.PlatformClient.ListClusters(ctx)
-	if err != nil {
-		return "", redact.Errorf("could not list clusters: %w", redact.Safe(err))
-	}
-
-	// Find the cluster with the matching name
-	for _, c := range clusters {
-		if strings.EqualFold(c.Name, clusterName) {
-			return c.ID, nil
-		}
-	}
-
-	return "", redact.Errorf("cluster not found: %s", clusterName)
 }
 
 func printMemberList(writer io.Writer, format outputformat.Format, members []client.ClusterMember) error {
