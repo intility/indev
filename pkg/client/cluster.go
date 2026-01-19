@@ -1,5 +1,7 @@
 package client
 
+import "github.com/google/uuid"
+
 type Cluster struct {
 	ID         string        `json:"id"`
 	Name       string        `json:"name"`
@@ -53,4 +55,23 @@ type NodePool struct {
 type ComputeResources struct {
 	Cores  int    `json:"cores"`
 	Memory string `json:"memory"`
+}
+
+type ClusterMemberRole string
+
+const (
+	ClusterMemberRoleAdmin  ClusterMemberRole = "admin"
+	ClusterMemberRoleReader ClusterMemberRole = "reader"
+)
+
+type ClusterMemberSubject struct {
+	Type    string    `json:"type"`
+	Name    string    `json:"name"`
+	Details string    `json:"details"`
+	ID      uuid.UUID `json:"id"`
+}
+
+type ClusterMember struct {
+	Subject ClusterMemberSubject `json:"subject"`
+	Roles   []ClusterMemberRole  `json:"roles"`
 }

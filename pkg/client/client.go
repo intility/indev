@@ -26,6 +26,7 @@ type ClusterClient interface {
 	GetClusterStatus(ctx context.Context, clusterID string) (*Cluster, error)
 	CreateCluster(ctx context.Context, request NewClusterRequest) (*Cluster, error)
 	DeleteCluster(ctx context.Context, name string) error
+	GetClusterMembers(ctx context.Context, clusterID string) ([]ClusterMember, error)
 }
 
 type IntegrationClient interface {
@@ -200,4 +201,19 @@ func (c *RestClient) DeleteCluster(ctx context.Context, id string) error {
 	}
 
 	return nil
+}
+
+func (c *RestClient) GetClusterMembers(ctx context.Context, clusterID string) ([]ClusterMember, error) {
+	var members []ClusterMember
+
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters/"+clusterID+"/members", nil)
+	if err != nil {
+		return members, err
+	}
+
+	if err = doRequest(c.httpClient, req, &members); err != nil {
+		return members, fmt.Errorf("request failed: %w", err)
+	}
+
+	return members, nil
 }
