@@ -292,7 +292,10 @@ func (m *mockClient) CreateCluster(_ context.Context, _ client.NewClusterRequest
 	return nil, nil
 }
 func (m *mockClient) DeleteCluster(_ context.Context, _ string) error { return nil }
-func (m *mockClient) GetMe(_ context.Context) (client.Me, error)      { return client.Me{}, nil }
+func (m *mockClient) GetClusterMembers(_ context.Context, _ string) ([]client.ClusterMember, error) {
+	return nil, nil
+}
+func (m *mockClient) GetMe(_ context.Context) (client.Me, error) { return client.Me{}, nil }
 func (m *mockClient) ListTeams(_ context.Context) ([]client.Team, error) {
 	return nil, nil
 }
