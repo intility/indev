@@ -298,6 +298,7 @@ func (m *mockClient) GetClusterMembers(_ context.Context, _ string) ([]client.Cl
 func (m *mockClient) AddClusterMember(_ context.Context, _ string, _ []client.AddClusterMemberRequest) error {
 	return nil
 }
+func (m *mockClient) RemoveClusterMember(_ context.Context, _, _ string) error { return nil }
 func (m *mockClient) GetMe(_ context.Context) (client.Me, error) { return client.Me{}, nil }
 func (m *mockClient) ListTeams(_ context.Context) ([]client.Team, error) {
 	return nil, nil

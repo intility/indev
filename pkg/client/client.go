@@ -28,6 +28,7 @@ type ClusterClient interface {
 	DeleteCluster(ctx context.Context, name string) error
 	GetClusterMembers(ctx context.Context, clusterID string) ([]ClusterMember, error)
 	AddClusterMember(ctx context.Context, clusterID string, request []AddClusterMemberRequest) error
+	RemoveClusterMember(ctx context.Context, clusterID string, memberID string) error
 }
 
 type IntegrationClient interface {
@@ -227,6 +228,19 @@ func (c *RestClient) AddClusterMember(ctx context.Context, clusterID string, req
 	}
 
 	req, err := c.createAuthenticatedRequest(ctx, "POST", c.baseURI+"/api/v1/clusters/"+clusterID+"/members", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	if err = doRequest[any](c.httpClient, req, nil); err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	return nil
+}
+
+func (c *RestClient) RemoveClusterMember(ctx context.Context, clusterID string, memberID string) error {
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/clusters/"+clusterID+"/members/"+memberID, nil)
 	if err != nil {
 		return err
 	}
