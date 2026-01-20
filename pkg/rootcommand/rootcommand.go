@@ -86,6 +86,7 @@ func getAccessCommand(set clientset.ClientSet) *cobra.Command {
 
 	cmd.AddCommand(access.NewListCommand(set))
 	cmd.AddCommand(access.NewGrantCommand(set))
+	cmd.AddCommand(access.NewRevokeCommand(set))
 
 	return cmd
 }
