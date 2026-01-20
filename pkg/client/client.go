@@ -26,6 +26,9 @@ type ClusterClient interface {
 	GetClusterStatus(ctx context.Context, clusterID string) (*Cluster, error)
 	CreateCluster(ctx context.Context, request NewClusterRequest) (*Cluster, error)
 	DeleteCluster(ctx context.Context, name string) error
+	GetClusterMembers(ctx context.Context, clusterID string) ([]ClusterMember, error)
+	AddClusterMember(ctx context.Context, clusterID string, request []AddClusterMemberRequest) error
+	RemoveClusterMember(ctx context.Context, clusterID string, memberID string) error
 }
 
 type IntegrationClient interface {
@@ -191,6 +194,53 @@ func (c *RestClient) GetClusterStatus(ctx context.Context, clusterID string) (*C
 
 func (c *RestClient) DeleteCluster(ctx context.Context, id string) error {
 	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/clusters/"+id, nil)
+	if err != nil {
+		return err
+	}
+
+	if err = doRequest[any](c.httpClient, req, nil); err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	return nil
+}
+
+func (c *RestClient) GetClusterMembers(ctx context.Context, clusterID string) ([]ClusterMember, error) {
+	var members []ClusterMember
+
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters/"+clusterID+"/members", nil)
+	if err != nil {
+		return members, err
+	}
+
+	if err = doRequest(c.httpClient, req, &members); err != nil {
+		return members, fmt.Errorf("request failed: %w", err)
+	}
+
+	return members, nil
+}
+
+func (c *RestClient) AddClusterMember(ctx context.Context, clusterID string, request []AddClusterMemberRequest) error {
+	payload := AddClusterMembersPayload{Values: request}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("could not marshal request: %w", err)
+	}
+
+	req, err := c.createAuthenticatedRequest(ctx, "POST", c.baseURI+"/api/v1/clusters/"+clusterID+"/members", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	if err = doRequest[any](c.httpClient, req, nil); err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	return nil
+}
+
+func (c *RestClient) RemoveClusterMember(ctx context.Context, clusterID string, memberID string) error {
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/clusters/"+clusterID+"/members/"+memberID, nil)
 	if err != nil {
 		return err
 	}

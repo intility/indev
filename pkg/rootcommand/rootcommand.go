@@ -11,6 +11,7 @@ import (
 	"github.com/intility/indev/pkg/clientset"
 	"github.com/intility/indev/pkg/commands/account"
 	"github.com/intility/indev/pkg/commands/cluster"
+	"github.com/intility/indev/pkg/commands/cluster/access"
 	"github.com/intility/indev/pkg/commands/teams"
 	"github.com/intility/indev/pkg/commands/teams/member"
 	"github.com/intility/indev/pkg/commands/user"
@@ -70,6 +71,22 @@ func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.AddCommand(cluster.NewLoginCommand(set))
 	cmd.AddCommand(cluster.NewOpenCommand(set))
 	cmd.AddCommand(cluster.NewStatusCommand(set))
+	cmd.AddCommand(getAccessCommand(set))
+
+	return cmd
+}
+
+func getAccessCommand(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "access",
+		Short: "Manage cluster access",
+		Long:  "Manage cluster access",
+		Run:   showHelp,
+	}
+
+	cmd.AddCommand(access.NewListCommand(set))
+	cmd.AddCommand(access.NewGrantCommand(set))
+	cmd.AddCommand(access.NewRevokeCommand(set))
 
 	return cmd
 }

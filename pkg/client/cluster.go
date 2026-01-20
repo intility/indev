@@ -1,5 +1,7 @@
 package client
 
+import "github.com/google/uuid"
+
 type Cluster struct {
 	ID         string        `json:"id"`
 	Name       string        `json:"name"`
@@ -53,4 +55,60 @@ type NodePool struct {
 type ComputeResources struct {
 	Cores  int    `json:"cores"`
 	Memory string `json:"memory"`
+}
+
+type ClusterMemberRole string
+
+const (
+	ClusterMemberRoleAdmin  ClusterMemberRole = "admin"
+	ClusterMemberRoleReader ClusterMemberRole = "reader"
+)
+
+type ClusterMemberSubject struct {
+	Type    string    `json:"type"`
+	Name    string    `json:"name"`
+	Details string    `json:"details"`
+	ID      uuid.UUID `json:"id"`
+}
+
+type ClusterMember struct {
+	Subject ClusterMemberSubject `json:"subject"`
+	Roles   []ClusterMemberRole  `json:"roles"`
+}
+
+// String returns the string representation of ClusterMemberRole.
+func (r ClusterMemberRole) String() string {
+	return string(r)
+}
+
+// IsValid checks if the ClusterMemberRole is valid.
+func (r ClusterMemberRole) IsValid() bool {
+	switch r {
+	case ClusterMemberRoleAdmin, ClusterMemberRoleReader:
+		return true
+	default:
+		return false
+	}
+}
+
+// GetClusterMemberRoleValues returns a slice of valid ClusterMemberRole values.
+func GetClusterMemberRoleValues() []string {
+	return []string{
+		string(ClusterMemberRoleAdmin),
+		string(ClusterMemberRoleReader),
+	}
+}
+
+type AddClusterMemberSubject struct {
+	Type string `json:"type"`
+	ID   string `json:"id"`
+}
+
+type AddClusterMemberRequest struct {
+	Subject AddClusterMemberSubject `json:"subject"`
+	Roles   []ClusterMemberRole     `json:"roles"`
+}
+
+type AddClusterMembersPayload struct {
+	Values []AddClusterMemberRequest `json:"values"`
 }
