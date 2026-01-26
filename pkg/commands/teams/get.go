@@ -3,7 +3,6 @@ package teams
 import (
 	"io"
 	"slices"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -41,19 +40,9 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 				return errEmptyName
 			}
 
-			// List teams to find the one by name
-			teams, err := set.PlatformClient.ListTeams(ctx)
+			team, err := set.PlatformClient.GetTeam(ctx, teamName)
 			if err != nil {
 				return redact.Errorf("could not get team: %w", redact.Safe(err))
-			}
-
-			// Find the team with the matching name
-			var team *client.Team
-			for _, c := range teams {
-				if strings.EqualFold(c.Name, teamName) {
-					team = &c
-					break
-				}
 			}
 
 			if team == nil {

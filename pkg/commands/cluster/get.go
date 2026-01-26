@@ -40,19 +40,10 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 				return errEmptyName
 			}
 
-			// List clusters to find the one by name
-			clusters, err := set.PlatformClient.ListClusters(ctx)
+			// Get cluster by name
+			cluster, err := set.PlatformClient.GetCluster(ctx, clusterName)
 			if err != nil {
-				return redact.Errorf("could not list clusters: %w", redact.Safe(err))
-			}
-
-			// Find the cluster with the matching name
-			var cluster *client.Cluster
-			for _, c := range clusters {
-				if strings.EqualFold(c.Name, clusterName) {
-					cluster = &c
-					break
-				}
+				return redact.Errorf("could not get cluster: %w", redact.Safe(err))
 			}
 
 			if cluster == nil {
