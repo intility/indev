@@ -1,8 +1,6 @@
 package teams
 
 import (
-	"strings"
-
 	"github.com/spf13/cobra"
 
 	"github.com/intility/indev/internal/redact"
@@ -33,17 +31,9 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 				return errEmptyName
 			}
 
-			teams, err := set.PlatformClient.ListTeams(ctx)
+			team, err := set.PlatformClient.GetTeam(ctx, teamName)
 			if err != nil {
-				return redact.Errorf("could not list teams: %w", redact.Safe(err))
-			}
-
-			var team *client.Team
-			for _, t := range teams {
-				if strings.EqualFold(t.Name, teamName) {
-					team = &t
-					break
-				}
+				return redact.Errorf("could not get team: %w", redact.Safe(err))
 			}
 
 			if team == nil {

@@ -2,10 +2,8 @@ package access
 
 import (
 	"context"
-	"strings"
 
 	"github.com/intility/indev/internal/redact"
-	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
 )
 
@@ -20,34 +18,23 @@ func resolveClusterID(ctx context.Context, set clientset.ClientSet, clusterName,
 		return "", redact.Errorf("cluster name or ID is required")
 	}
 
-	// List clusters to find the one by name
-	clusters, err := set.PlatformClient.ListClusters(ctx)
+	// Get cluster by name
+	cluster, err := set.PlatformClient.GetCluster(ctx, clusterName)
 	if err != nil {
-		return "", redact.Errorf("could not list clusters: %w", redact.Safe(err))
+		return "", redact.Errorf("could not get cluster: %w", redact.Safe(err))
 	}
 
-	// Find the cluster with the matching name
-	for _, c := range clusters {
-		if strings.EqualFold(c.Name, clusterName) {
-			return c.ID, nil
-		}
+	if cluster == nil {
+		return "", redact.Errorf("cluster not found: %s", clusterName)
 	}
 
-	return "", redact.Errorf("cluster not found: %s", clusterName)
+	return cluster.ID, nil
 }
 
 func getUserIDByUPN(ctx context.Context, set clientset.ClientSet, upn string) (string, error) {
-	users, err := set.PlatformClient.ListUsers(ctx)
+	user, err := set.PlatformClient.GetUser(ctx, upn)
 	if err != nil {
-		return "", redact.Errorf("could not list users: %w", redact.Safe(err))
-	}
-
-	var user *client.User
-	for _, u := range users {
-		if strings.EqualFold(u.UPN, upn) {
-			user = &u
-			break
-		}
+		return "", redact.Errorf("could not get user: %w", redact.Safe(err))
 	}
 
 	if user == nil {
@@ -58,17 +45,9 @@ func getUserIDByUPN(ctx context.Context, set clientset.ClientSet, upn string) (s
 }
 
 func getTeamIDByName(ctx context.Context, set clientset.ClientSet, teamName string) (string, error) {
-	teams, err := set.PlatformClient.ListTeams(ctx)
+	team, err := set.PlatformClient.GetTeam(ctx, teamName)
 	if err != nil {
-		return "", redact.Errorf("could not list teams: %w", redact.Safe(err))
-	}
-
-	var team *client.Team
-	for _, t := range teams {
-		if strings.EqualFold(t.Name, teamName) {
-			team = &t
-			break
-		}
+		return "", redact.Errorf("could not get team: %w", redact.Safe(err))
 	}
 
 	if team == nil {

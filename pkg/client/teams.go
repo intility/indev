@@ -16,6 +16,8 @@ type Team struct {
 	Role        []string `json:"roles"`
 }
 
+type TeamList []Team
+
 type Subject struct {
 	Type    string    `json:"type"`
 	Name    string    `json:"name"`
@@ -78,7 +80,7 @@ type AddTeamMemberRequest struct {
 }
 
 func (c *RestClient) ListTeams(ctx context.Context) ([]Team, error) {
-	var teams []Team
+	var teams TeamList
 
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/teams", nil)
 	if err != nil {
@@ -90,6 +92,24 @@ func (c *RestClient) ListTeams(ctx context.Context) ([]Team, error) {
 	}
 
 	return teams, nil
+}
+
+func (c *RestClient) GetTeam(ctx context.Context, name string) (*Team, error) {
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/teams/by-name/"+name, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var team Team
+	if err = doRequest(c.httpClient, req, &team); err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	if team.Name != name {
+		return nil, fmt.Errorf("team not found: %s", name)
+	}
+
+	return &team, nil
 }
 
 func (c *RestClient) GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error) {

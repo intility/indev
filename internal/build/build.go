@@ -34,8 +34,8 @@ var (
 	OTELCollectorToken    = ""
 
 	AuthPlatformAudience = "api://cd5aff56-575c-4e7e-b68e-3f67fa42eb31/user_impersonation"
-	AuthAuthority        = "https://login.microsoftonline.com/intility.no"
-	AuthClientID         = "b65cf9b0-290c-4b44-a4b1-0b02b7752b3c"
+	AuthAuthority        = "https://login.microsoftonline.com/organizations"
+	AuthClientID         = "27f5ab79-28cb-4824-b603-4b0795b8985e"
 	AuthRedirect         = "http://localhost:42069"
 )
 
@@ -121,7 +121,7 @@ func PlatformAPIHost() string {
 
 func ClientID() string {
 	if IsDev {
-		return "b65cf9b0-290c-4b44-a4b1-0b02b7752b3c"
+		return "27f5ab79-28cb-4824-b603-4b0795b8985e"
 	}
 
 	return AuthClientID
@@ -129,7 +129,7 @@ func ClientID() string {
 
 func Authority() string {
 	if IsDev {
-		return "https://login.microsoftonline.com/intility.no"
+		return "https://login.microsoftonline.com/organizations"
 	}
 
 	return AuthAuthority

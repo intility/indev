@@ -1,15 +1,12 @@
 package cluster
 
 import (
-	"strings"
-
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 
 	"github.com/intility/indev/internal/redact"
 	"github.com/intility/indev/internal/telemetry"
 	"github.com/intility/indev/internal/ux"
-	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
 )
 
@@ -20,10 +17,10 @@ func NewOpenCommand(set clientset.ClientSet) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "open [name]",
-		Short: "Open the cluster console in a browser",
-		Long:  `Open the OpenShift web console for the specified cluster in your default browser.`,
-		Args:  cobra.MaximumNArgs(1),
+		Use:     "open [name]",
+		Short:   "Open the cluster console in a browser",
+		Long:    `Open the OpenShift web console for the specified cluster in your default browser.`,
+		Args:    cobra.MaximumNArgs(1),
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.open")
@@ -40,19 +37,10 @@ func NewOpenCommand(set clientset.ClientSet) *cobra.Command {
 				return errEmptyName
 			}
 
-			// List clusters to find the one by name
-			clusters, err := set.PlatformClient.ListClusters(ctx)
+			// Get cluster by name
+			cluster, err := set.PlatformClient.GetCluster(ctx, clusterName)
 			if err != nil {
-				return redact.Errorf("could not list clusters: %w", redact.Safe(err))
-			}
-
-			// Find the cluster with the matching name (case-insensitive)
-			var cluster *client.Cluster
-			for _, c := range clusters {
-				if strings.EqualFold(c.Name, clusterName) {
-					cluster = &c
-					break
-				}
+				return redact.Errorf("could not get cluster: %w", redact.Safe(err))
 			}
 
 			if cluster == nil {

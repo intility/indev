@@ -41,6 +41,7 @@ type MeClient interface {
 
 type TeamsClient interface {
 	ListTeams(ctx context.Context) ([]Team, error)
+	GetTeam(ctx context.Context, name string) (*Team, error)
 	GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error)
 	CreateTeam(ctx context.Context, request NewTeamRequest) (*Team, error)
 	DeleteTeam(ctx context.Context, request DeleteTeamRequest) error
@@ -53,6 +54,7 @@ type MemberClient interface {
 
 type UserClient interface {
 	ListUsers(ctx context.Context) ([]User, error)
+	GetUser(ctx context.Context, upn string) (*User, error)
 }
 
 type Client interface {
@@ -165,7 +167,7 @@ func (c *RestClient) CreateCluster(ctx context.Context, request NewClusterReques
 }
 
 func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, error) {
-	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters/"+name, nil)
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/clusters/by-name/"+name, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +175,10 @@ func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, err
 	var cluster Cluster
 	if err = doRequest(c.httpClient, req, &cluster); err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	if cluster.Name != name {
+		return nil, fmt.Errorf("cluster not found: %s", name)
 	}
 
 	return &cluster, nil

@@ -1,14 +1,11 @@
 package cluster
 
 import (
-	"strings"
-
 	"github.com/spf13/cobra"
 
 	"github.com/intility/indev/internal/redact"
 	"github.com/intility/indev/internal/telemetry"
 	"github.com/intility/indev/internal/ux"
-	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
 )
 
@@ -37,19 +34,10 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 				return errEmptyName
 			}
 
-			// List clusters to find the one by name
-			clusters, err := set.PlatformClient.ListClusters(ctx)
+			// Get cluster by name
+			cluster, err := set.PlatformClient.GetCluster(ctx, clusterName)
 			if err != nil {
-				return redact.Errorf("could not list clusters: %w", redact.Safe(err))
-			}
-
-			// Find the cluster with the matching name
-			var cluster *client.Cluster
-			for _, c := range clusters {
-				if strings.EqualFold(c.Name, clusterName) {
-					cluster = &c
-					break
-				}
+				return redact.Errorf("could not get cluster: %w", redact.Safe(err))
 			}
 
 			if cluster == nil {

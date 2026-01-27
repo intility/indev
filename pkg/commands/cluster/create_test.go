@@ -299,8 +299,11 @@ func (m *mockClient) AddClusterMember(_ context.Context, _ string, _ []client.Ad
 	return nil
 }
 func (m *mockClient) RemoveClusterMember(_ context.Context, _, _ string) error { return nil }
-func (m *mockClient) GetMe(_ context.Context) (client.Me, error) { return client.Me{}, nil }
+func (m *mockClient) GetMe(_ context.Context) (client.Me, error)               { return client.Me{}, nil }
 func (m *mockClient) ListTeams(_ context.Context) ([]client.Team, error) {
+	return nil, nil
+}
+func (m *mockClient) GetTeam(_ context.Context, _ string) (*client.Team, error) {
 	return nil, nil
 }
 func (m *mockClient) GetTeamMembers(_ context.Context, _ string) ([]client.TeamMember, error) {
@@ -315,6 +318,9 @@ func (m *mockClient) AddTeamMember(_ context.Context, _ string, _ []client.AddTe
 }
 func (m *mockClient) RemoveTeamMember(_ context.Context, _, _ string) error { return nil }
 func (m *mockClient) ListUsers(_ context.Context) ([]client.User, error)    { return nil, nil }
+func (m *mockClient) GetUser(_ context.Context, _ string) (*client.User, error) {
+	return nil, nil
+}
 
 func TestSelectSSOProvisioner(t *testing.T) {
 	tests := []struct {

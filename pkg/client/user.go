@@ -12,8 +12,10 @@ type User struct {
 	Roles []string `json:"roles"`
 }
 
+type UserList []User
+
 func (c *RestClient) ListUsers(ctx context.Context) ([]User, error) {
-	var users []User
+	var users UserList
 
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/users", nil)
 	if err != nil {
@@ -25,4 +27,22 @@ func (c *RestClient) ListUsers(ctx context.Context) ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func (c *RestClient) GetUser(ctx context.Context, upn string) (*User, error) {
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/users/by-upn/"+upn, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var user User
+	if err = doRequest(c.httpClient, req, &user); err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	if user.UPN != upn {
+		return nil, fmt.Errorf("user not found: %s", upn)
+	}
+
+	return &user, nil
 }
