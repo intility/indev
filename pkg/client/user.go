@@ -2,8 +2,11 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 )
+
+var ErrUserNotFound = errors.New("user not found")
 
 type User struct {
 	ID    string   `json:"id"    yaml:"id"`
@@ -41,7 +44,7 @@ func (c *RestClient) GetUser(ctx context.Context, upn string) (*User, error) {
 	}
 
 	if user.UPN != upn {
-		return nil, fmt.Errorf("user not found: %s", upn)
+		return nil, fmt.Errorf("%w: %s", ErrUserNotFound, upn)
 	}
 
 	return &user, nil

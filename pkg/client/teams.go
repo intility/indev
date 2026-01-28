@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
 )
+
+var ErrTeamNotFound = errors.New("team not found")
 
 type Team struct {
 	ID          string   `json:"id"          yaml:"id"`
@@ -106,7 +109,7 @@ func (c *RestClient) GetTeam(ctx context.Context, name string) (*Team, error) {
 	}
 
 	if team.Name != name {
-		return nil, fmt.Errorf("team not found: %s", name)
+		return nil, fmt.Errorf("%w: %s", ErrTeamNotFound, name)
 	}
 
 	return &team, nil

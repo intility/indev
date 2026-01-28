@@ -157,7 +157,7 @@ func Errorf(format string, a ...any) error {
 		}
 	}
 
-	safeErr.err = fmt.Errorf(format, args...) //nolint:goerr113
+	safeErr.err = fmt.Errorf(format, args...) //nolint:err113
 
 	// Now create the redacted error by replacing all args with their redacted
 	// version or by inserting a placeholder if the arg can't be redacted.
@@ -174,7 +174,7 @@ func Errorf(format string, a ...any) error {
 		}
 	}
 
-	safeErr.redacted = fmt.Errorf(format, args...) //nolint:goerr113
+	safeErr.redacted = fmt.Errorf(format, args...) //nolint:err113
 
 	return safeErr
 }

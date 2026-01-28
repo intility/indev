@@ -14,7 +14,10 @@ import (
 	"github.com/intility/indev/pkg/client"
 )
 
-var errNotAuthenticatedPreHook = errors.New("you need to sign in before executing this operation")
+var (
+	errNotAuthenticatedPreHook = errors.New("you need to sign in before executing this operation")
+	errInvalidHomeAccountID    = errors.New("invalid HomeAccountID format")
+)
 
 type Authenticator interface {
 	IsAuthenticated(ctx context.Context) (bool, error)
@@ -111,7 +114,7 @@ func (c *ClientSet) GetTenantID(ctx context.Context) (string, error) {
 
 	parts := strings.Split(account.HomeAccountID, ".")
 	if len(parts) < 2 {
-		return "", fmt.Errorf("invalid HomeAccountID format: %s", account.HomeAccountID)
+		return "", fmt.Errorf("%w: %s", errInvalidHomeAccountID, account.HomeAccountID)
 	}
 
 	return parts[1], nil

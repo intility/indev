@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +15,8 @@ import (
 	"github.com/intility/indev/internal/build"
 	"github.com/intility/indev/pkg/authenticator"
 )
+
+var ErrClusterNotFound = errors.New("cluster not found")
 
 const (
 	defaultHTTPTimeout = 10 * time.Second
@@ -178,7 +181,7 @@ func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, err
 	}
 
 	if cluster.Name != name {
-		return nil, fmt.Errorf("cluster not found: %s", name)
+		return nil, fmt.Errorf("%w: %s", ErrClusterNotFound, name)
 	}
 
 	return &cluster, nil
