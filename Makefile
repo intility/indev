@@ -172,7 +172,7 @@ GOMOD = $(LOCALBIN)/gomod-$(GOMOD_VERSION)
 
 ## Tool Versions
 TOOLKIT_TOOLS_GEN_VERSION ?= latest
-GOLANGCI_LINT_VERSION ?= v1.59.1
+GOLANGCI_LINT_VERSION ?= v2.8.0
 GOSEC_VERSION ?= latest
 GOVULNCHECK_VERSION ?= latest
 MOCKERY_VERSION ?= v2.42.1
@@ -184,7 +184,7 @@ GOMOD_VERSION ?= latest
 .PHONY: golangci-lint
 golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
 $(GOLANGCI_LINT): $(LOCALBIN)
-	$(call go-install-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint,${GOLANGCI_LINT_VERSION})
+	$(call go-install-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/v2/cmd/golangci-lint,${GOLANGCI_LINT_VERSION})
 
 .PHONY: gosec
 gosec: $(GOSEC) ## Download gosec locally if necessary.
