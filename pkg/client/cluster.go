@@ -65,15 +65,15 @@ const (
 )
 
 type ClusterMemberSubject struct {
-	Type    string    `json:"type"`
-	Name    string    `json:"name"`
-	Details string    `json:"details"`
-	ID      uuid.UUID `json:"id"`
+	Type    string    `json:"type"    yaml:"type"`
+	Name    string    `json:"name"    yaml:"name"`
+	Details string    `json:"details" yaml:"details"`
+	ID      uuid.UUID `json:"id"      yaml:"id"`
 }
 
 type ClusterMember struct {
-	Subject ClusterMemberSubject `json:"subject"`
-	Roles   []ClusterMemberRole  `json:"roles"`
+	Subject ClusterMemberSubject `json:"subject" yaml:"subject"`
+	Roles   []ClusterMemberRole  `json:"roles"   yaml:"roles"`
 }
 
 // String returns the string representation of ClusterMemberRole.

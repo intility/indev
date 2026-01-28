@@ -6,10 +6,10 @@ import (
 )
 
 type User struct {
-	ID    string   `json:"id"`
-	Name  string   `json:"name"`
-	UPN   string   `json:"upn"`
-	Roles []string `json:"roles"`
+	ID    string   `json:"id"    yaml:"id"`
+	Name  string   `json:"name"  yaml:"name"`
+	UPN   string   `json:"upn"   yaml:"upn"`
+	Roles []string `json:"roles" yaml:"roles"`
 }
 
 type UserList []User

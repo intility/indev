@@ -10,19 +10,19 @@ import (
 )
 
 type Team struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Role        []string `json:"roles"`
+	ID          string   `json:"id"          yaml:"id"`
+	Name        string   `json:"name"        yaml:"name"`
+	Description string   `json:"description" yaml:"description"`
+	Role        []string `json:"roles"       yaml:"roles"`
 }
 
 type TeamList []Team
 
 type Subject struct {
-	Type    string    `json:"type"`
-	Name    string    `json:"name"`
-	Details string    `json:"details"`
-	ID      uuid.UUID `json:"id"`
+	Type    string    `json:"type"    yaml:"type"`
+	Name    string    `json:"name"    yaml:"name"`
+	Details string    `json:"details" yaml:"details"`
+	ID      uuid.UUID `json:"id"      yaml:"id"`
 }
 
 type MemberRole string
