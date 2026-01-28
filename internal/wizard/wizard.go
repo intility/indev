@@ -406,6 +406,7 @@ func NewWizard(inputs []Input) *Wizard {
 				placeholder: input.Placeholder,
 				options:     options,
 				selected:    0,
+				focused:     false,
 				isToggle:    true,
 				style:       blurredStyle,
 			}
@@ -416,6 +417,7 @@ func NewWizard(inputs []Input) *Wizard {
 				placeholder: input.Placeholder,
 				options:     input.Options,
 				selected:    0,
+				focused:     false,
 				isToggle:    false,
 				style:       blurredStyle,
 			}

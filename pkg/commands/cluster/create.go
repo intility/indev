@@ -86,23 +86,40 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 			clusterName := options.Name + "-" + generateSuffix()
 
 			// Create node pool based on autoscaling configuration
-			nodePool := client.NodePool{
-				Preset: options.Preset,
-			}
+			var nodePool client.NodePool
 
 			if options.EnableAutoscaling {
-				nodePool.AutoscalingEnabled = true
-				nodePool.MinCount = &options.MinNodes
-				nodePool.MaxCount = &options.MaxNodes
+				nodePool = client.NodePool{
+					ID:                 "",
+					Name:               "",
+					Preset:             options.Preset,
+					Replicas:           nil,
+					Compute:            nil,
+					AutoscalingEnabled: true,
+					MinCount:           &options.MinNodes,
+					MaxCount:           &options.MaxNodes,
+				}
 			} else {
 				replicas := options.NodeCount
-				nodePool.Replicas = &replicas
+				nodePool = client.NodePool{
+					ID:                 "",
+					Name:               "",
+					Preset:             options.Preset,
+					Replicas:           &replicas,
+					Compute:            nil,
+					AutoscalingEnabled: false,
+					MinCount:           nil,
+					MaxCount:           nil,
+				}
 			}
 
 			_, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
 				Name:           clusterName,
 				SSOProvisioner: ssoProvisioner,
 				NodePools:      []client.NodePool{nodePool},
+				Version:        "",
+				Environment:    "",
+				PullSecretRef:  nil,
 			})
 			if err != nil {
 				return redact.Errorf("could not create cluster: %w", redact.Safe(err))
@@ -145,23 +162,38 @@ func optionsFromWizard() (CreateOptions, error) {
 			Type:        wizard.InputTypeText,
 			Limit:       0,
 			Validator:   nil,
+			Options:     nil,
+			DependsOn:   "",
+			ShowWhen:    nil,
 		},
 		{
 			ID:          "preset",
 			Placeholder: "Node Preset",
 			Type:        wizard.InputTypeSelect,
+			Limit:       0,
+			Validator:   nil,
 			Options:     []string{"minimal", "balanced", "performance"},
+			DependsOn:   "",
+			ShowWhen:    nil,
 		},
 		{
 			ID:          "autoscaling",
 			Placeholder: "Enable autoscaling",
 			Type:        wizard.InputTypeToggle,
+			Limit:       0,
+			Validator:   nil,
 			Options:     []string{answerNo, answerYes},
+			DependsOn:   "",
+			ShowWhen:    nil,
 		},
 		{
 			ID:          "nodes",
 			Placeholder: "Node Count (" + strconv.Itoa(minCount) + "-" + strconv.Itoa(maxCount) + ")",
 			Type:        wizard.InputTypeText,
+			Limit:       0,
+			Validator:   nil,
+			Options:     nil,
+			DependsOn:   "",
 			ShowWhen: func(answers map[string]wizard.Answer) bool {
 				// Show this field only when autoscaling is disabled
 				return answers["autoscaling"].Value == answerNo
@@ -171,6 +203,10 @@ func optionsFromWizard() (CreateOptions, error) {
 			ID:          "minNodes",
 			Placeholder: "Minimum Nodes (" + strconv.Itoa(minCount) + "-" + strconv.Itoa(maxCount) + ")",
 			Type:        wizard.InputTypeText,
+			Limit:       0,
+			Validator:   nil,
+			Options:     nil,
+			DependsOn:   "",
 			ShowWhen: func(answers map[string]wizard.Answer) bool {
 				// Show this field only when autoscaling is enabled
 				return answers["autoscaling"].Value == answerYes
@@ -180,6 +216,10 @@ func optionsFromWizard() (CreateOptions, error) {
 			ID:          "maxNodes",
 			Placeholder: "Maximum Nodes (" + strconv.Itoa(minCount) + "-" + strconv.Itoa(maxCount) + ")",
 			Type:        wizard.InputTypeText,
+			Limit:       0,
+			Validator:   nil,
+			Options:     nil,
+			DependsOn:   "",
 			ShowWhen: func(answers map[string]wizard.Answer) bool {
 				// Show this field only when autoscaling is enabled
 				return answers["autoscaling"].Value == answerYes
