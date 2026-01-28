@@ -1,158 +1,271 @@
-linters:
-  disable-all: true
-  enable:
-    - depguard
-    - revive
-    - stylecheck
-    - gosec
-    - goconst
-    - gocyclo
-    - gci
-    - unparam
-    - govet
-  presets:
-    - bugs
-    - comment
-    - complexity
-    - error
-    - format
-    - import
-    #    - metalinter #slow
-    - module
-    - performance
-    #    - sql
-    - style
-    - test
-    - unused
-linters-settings:
-  revive:
-    ignore-generated-header: true
-    enable-all-rules: false
-    # Specifying any rule explicitly will disable the default-enabled rules.
-    # Manually specify the defaults along with `context-as-argument`.
-    rules:
-      # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md
-      - name: argument-limit
-        arguments: [4]
-      - name: bare-return
-        disabled: false
-      - name: blank-imports
-        disabled: false
-      - name: error-naming
-        disabled: false
-      - name: error-return
-        disabled: false
-      - name: error-strings
-        disabled: false
-      - name: exported
-        disabled: false
-      - name: increment-decrement
-        disabled: false
-      - name: indent-error-flow
-        disabled: false
-      - name: receiver-naming
-        disabled: false
-      - name: range
-        disabled: false
-      - name: var-naming
-        disabled: false
-  stylecheck:
-    checks: ["all"]
-  gci:
-    custom-order: true
-    sections:
-      - standard
-      - default
-      - prefix(github.com/intility/indev)
-  depguard:
-    rules:
-      prevent_unmaintained_packages:
-        list-mode: lax
-        deny:
-          - pkg: io/ioutil
-            desc: "replaced by io and os packages since Go 1.16"
-  nlreturn:
-    block-size: 2
-  forbidigo:
-    forbid:
-      - p: ^fmt\.Print.*$
-        msg: "reasons"
-      - p: ^cmd\.Print.*$
-        msg: "use ux.Fprint(cmd.OutOrStdout(), msg) instead"
-  varnamelen:
-    ignore-decls:
-      - w http.ResponseWriter
-      - r *http.Request
-  exhaustruct:
-    # List of regular expressions to exclude struct packages and their names from checks.
-    # Regular expressions must match complete canonical struct package/name/structname.
-    # These packages typically contains no suitable constructors, but needs to be used with zero values.
-    # Default: []
-    exclude:
-      # std libs
-      - "^net/http.Client$"
-      - "^net/http.Cookie$"
-      - "^net/http.Request$"
-      - "^net/http.Response$"
-      - "^net/http.Server$"
-      - "^net/http.Transport$"
-      # 3rd party
-      - ".+/cobra.Command$"
-      - ".+openai.ChatCompletionRequest"
-      - ".+openai.ChatCompletionMessage"
-issues:
-  exclude-dirs:
-    - bin
-    - vendor
-    - mocks
-    - internal/telemetry
-    - .codecov.yml
-    - .coveralls.yml
-    - .git
-    - .gitattributes
-    - .github
-    - .gitignore
-    - .gitlab
-    - .gitmodules
-    - .golangci
-    - .golangci.yaml
-    - .goreleaser
-    - .goreleaser.d
-    - .goreleaser.yml
-    - .idea
-    - .mockery.yaml
-    - .travis.yml
-    - .vscode
-  exclude-rules:
-    - path: cmd
-      linters:
-        - gochecknoinits
-        - gochecknoglobals
-
-    - path: internal/build
-      linters:
-        - gochecknoglobals
-
-    - path: internal/telemetry
-      linters:
-        - gochecknoglobals
-
-    - path: internal/pipeline
-      linters:
-        - ireturn
-        - wrapcheck
-
-    - path: internal/ux
-      linters:
-        - gochecknoglobals
-
-    - path: '(.+)\.go$'
-      linters:
-        - varnamelen
-    # pkg/wizard is based on charmbracelet/bubbletea that uses
-    # interfaces as return values to manage the state machine.
-    - path: 'internal/wizard/.*\.go$'
-      linters:
-        - ireturn
+version: "2"
 run:
-  tests: false # skip test files
+  tests: false
+linters:
+  default: none
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - depguard
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - ireturn
+    - lll
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nlreturn
+    - noctx
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - usetesting
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl_v5
+    - zerologlint
+  settings:
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2
+    depguard:
+      rules:
+        prevent_unmaintained_packages:
+          list-mode: lax
+          deny:
+            - pkg: io/ioutil
+              desc: replaced by io and os packages since Go 1.16
+    exhaustruct:
+      exclude:
+        - ^net/http.Client$
+        - ^net/http.Cookie$
+        - ^net/http.Request$
+        - ^net/http.Response$
+        - ^net/http.Server$
+        - ^net/http.Transport$
+        - .+/cobra.Command$
+        - .+openai.ChatCompletionRequest
+        - .+openai.ChatCompletionMessage
+    forbidigo:
+      forbid:
+        - pattern: ^fmt\.Print.*$
+          msg: reasons
+        - pattern: ^cmd\.Print.*$
+          msg: use ux.Fprint(cmd.OutOrStdout(), msg) instead
+    nlreturn:
+      block-size: 2
+    revive:
+      enable-all-rules: false
+      rules:
+        - name: argument-limit
+          arguments:
+            - 4
+        - name: bare-return
+          disabled: false
+        - name: blank-imports
+          disabled: false
+        - name: error-naming
+          disabled: false
+        - name: error-return
+          disabled: false
+        - name: error-strings
+          disabled: false
+        - name: exported
+          disabled: false
+        - name: increment-decrement
+          disabled: false
+        - name: indent-error-flow
+          disabled: false
+        - name: receiver-naming
+          disabled: false
+        - name: range
+          disabled: false
+        - name: var-naming
+          disabled: false
+    staticcheck:
+      checks:
+        - all
+    varnamelen:
+      ignore-decls:
+        - w http.ResponseWriter
+        - r *http.Request
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - gochecknoglobals
+          - gochecknoinits
+        path: cmd
+      - linters:
+          - gochecknoglobals
+        path: internal/build
+      - linters:
+          - gochecknoglobals
+        path: internal/telemetry
+      - linters:
+          - ireturn
+          - wrapcheck
+        path: internal/pipeline
+      - linters:
+          - gochecknoglobals
+        path: internal/ux
+      - linters:
+          - varnamelen
+        path: (.+)\.go$
+      - linters:
+          - ireturn
+        path: internal/wizard/.*\.go$
+    paths:
+      - bin
+      - vendor
+      - mocks
+      - internal/telemetry
+      - .codecov.yml
+      - .coveralls.yml
+      - .git
+      - .gitattributes
+      - .github
+      - .gitignore
+      - .gitlab
+      - .gitmodules
+      - .golangci
+      - .golangci.yaml
+      - .goreleaser
+      - .goreleaser.d
+      - .goreleaser.yml
+      - .idea
+      - .mockery.yaml
+      - .travis.yml
+      - .vscode
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/intility/indev)
+      custom-order: true
+  exclusions:
+    generated: lax
+    paths:
+      - bin
+      - vendor
+      - mocks
+      - internal/telemetry
+      - .codecov.yml
+      - .coveralls.yml
+      - .git
+      - .gitattributes
+      - .github
+      - .gitignore
+      - .gitlab
+      - .gitmodules
+      - .golangci
+      - .golangci.yaml
+      - .goreleaser
+      - .goreleaser.d
+      - .goreleaser.yml
+      - .idea
+      - .mockery.yaml
+      - .travis.yml
+      - .vscode
+      - third_party$
+      - builtin$
+      - examples$

@@ -71,11 +71,11 @@ func CreateAuthGate(message any) func(cmd *cobra.Command, args []string) error {
 //goland:noinspection GoUnusedExportedFunction
 func CreatePasswordPrompter(cmd *cobra.Command) func(string) (string, error) {
 	return func(prompt string) (string, error) {
-		ux.Fprint(cmd.OutOrStdout(), "%s: ", prompt)
+		ux.Fprintf(cmd.OutOrStdout(), "%s: ", prompt)
 
 		bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 
-		ux.Fprint(cmd.OutOrStdout(), "\n")
+		ux.Fprintf(cmd.OutOrStdout(), "\n")
 
 		if err != nil {
 			return "", fmt.Errorf("could not read password: %w", err)
@@ -87,7 +87,7 @@ func CreatePasswordPrompter(cmd *cobra.Command) func(string) (string, error) {
 
 func CreatePrinter(cmd *cobra.Command) func(ctx context.Context, message string) error {
 	return func(ctx context.Context, message string) error {
-		ux.Fprint(cmd.OutOrStdout(), "%s\n", message)
+		ux.Fprintf(cmd.OutOrStdout(), "%s\n", message)
 		return nil
 	}
 }

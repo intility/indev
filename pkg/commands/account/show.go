@@ -25,8 +25,8 @@ func NewShowCommand(set clientset.ClientSet) *cobra.Command {
 			account, err := set.Authenticator.GetCurrentAccount(cmd.Context())
 			if err != nil {
 				if errors.Is(err, authenticator.ErrNoAccounts) {
-					ux.Fprint(cmd.OutOrStdout(), "You are not signed in to any accounts\n")
-					ux.Fprint(cmd.OutOrStdout(), "Use `%s %s` to sign in\n", cmd.Root().Name(), "login")
+					ux.Fprintf(cmd.OutOrStdout(), "You are not signed in to any accounts\n")
+					ux.Fprintf(cmd.OutOrStdout(), "Use `%s %s` to sign in\n", cmd.Root().Name(), "login")
 
 					return nil
 				}
@@ -41,11 +41,11 @@ func NewShowCommand(set clientset.ClientSet) *cobra.Command {
 
 			role := getOrganizationalRole(me.OrganizationRoles)
 
-			ux.Fprint(cmd.OutOrStdout(), "Account information\n")
-			ux.Fprint(cmd.OutOrStdout(), "Username: %s\n", account.PreferredUsername)
-			ux.Fprint(cmd.OutOrStdout(), "Realm: %s\n", account.Realm)
-			ux.Fprint(cmd.OutOrStdout(), "Organization: %s\n", me.OrganizationName)
-			ux.Fprint(cmd.OutOrStdout(), "Organization Role: %s\n", role)
+			ux.Fprintf(cmd.OutOrStdout(), "Account information\n")
+			ux.Fprintf(cmd.OutOrStdout(), "Username: %s\n", account.PreferredUsername)
+			ux.Fprintf(cmd.OutOrStdout(), "Realm: %s\n", account.Realm)
+			ux.Fprintf(cmd.OutOrStdout(), "Organization: %s\n", me.OrganizationName)
+			ux.Fprintf(cmd.OutOrStdout(), "Organization Role: %s\n", role)
 
 			return nil
 		},
@@ -58,8 +58,10 @@ func getOrganizationalRole(roles []string) string {
 	if slices.Contains(roles, "owner") {
 		return "Admin"
 	}
+
 	if slices.Contains(roles, "member") {
 		return "Member"
 	}
+
 	return "Unknown"
 }

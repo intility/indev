@@ -36,7 +36,7 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 			}
 
 			if len(teams) == 0 {
-				ux.Fprint(cmd.OutOrStdout(), "No teams found\n")
+				ux.Fprintf(cmd.OutOrStdout(), "No teams found\n")
 				return nil
 			}
 
@@ -72,7 +72,7 @@ func printTeamsList(writer io.Writer, format outputformat.Format, teams []client
 			}
 		})
 
-		ux.Fprint(writer, "%s", table.String())
+		ux.Fprintf(writer, "%s", table.String())
 	case "json":
 		enc := json.NewEncoder(writer)
 		enc.SetIndent("", "  ")
@@ -91,7 +91,7 @@ func printTeamsList(writer io.Writer, format outputformat.Format, teams []client
 			}
 		})
 
-		ux.Fprint(writer, "%s", table.String())
+		ux.Fprintf(writer, "%s", table.String())
 	}
 
 	if err != nil {

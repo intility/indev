@@ -91,7 +91,7 @@ func TestTableFromObjects(t *testing.T) {
 
 		table := TableFromObjects(items, func(item Item) []Row {
 			return []Row{
-				NewRow("ID", string(rune(item.ID + '0'))),
+				NewRow("ID", string(rune(item.ID+'0'))),
 				NewRow("Label", item.Label),
 			}
 		})

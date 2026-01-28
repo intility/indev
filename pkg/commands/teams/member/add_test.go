@@ -19,7 +19,7 @@ func TestValidateAddOptions(t *testing.T) {
 			name: "missing both team and team-id returns error",
 			options: AddMemberOptions{
 				Team:   "",
-				TeamId: "",
+				TeamID: "",
 				User:   "user@example.com",
 				Role:   client.MemberRoleMember,
 			},
@@ -29,7 +29,7 @@ func TestValidateAddOptions(t *testing.T) {
 			name: "team name provided is valid",
 			options: AddMemberOptions{
 				Team:   "my-team",
-				TeamId: "",
+				TeamID: "",
 				User:   "user@example.com",
 				Role:   client.MemberRoleMember,
 			},
@@ -39,7 +39,7 @@ func TestValidateAddOptions(t *testing.T) {
 			name: "team-id provided is valid",
 			options: AddMemberOptions{
 				Team:   "",
-				TeamId: "team-123",
+				TeamID: "team-123",
 				User:   "user@example.com",
 				Role:   client.MemberRoleMember,
 			},
@@ -49,7 +49,7 @@ func TestValidateAddOptions(t *testing.T) {
 			name: "both team and team-id provided is valid",
 			options: AddMemberOptions{
 				Team:   "my-team",
-				TeamId: "team-123",
+				TeamID: "team-123",
 				User:   "user@example.com",
 				Role:   client.MemberRoleMember,
 			},
@@ -62,7 +62,7 @@ func TestValidateAddOptions(t *testing.T) {
 			options: AddMemberOptions{
 				Team:   "my-team",
 				User:   "",
-				UserId: "",
+				UserID: "",
 				Role:   client.MemberRoleMember,
 			},
 			wantErr: errUserRequired,
@@ -72,7 +72,7 @@ func TestValidateAddOptions(t *testing.T) {
 			options: AddMemberOptions{
 				Team:   "my-team",
 				User:   "user@example.com",
-				UserId: "",
+				UserID: "",
 				Role:   client.MemberRoleMember,
 			},
 			wantErr: nil,
@@ -82,7 +82,7 @@ func TestValidateAddOptions(t *testing.T) {
 			options: AddMemberOptions{
 				Team:   "my-team",
 				User:   "",
-				UserId: "user-123",
+				UserID: "user-123",
 				Role:   client.MemberRoleMember,
 			},
 			wantErr: nil,
@@ -148,8 +148,8 @@ func TestValidateAddOptions(t *testing.T) {
 		{
 			name: "all valid options with IDs",
 			options: AddMemberOptions{
-				TeamId: "team-abc-123",
-				UserId: "user-xyz-789",
+				TeamID: "team-abc-123",
+				UserID: "user-xyz-789",
 				Role:   client.MemberRoleMember,
 			},
 			wantErr: nil,

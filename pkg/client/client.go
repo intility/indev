@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +15,8 @@ import (
 	"github.com/intility/indev/internal/build"
 	"github.com/intility/indev/pkg/authenticator"
 )
+
+var ErrClusterNotFound = errors.New("cluster not found")
 
 const (
 	defaultHTTPTimeout = 10 * time.Second
@@ -42,14 +45,14 @@ type MeClient interface {
 type TeamsClient interface {
 	ListTeams(ctx context.Context) ([]Team, error)
 	GetTeam(ctx context.Context, name string) (*Team, error)
-	GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error)
+	GetTeamMembers(ctx context.Context, teamID string) ([]TeamMember, error)
 	CreateTeam(ctx context.Context, request NewTeamRequest) (*Team, error)
 	DeleteTeam(ctx context.Context, request DeleteTeamRequest) error
 }
 
 type MemberClient interface {
-	AddTeamMember(ctx context.Context, teamId string, request []AddTeamMemberRequest) error
-	RemoveTeamMember(ctx context.Context, teamId string, memberId string) error
+	AddTeamMember(ctx context.Context, teamID string, request []AddTeamMemberRequest) error
+	RemoveTeamMember(ctx context.Context, teamID string, memberID string) error
 }
 
 type UserClient interface {
@@ -178,7 +181,7 @@ func (c *RestClient) GetCluster(ctx context.Context, name string) (*Cluster, err
 	}
 
 	if cluster.Name != name {
-		return nil, fmt.Errorf("cluster not found: %s", name)
+		return nil, fmt.Errorf("%w: %s", ErrClusterNotFound, name)
 	}
 
 	return &cluster, nil
@@ -228,12 +231,15 @@ func (c *RestClient) GetClusterMembers(ctx context.Context, clusterID string) ([
 
 func (c *RestClient) AddClusterMember(ctx context.Context, clusterID string, request []AddClusterMemberRequest) error {
 	payload := AddClusterMembersPayload{Values: request}
+
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return fmt.Errorf("could not marshal request: %w", err)
 	}
 
-	req, err := c.createAuthenticatedRequest(ctx, "POST", c.baseURI+"/api/v1/clusters/"+clusterID+"/members", bytes.NewReader(body))
+	endpoint := c.baseURI + "/api/v1/clusters/" + clusterID + "/members"
+
+	req, err := c.createAuthenticatedRequest(ctx, "POST", endpoint, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
@@ -246,7 +252,9 @@ func (c *RestClient) AddClusterMember(ctx context.Context, clusterID string, req
 }
 
 func (c *RestClient) RemoveClusterMember(ctx context.Context, clusterID string, memberID string) error {
-	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/clusters/"+clusterID+"/members/"+memberID, nil)
+	endpoint := c.baseURI + "/api/v1/clusters/" + clusterID + "/members/" + memberID
+
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", endpoint, nil)
 	if err != nil {
 		return err
 	}

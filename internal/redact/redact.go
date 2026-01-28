@@ -59,6 +59,7 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -90,7 +91,9 @@ func Error(err error) error {
 			wrapped: err,
 		}
 	default:
-		msg := placeholder(err)
+		var parts []string
+
+		parts = append(parts, placeholder(err))
 		wrapped := err
 
 		for {
@@ -100,15 +103,16 @@ func Error(err error) error {
 			}
 
 			if redactor, ok := wrapped.(redactor); ok {
-				msg += ": " + redactor.Redact()
+				parts = append(parts, redactor.Redact())
+
 				break
 			}
 
-			msg += ": " + placeholder(wrapped)
+			parts = append(parts, placeholder(wrapped))
 		}
 
 		return &redactedError{
-			msg:     msg,
+			msg:     strings.Join(parts, ": "),
 			wrapped: err,
 		}
 	}
@@ -153,7 +157,7 @@ func Errorf(format string, a ...any) error {
 		}
 	}
 
-	safeErr.err = fmt.Errorf(format, args...) //nolint:goerr113
+	safeErr.err = fmt.Errorf(format, args...) //nolint:err113
 
 	// Now create the redacted error by replacing all args with their redacted
 	// version or by inserting a placeholder if the arg can't be redacted.
@@ -170,7 +174,7 @@ func Errorf(format string, a ...any) error {
 		}
 	}
 
-	safeErr.redacted = fmt.Errorf(format, args...) //nolint:goerr113
+	safeErr.redacted = fmt.Errorf(format, args...) //nolint:err113
 
 	return safeErr
 }

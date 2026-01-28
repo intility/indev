@@ -7,7 +7,7 @@ import (
 	"github.com/intility/indev/pkg/clientset"
 )
 
-func getTeamIdByName(ctx context.Context, set clientset.ClientSet, teamName string) (string, error) {
+func getTeamIDByName(ctx context.Context, set clientset.ClientSet, teamName string) (string, error) {
 	team, err := set.PlatformClient.GetTeam(ctx, teamName)
 	if err != nil {
 		return "", redact.Errorf("could not get team: %w", redact.Safe(err))
@@ -20,7 +20,7 @@ func getTeamIdByName(ctx context.Context, set clientset.ClientSet, teamName stri
 	return team.ID, nil
 }
 
-func getUserIdByUpn(ctx context.Context, set clientset.ClientSet, upn string) (string, error) {
+func getUserIDByUpn(ctx context.Context, set clientset.ClientSet, upn string) (string, error) {
 	user, err := set.PlatformClient.GetUser(ctx, upn)
 	if err != nil {
 		return "", redact.Errorf("could not get user: %w", redact.Safe(err))

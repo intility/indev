@@ -60,7 +60,6 @@ func TestPrintTeamDetails(t *testing.T) {
 		name    string
 		team    *client.Team
 		members []client.TeamMember
-		wantErr bool
 		check   func(t *testing.T, output string)
 	}{
 		{
@@ -80,7 +79,6 @@ func TestPrintTeamDetails(t *testing.T) {
 					Roles:   []client.MemberRole{client.MemberRoleMember},
 				},
 			},
-			wantErr: false,
 			check: func(t *testing.T, output string) {
 				assert.Contains(t, output, "team-123")
 				assert.Contains(t, output, "Platform Team")
@@ -99,7 +97,6 @@ func TestPrintTeamDetails(t *testing.T) {
 				Description: "A team with no members",
 			},
 			members: []client.TeamMember{},
-			wantErr: false,
 			check: func(t *testing.T, output string) {
 				assert.Contains(t, output, "team-456")
 				assert.Contains(t, output, "Empty Team")
@@ -111,14 +108,9 @@ func TestPrintTeamDetails(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var buf bytes.Buffer
-			err := printTeamDetails(&buf, tt.team, tt.members)
+			printTeamDetails(&buf, tt.team, tt.members)
 
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				tt.check(t, buf.String())
-			}
+			tt.check(t, buf.String())
 		})
 	}
 }

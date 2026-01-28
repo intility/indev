@@ -54,9 +54,7 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not get members from team: %w", redact.Safe(err))
 			}
 
-			if err = printTeamDetails(cmd.OutOrStdout(), team, members); err != nil {
-				return redact.Errorf("could not print team details: %w", redact.Safe(err))
-			}
+			printTeamDetails(cmd.OutOrStdout(), team, members)
 
 			return nil
 		},
@@ -67,12 +65,12 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
-func printTeamDetails(writer io.Writer, team *client.Team, members []client.TeamMember) error {
-	ux.Fprint(writer, "Team Information:\n")
-	ux.Fprint(writer, "  ID:          	%s\n", team.ID)
-	ux.Fprint(writer, "  Name:        	%s\n", team.Name)
-	ux.Fprint(writer, "  Description:  %s\n", team.Description)
-	ux.Fprint(writer, "Members:\n")
+func printTeamDetails(writer io.Writer, team *client.Team, members []client.TeamMember) {
+	ux.Fprintf(writer, "Team Information:\n")
+	ux.Fprintf(writer, "  ID:          	%s\n", team.ID)
+	ux.Fprintf(writer, "  Name:        	%s\n", team.Name)
+	ux.Fprintf(writer, "  Description:  %s\n", team.Description)
+	ux.Fprintf(writer, "Members:\n")
 
 	table := ux.TableFromObjects(members, func(member client.TeamMember) []ux.Row {
 		return []ux.Row{
@@ -81,20 +79,21 @@ func printTeamDetails(writer io.Writer, team *client.Team, members []client.Team
 		}
 	})
 
-	ux.Fprint(writer, "%s", table.String())
-
-	return nil
+	ux.Fprintf(writer, "%s", table.String())
 }
 
 func getTeamRole(roles []client.MemberRole) string {
 	if slices.Contains(roles, client.MemberRoleOwner) {
 		return "Owner"
 	}
+
 	if slices.Contains(roles, client.MemberRoleMember) {
 		return "Member"
 	}
+
 	if len(roles) == 0 {
 		return "None"
 	}
+
 	return "Unknown"
 }
