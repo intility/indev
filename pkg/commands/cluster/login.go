@@ -69,7 +69,7 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 				)
 			}
 
-			ux.Fprint(cmd.OutOrStdout(), "Logging in to cluster %s...\n\n", clusterName)
+			ux.Fprintf(cmd.OutOrStdout(), "Logging in to cluster %s...\n\n", clusterName)
 
 			// Execute oc login with web authentication
 			ocCmd := exec.CommandContext(ctx, "oc", "login", "-w", apiURL)

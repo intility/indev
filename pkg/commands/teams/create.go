@@ -66,7 +66,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not create team: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "created team: %s (ID: %s)\n", team.Name, team.ID)
+			ux.Fsuccessf(cmd.OutOrStdout(), "created team: %s (ID: %s)\n", team.Name, team.ID)
 
 			return nil
 		},

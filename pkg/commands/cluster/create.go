@@ -19,11 +19,11 @@ import (
 )
 
 const (
-	maxCount       = 8
-	minCount       = 2
-	suffixLength   = 6
-	answerYes      = "yes"
-	answerNo       = "no"
+	maxCount     = 8
+	minCount     = 2
+	suffixLength = 6
+	answerYes    = "yes"
+	answerNo     = "no"
 )
 
 var (
@@ -108,7 +108,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "created cluster: %s\n", clusterName)
+			ux.Fsuccessf(cmd.OutOrStdout(), "created cluster: %s\n", clusterName)
 
 			return nil
 		},
@@ -288,11 +288,11 @@ func selectSSOProvisioner(ctx context.Context, platformClient client.Client, out
 	case 0:
 		return "", redact.Errorf("no SSO provisioner configured for your organization")
 	case 1:
-		ux.Fprint(out, "Using SSO provisioner: %s\n", provisioners[0].Name)
+		ux.Fprintf(out, "Using SSO provisioner: %s\n", provisioners[0].Name)
 		return provisioners[0].ID, nil
 	default:
 		// For now, auto-select the first one. Future: add wizard step
-		ux.Fprint(out, "Using SSO provisioner: %s\n", provisioners[0].Name)
+		ux.Fprintf(out, "Using SSO provisioner: %s\n", provisioners[0].Name)
 		return provisioners[0].ID, nil
 	}
 }

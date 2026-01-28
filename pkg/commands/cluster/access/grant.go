@@ -124,7 +124,7 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 				subjectName = subjectID
 			}
 
-			ux.Fsuccess(
+			ux.Fsuccessf(
 				cmd.OutOrStdout(),
 				"Granted %s access to %s %s on cluster %s\n",
 				options.Role, subjectType, subjectName, clusterDisplay,

@@ -83,7 +83,7 @@ func NewAddCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not add team member: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccess(
+			ux.Fsuccessf(
 				cmd.OutOrStdout(),
 				"added user: %s (%s) to team: %s (%s)\n",
 				options.User, options.UserID, options.Team, options.TeamID,

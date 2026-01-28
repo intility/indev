@@ -47,7 +47,7 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not delete team: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "deleted team: %s\n", teamName)
+			ux.Fsuccessf(cmd.OutOrStdout(), "deleted team: %s\n", teamName)
 
 			return nil
 		},

@@ -44,7 +44,7 @@ func (t TraceExporter) ExportSpans(ctx context.Context, spans []sdktrace.ReadOnl
 
 	err := t.saveSpans(spans)
 	if err != nil {
-		ux.Ferror(os.Stderr, "failed to flush spans: %v\n", err)
+		ux.Ferrorf(os.Stderr, "failed to flush spans: %v\n", err)
 		return nil
 	}
 

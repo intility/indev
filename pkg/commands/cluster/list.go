@@ -36,7 +36,7 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 			}
 
 			if len(clusters) == 0 {
-				ux.Fprint(cmd.OutOrStdout(), "No clusters found\n")
+				ux.Fprintf(cmd.OutOrStdout(), "No clusters found\n")
 				return nil
 			}
 
@@ -70,7 +70,7 @@ func printClusterList(writer io.Writer, format outputformat.Format, clusters cli
 			}
 		})
 
-		ux.Fprint(writer, "%s", table.String())
+		ux.Fprintf(writer, "%s", table.String())
 
 		return nil
 	case "json":
@@ -92,7 +92,7 @@ func printClusterList(writer io.Writer, format outputformat.Format, clusters cli
 			}
 		})
 
-		ux.Fprint(writer, "%s", table.String())
+		ux.Fprintf(writer, "%s", table.String())
 
 		return nil
 	}

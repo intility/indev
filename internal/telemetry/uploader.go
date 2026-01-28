@@ -43,7 +43,7 @@ func (t *TraceUploader) Upload(ctx context.Context) error {
 
 	endpoint := env.OtelExporterEndpoint()
 
-	ux.Finfo(os.Stdout, "uploading %d traces to %s\n", len(traces), endpoint)
+	ux.Finfof(os.Stdout, "uploading %d traces to %s\n", len(traces), endpoint)
 
 	client := otlptracehttp.NewClient(
 		otlptracehttp.WithEndpointURL(endpoint),
@@ -51,25 +51,25 @@ func (t *TraceUploader) Upload(ctx context.Context) error {
 
 	err := client.Start(ctx)
 	if err != nil {
-		ux.Ferror(os.Stderr, "failed to start client: %v\n", err)
+		ux.Ferrorf(os.Stderr, "failed to start client: %v\n", err)
 
 		return fmt.Errorf("failed to start client: %w", err)
 	}
 
-	ux.Finfo(os.Stdout, "flushing %d traces\n", len(traces))
+	ux.Finfof(os.Stdout, "flushing %d traces\n", len(traces))
 
 	for _, trace := range traces {
 		spans := trace.GetResourceSpans()
 
 		err = client.UploadTraces(ctx, spans)
 		if err != nil {
-			ux.Ferror(os.Stderr, "failed to upload traces: %v\n", err)
+			ux.Ferrorf(os.Stderr, "failed to upload traces: %v\n", err)
 		}
 	}
 
 	err = client.Stop(ctx)
 	if err != nil {
-		ux.Ferror(os.Stderr, "failed to stop client: %v\n", err)
+		ux.Ferrorf(os.Stderr, "failed to stop client: %v\n", err)
 	}
 
 	return nil

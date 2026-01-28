@@ -55,7 +55,7 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not authenticate: %w", err)
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "authenticated as %s", result.Account.PreferredUsername)
+			ux.Fsuccessf(cmd.OutOrStdout(), "authenticated as %s", result.Account.PreferredUsername)
 
 			return nil
 		},

@@ -64,7 +64,7 @@ func NewRemoveCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not remove team member: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccess(
+			ux.Fsuccessf(
 				cmd.OutOrStdout(),
 				"removed user: %s (%s) from team: %s (%s)\n",
 				options.User, options.UserID, options.Team, options.TeamID,

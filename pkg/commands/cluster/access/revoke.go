@@ -107,7 +107,7 @@ func NewRevokeCommand(set clientset.ClientSet) *cobra.Command {
 				subjectName = subjectID
 			}
 
-			ux.Fsuccess(
+			ux.Fsuccessf(
 				cmd.OutOrStdout(),
 				"Revoked access for %s %s from cluster %s\n",
 				subjectType, subjectName, clusterDisplay,

@@ -66,11 +66,11 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 }
 
 func printTeamDetails(writer io.Writer, team *client.Team, members []client.TeamMember) {
-	ux.Fprint(writer, "Team Information:\n")
-	ux.Fprint(writer, "  ID:          	%s\n", team.ID)
-	ux.Fprint(writer, "  Name:        	%s\n", team.Name)
-	ux.Fprint(writer, "  Description:  %s\n", team.Description)
-	ux.Fprint(writer, "Members:\n")
+	ux.Fprintf(writer, "Team Information:\n")
+	ux.Fprintf(writer, "  ID:          	%s\n", team.ID)
+	ux.Fprintf(writer, "  Name:        	%s\n", team.Name)
+	ux.Fprintf(writer, "  Description:  %s\n", team.Description)
+	ux.Fprintf(writer, "Members:\n")
 
 	table := ux.TableFromObjects(members, func(member client.TeamMember) []ux.Row {
 		return []ux.Row{
@@ -79,7 +79,7 @@ func printTeamDetails(writer io.Writer, team *client.Team, members []client.Team
 		}
 	})
 
-	ux.Fprint(writer, "%s", table.String())
+	ux.Fprintf(writer, "%s", table.String())
 }
 
 func getTeamRole(roles []client.MemberRole) string {

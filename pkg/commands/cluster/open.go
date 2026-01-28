@@ -51,8 +51,8 @@ func NewOpenCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("console URL not available for cluster: %s", clusterName)
 			}
 
-			ux.Fprint(cmd.OutOrStdout(), "Opening console for cluster %s...\n", cluster.Name)
-			ux.Fprint(cmd.OutOrStdout(), "URL: %s\n", cluster.ConsoleURL)
+			ux.Fprintf(cmd.OutOrStdout(), "Opening console for cluster %s...\n", cluster.Name)
+			ux.Fprintf(cmd.OutOrStdout(), "URL: %s\n", cluster.ConsoleURL)
 
 			if err := browser.OpenURL(cluster.ConsoleURL); err != nil {
 				return redact.Errorf("could not open browser: %w", redact.Safe(err))
