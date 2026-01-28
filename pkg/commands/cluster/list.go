@@ -130,6 +130,7 @@ func nodePoolSummary(cluster client.Cluster) string {
 	}
 
 	totalNodes := 0
+
 	for _, pool := range cluster.NodePools {
 		if pool.Replicas != nil {
 			totalNodes += *pool.Replicas
@@ -143,5 +144,6 @@ func rolesString(cluster client.Cluster) string {
 	if len(cluster.Roles) == 0 {
 		return ""
 	}
+
 	return fmt.Sprintf("%v", cluster.Roles)
 }

@@ -91,11 +91,7 @@ func fqcn(cmd *cobra.Command) string {
 
 	current := cmd
 
-	for {
-		if !current.HasParent() || current.Parent().Name() == build.AppName {
-			break
-		}
-
+	for current.HasParent() && current.Parent().Name() != build.AppName {
 		parents = append(parents, current.Parent().Name())
 		current = current.Parent()
 	}

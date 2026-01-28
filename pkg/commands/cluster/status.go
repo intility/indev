@@ -21,7 +21,7 @@ func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "status [name]",
 		Short:   "Show detailed status of a cluster",
-		Long:    `Display comprehensive status information for a specific cluster, including node pools, deployment status, and resources.`,
+		Long:    `Display comprehensive status information for a cluster.`,
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -49,9 +49,7 @@ func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("cluster not found: %s", clusterName)
 			}
 
-			if err = printClusterStatus(cmd.OutOrStdout(), cluster); err != nil {
-				return redact.Errorf("could not print cluster status: %w", redact.Safe(err))
-			}
+			printClusterStatus(cmd.OutOrStdout(), cluster)
 
 			return nil
 		},
@@ -62,7 +60,7 @@ func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
-func printClusterStatus(writer io.Writer, cluster *client.Cluster) error {
+func printClusterStatus(writer io.Writer, cluster *client.Cluster) {
 	// Determine and display ONLY the status
 	if cluster.Status.Ready.Status {
 		ux.Fprint(writer, "Ready\n")
@@ -73,6 +71,4 @@ func printClusterStatus(writer io.Writer, cluster *client.Cluster) error {
 	} else {
 		ux.Fprint(writer, "Not Ready\n")
 	}
-
-	return nil
 }

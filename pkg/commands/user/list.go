@@ -107,6 +107,7 @@ func sortUsersByOwnerThenName(users []client.User) {
 		if hasOwnerI != hasOwnerJ {
 			return hasOwnerI // Owners first
 		}
+
 		return users[i].Name < users[j].Name // Then by name
 	})
 }

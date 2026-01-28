@@ -23,8 +23,14 @@ const (
 var (
 	errEmptyName         = redact.Errorf("team name cannot be empty")
 	errEmptyDescription  = redact.Errorf("team description cannot be empty")
-	errInvalidNameLength = redact.Errorf("team name must be between %d and %d characters long", minNameLength, maxNameLength)
-	errInvalidDescLength = redact.Errorf("team description must be between %d and %d characters long", minDescriptionLength, maxDescriptionLength)
+	errInvalidNameLength = redact.Errorf(
+		"team name must be between %d and %d characters long",
+		minNameLength, maxNameLength,
+	)
+	errInvalidDescLength = redact.Errorf(
+		"team description must be between %d and %d characters long",
+		minDescriptionLength, maxDescriptionLength,
+	)
 	errInvalidNameFormat = redact.Errorf("team name must match the pattern %s", validNameRegex)
 )
 

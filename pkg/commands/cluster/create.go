@@ -19,9 +19,11 @@ import (
 )
 
 const (
-	maxCount     = 8
-	minCount     = 2
-	suffixLength = 6
+	maxCount       = 8
+	minCount       = 2
+	suffixLength   = 6
+	answerYes      = "yes"
+	answerNo       = "no"
 )
 
 var (
@@ -154,7 +156,7 @@ func optionsFromWizard() (CreateOptions, error) {
 			ID:          "autoscaling",
 			Placeholder: "Enable autoscaling",
 			Type:        wizard.InputTypeToggle,
-			Options:     []string{"no", "yes"},
+			Options:     []string{answerNo, answerYes},
 		},
 		{
 			ID:          "nodes",
@@ -162,7 +164,7 @@ func optionsFromWizard() (CreateOptions, error) {
 			Type:        wizard.InputTypeText,
 			ShowWhen: func(answers map[string]wizard.Answer) bool {
 				// Show this field only when autoscaling is disabled
-				return answers["autoscaling"].Value == "no"
+				return answers["autoscaling"].Value == answerNo
 			},
 		},
 		{
@@ -171,7 +173,7 @@ func optionsFromWizard() (CreateOptions, error) {
 			Type:        wizard.InputTypeText,
 			ShowWhen: func(answers map[string]wizard.Answer) bool {
 				// Show this field only when autoscaling is enabled
-				return answers["autoscaling"].Value == "yes"
+				return answers["autoscaling"].Value == answerYes
 			},
 		},
 		{
@@ -180,7 +182,7 @@ func optionsFromWizard() (CreateOptions, error) {
 			Type:        wizard.InputTypeText,
 			ShowWhen: func(answers map[string]wizard.Answer) bool {
 				// Show this field only when autoscaling is enabled
-				return answers["autoscaling"].Value == "yes"
+				return answers["autoscaling"].Value == answerYes
 			},
 		},
 	})
@@ -196,22 +198,25 @@ func optionsFromWizard() (CreateOptions, error) {
 
 	options.Name = result.MustGetValue("name")
 	options.Preset = result.MustGetValue("preset")
-	options.EnableAutoscaling = result.MustGetValue("autoscaling") == "yes"
+	options.EnableAutoscaling = result.MustGetValue("autoscaling") == answerYes
 
 	if options.EnableAutoscaling {
 		minNodesStr := result.MustGetValue("minNodes")
+
 		options.MinNodes, err = strconv.Atoi(minNodesStr)
 		if err != nil {
 			return options, redact.Errorf("invalid minimum node count: %w", redact.Safe(err))
 		}
 
 		maxNodesStr := result.MustGetValue("maxNodes")
+
 		options.MaxNodes, err = strconv.Atoi(maxNodesStr)
 		if err != nil {
 			return options, redact.Errorf("invalid maximum node count: %w", redact.Safe(err))
 		}
 	} else {
 		nodeCountStr := result.MustGetValue("nodes")
+
 		options.NodeCount, err = strconv.Atoi(nodeCountStr)
 		if err != nil {
 			return options, redact.Errorf("invalid node count: %w", redact.Safe(err))
@@ -272,6 +277,7 @@ func selectSSOProvisioner(ctx context.Context, platformClient client.Client, out
 
 	// Filter for EntraID type
 	var provisioners []client.IntegrationInstance
+
 	for _, instance := range instances {
 		if instance.Type == "EntraID" {
 			provisioners = append(provisioners, instance)

@@ -58,8 +58,10 @@ func getOrganizationalRole(roles []string) string {
 	if slices.Contains(roles, "owner") {
 		return "Admin"
 	}
+
 	if slices.Contains(roles, "member") {
 		return "Member"
 	}
+
 	return "Unknown"
 }

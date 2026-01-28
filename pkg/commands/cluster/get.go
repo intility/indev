@@ -22,7 +22,7 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "get [name]",
 		Short:   "Get detailed information about a cluster",
-		Long:    `Display comprehensive information about a specific cluster, including configuration, node pools, and status.`,
+		Long:    `Display comprehensive cluster information.`,
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -70,6 +70,7 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) error {
 	ux.Fprint(writer, "  ID:          %s\n", cluster.ID)
 	ux.Fprint(writer, "  Version:     %s\n", cluster.Version)
 	ux.Fprint(writer, "  Console URL: %s\n", cluster.ConsoleURL)
+
 	if len(cluster.Roles) > 0 {
 		ux.Fprint(writer, "  Roles:       %s\n", strings.Join(cluster.Roles, ", "))
 	}
@@ -90,6 +91,7 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) error {
 	if cluster.Status.Ready.Message != "" {
 		ux.Fprint(writer, "  Message:     %s\n", cluster.Status.Ready.Message)
 	}
+
 	if cluster.Status.Ready.Reason != "" {
 		ux.Fprint(writer, "  Reason:      %s\n", cluster.Status.Ready.Reason)
 	}
@@ -97,15 +99,19 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) error {
 	// Node pools
 	if len(cluster.NodePools) > 0 {
 		ux.Fprint(writer, "\nNode Pools:\n")
+
 		for i, pool := range cluster.NodePools {
 			if i > 0 {
 				ux.Fprint(writer, "\n")
 			}
+
 			ux.Fprint(writer, "  Pool %d:\n", i+1)
 			ux.Fprint(writer, "    Name:               %s\n", pool.Name)
+
 			if pool.ID != "" {
 				ux.Fprint(writer, "    ID:                 %s\n", pool.ID)
 			}
+
 			ux.Fprint(writer, "    Preset:             %s\n", pool.Preset)
 
 			if pool.Replicas != nil {
@@ -119,10 +125,12 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) error {
 			}
 
 			ux.Fprint(writer, "    Autoscaling:        %v\n", pool.AutoscalingEnabled)
+
 			if pool.AutoscalingEnabled {
 				if pool.MinCount != nil {
 					ux.Fprint(writer, "      Min Count:        %d\n", *pool.MinCount)
 				}
+
 				if pool.MaxCount != nil {
 					ux.Fprint(writer, "      Max Count:        %d\n", *pool.MaxCount)
 				}

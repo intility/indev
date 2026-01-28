@@ -44,17 +44,22 @@ func NewRevokeCommand(set clientset.ClientSet) *cobra.Command {
 				if err != nil {
 					return err
 				}
+
 				options.ClusterID = clusterID
 			}
 
 			// Determine subject type and resolve ID
-			var subjectType string
-			var subjectID string
-			var subjectName string
+			var (
+				subjectType string
+				subjectID   string
+				subjectName string
+			)
 
 			if options.User != "" || options.UserID != "" {
 				subjectType = "user"
+
 				subjectName = options.User
+
 				if options.UserID != "" {
 					subjectID = options.UserID
 				} else {
@@ -62,11 +67,14 @@ func NewRevokeCommand(set clientset.ClientSet) *cobra.Command {
 					if err != nil {
 						return err
 					}
+
 					subjectID = userID
 				}
 			} else {
 				subjectType = "team"
+
 				subjectName = options.Team
+
 				if options.TeamID != "" {
 					subjectID = options.TeamID
 				} else {
@@ -74,6 +82,7 @@ func NewRevokeCommand(set clientset.ClientSet) *cobra.Command {
 					if err != nil {
 						return err
 					}
+
 					subjectID = teamID
 				}
 			}
@@ -85,6 +94,7 @@ func NewRevokeCommand(set clientset.ClientSet) *cobra.Command {
 				if strings.Contains(err.Error(), "404 Not Found") {
 					return redact.Errorf("%s %s does not have access to cluster %s", subjectType, subjectName, options.Cluster)
 				}
+
 				return redact.Errorf("could not revoke cluster access: %w", redact.Safe(err))
 			}
 
@@ -97,7 +107,11 @@ func NewRevokeCommand(set clientset.ClientSet) *cobra.Command {
 				subjectName = subjectID
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "Revoked access for %s %s from cluster %s\n", subjectType, subjectName, clusterDisplay)
+			ux.Fsuccess(
+				cmd.OutOrStdout(),
+				"Revoked access for %s %s from cluster %s\n",
+				subjectType, subjectName, clusterDisplay,
+			)
 
 			return nil
 		},

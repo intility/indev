@@ -62,7 +62,11 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 
 			// Check if oc is installed
 			if _, err := exec.LookPath("oc"); err != nil {
-				return redact.Errorf("oc command not found. Please install the OpenShift CLI: https://developers.intility.com/docs/getting-started/first-steps/deploy-first-application/?h=oc#install-openshift-cli")
+				return redact.Errorf(
+					"oc command not found. Please install the OpenShift CLI: " +
+						"https://developers.intility.com/docs/getting-started/" +
+						"first-steps/deploy-first-application/?h=oc#install-openshift-cli",
+				)
 			}
 
 			ux.Fprint(cmd.OutOrStdout(), "Logging in to cluster %s...\n\n", clusterName)
@@ -91,5 +95,6 @@ func getAPIURL(clusterName, tenantID string) string {
 	if tenantID == mustafarTenantID {
 		return fmt.Sprintf("https://api-%s.clusters.zone-1.xcv.net", clusterName)
 	}
+
 	return fmt.Sprintf("https://api-%s.apps.intilitycloud.com", clusterName)
 }

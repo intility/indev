@@ -1,7 +1,6 @@
 package access
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -14,10 +13,13 @@ import (
 )
 
 var (
-	errClusterRequired     = redact.Errorf("cluster name or ID is required")
-	errSubjectRequired     = redact.Errorf("either user or team must be specified, but not both")
-	errRoleRequired        = redact.Errorf("role must be specified")
-	errInvalidClusterRole  = redact.Errorf("invalid role supplied, valid roles are: \"%s\"", strings.Join(client.GetClusterMemberRoleValues(), ", "))
+	errClusterRequired    = redact.Errorf("cluster name or ID is required")
+	errSubjectRequired    = redact.Errorf("either user or team must be specified, but not both")
+	errRoleRequired       = redact.Errorf("role must be specified")
+	errInvalidClusterRole = redact.Errorf(
+		"invalid role supplied, valid roles are: \"%s\"",
+		strings.Join(client.GetClusterMemberRoleValues(), ", "),
+	)
 )
 
 type GrantOptions struct {
@@ -54,17 +56,21 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 				if err != nil {
 					return err
 				}
+
 				options.ClusterID = clusterID
 			}
 
 			// Determine subject type and resolve ID
-			var subjectType string
-			var subjectID string
-			var subjectName string
+			var (
+				subjectType string
+				subjectID   string
+				subjectName string
+			)
 
 			if options.User != "" || options.UserID != "" {
 				subjectType = "user"
 				subjectName = options.User
+
 				if options.UserID != "" {
 					subjectID = options.UserID
 				} else {
@@ -72,11 +78,13 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 					if err != nil {
 						return err
 					}
+
 					subjectID = userID
 				}
 			} else {
 				subjectType = "team"
 				subjectName = options.Team
+
 				if options.TeamID != "" {
 					subjectID = options.TeamID
 				} else {
@@ -84,6 +92,7 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 					if err != nil {
 						return err
 					}
+
 					subjectID = teamID
 				}
 			}
@@ -102,6 +111,7 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 				if strings.Contains(err.Error(), "409 Conflict") {
 					return redact.Errorf("%s %s already has access to cluster %s", subjectType, subjectName, options.Cluster)
 				}
+
 				return redact.Errorf("could not grant cluster access: %w", redact.Safe(err))
 			}
 
@@ -114,7 +124,11 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 				subjectName = subjectID
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "Granted %s access to %s %s on cluster %s\n", options.Role, subjectType, subjectName, clusterDisplay)
+			ux.Fsuccess(
+				cmd.OutOrStdout(),
+				"Granted %s access to %s %s on cluster %s\n",
+				options.Role, subjectType, subjectName, clusterDisplay,
+			)
 
 			return nil
 		},
@@ -127,7 +141,8 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.Flags().StringVarP(&options.Team, "team", "t", "", "Name of the team to grant access")
 	cmd.Flags().StringVar(&options.TeamID, "team-id", "", "ID of the team to grant access")
 
-	roleFlagDescription := fmt.Sprintf("Role to grant. Valid roles are: %s", strings.Join(client.GetClusterMemberRoleValues(), ", "))
+	roleFlagDescription := "Role to grant. Valid roles are: " +
+		strings.Join(client.GetClusterMemberRoleValues(), ", ")
 	cmd.Flags().StringVarP((*string)(&options.Role), "role", "r", "", roleFlagDescription)
 
 	return cmd

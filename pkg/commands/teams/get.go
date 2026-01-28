@@ -54,9 +54,7 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not get members from team: %w", redact.Safe(err))
 			}
 
-			if err = printTeamDetails(cmd.OutOrStdout(), team, members); err != nil {
-				return redact.Errorf("could not print team details: %w", redact.Safe(err))
-			}
+			printTeamDetails(cmd.OutOrStdout(), team, members)
 
 			return nil
 		},
@@ -67,7 +65,7 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
-func printTeamDetails(writer io.Writer, team *client.Team, members []client.TeamMember) error {
+func printTeamDetails(writer io.Writer, team *client.Team, members []client.TeamMember) {
 	ux.Fprint(writer, "Team Information:\n")
 	ux.Fprint(writer, "  ID:          	%s\n", team.ID)
 	ux.Fprint(writer, "  Name:        	%s\n", team.Name)
@@ -82,19 +80,20 @@ func printTeamDetails(writer io.Writer, team *client.Team, members []client.Team
 	})
 
 	ux.Fprint(writer, "%s", table.String())
-
-	return nil
 }
 
 func getTeamRole(roles []client.MemberRole) string {
 	if slices.Contains(roles, client.MemberRoleOwner) {
 		return "Owner"
 	}
+
 	if slices.Contains(roles, client.MemberRoleMember) {
 		return "Member"
 	}
+
 	if len(roles) == 0 {
 		return "None"
 	}
+
 	return "Unknown"
 }

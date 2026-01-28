@@ -32,6 +32,7 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 			defer span.End()
 
 			span.SetAttributes(attribute.Bool("device_code_flow", useDeviceCodeFlow))
+
 			cfg := authenticator.Config{
 				ClientID:    build.ClientID(),
 				Authority:   build.Authority(),
