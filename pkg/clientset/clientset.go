@@ -14,7 +14,14 @@ import (
 	"github.com/intility/indev/pkg/client"
 )
 
-var errNotAuthenticatedPreHook = errors.New("you need to sign in before executing this operation")
+// homeAccountIDParts is the expected number of parts when splitting
+// HomeAccountID by ".". Format is "<oid>.<tid>".
+const homeAccountIDParts = 2
+
+var (
+	errNotAuthenticatedPreHook = errors.New("you need to sign in before executing this operation")
+	errInvalidHomeAccountID    = errors.New("invalid HomeAccountID format")
+)
 
 type Authenticator interface {
 	IsAuthenticated(ctx context.Context) (bool, error)
@@ -91,11 +98,7 @@ func fqcn(cmd *cobra.Command) string {
 
 	current := cmd
 
-	for {
-		if !current.HasParent() || current.Parent().Name() == build.AppName {
-			break
-		}
-
+	for current.HasParent() && current.Parent().Name() != build.AppName {
 		parents = append(parents, current.Parent().Name())
 		current = current.Parent()
 	}
@@ -114,8 +117,8 @@ func (c *ClientSet) GetTenantID(ctx context.Context) (string, error) {
 	}
 
 	parts := strings.Split(account.HomeAccountID, ".")
-	if len(parts) < 2 {
-		return "", fmt.Errorf("invalid HomeAccountID format: %s", account.HomeAccountID)
+	if len(parts) < homeAccountIDParts {
+		return "", fmt.Errorf("%w: %s", errInvalidHomeAccountID, account.HomeAccountID)
 	}
 
 	return parts[1], nil

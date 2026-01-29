@@ -4,25 +4,28 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
 )
 
+var ErrTeamNotFound = errors.New("team not found")
+
 type Team struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Role        []string `json:"roles"`
+	ID          string   `json:"id"          yaml:"id"`
+	Name        string   `json:"name"        yaml:"name"`
+	Description string   `json:"description" yaml:"description"`
+	Role        []string `json:"roles"       yaml:"roles"`
 }
 
 type TeamList []Team
 
 type Subject struct {
-	Type    string    `json:"type"`
-	Name    string    `json:"name"`
-	Details string    `json:"details"`
-	ID      uuid.UUID `json:"id"`
+	Type    string    `json:"type"    yaml:"type"`
+	Name    string    `json:"name"    yaml:"name"`
+	Details string    `json:"details" yaml:"details"`
+	ID      uuid.UUID `json:"id"      yaml:"id"`
 }
 
 type MemberRole string
@@ -66,7 +69,7 @@ type NewTeamRequest struct {
 }
 
 type DeleteTeamRequest struct {
-	TeamId string `json:"teamId"`
+	TeamID string `json:"teamId"`
 }
 
 type AddMemberSubject struct {
@@ -106,16 +109,16 @@ func (c *RestClient) GetTeam(ctx context.Context, name string) (*Team, error) {
 	}
 
 	if team.Name != name {
-		return nil, fmt.Errorf("team not found: %s", name)
+		return nil, fmt.Errorf("%w: %s", ErrTeamNotFound, name)
 	}
 
 	return &team, nil
 }
 
-func (c *RestClient) GetTeamMembers(ctx context.Context, teamId string) ([]TeamMember, error) {
+func (c *RestClient) GetTeamMembers(ctx context.Context, teamID string) ([]TeamMember, error) {
 	var members []TeamMember
 
-	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/teams/"+teamId+"/members", nil)
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/teams/"+teamID+"/members", nil)
 	if err != nil {
 		return members, err
 	}
@@ -147,7 +150,7 @@ func (c *RestClient) CreateTeam(ctx context.Context, request NewTeamRequest) (*T
 }
 
 func (c *RestClient) DeleteTeam(ctx context.Context, request DeleteTeamRequest) error {
-	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/teams/"+request.TeamId, nil)
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/teams/"+request.TeamID, nil)
 	if err != nil {
 		return err
 	}
@@ -159,13 +162,15 @@ func (c *RestClient) DeleteTeam(ctx context.Context, request DeleteTeamRequest) 
 	return nil
 }
 
-func (c *RestClient) AddTeamMember(ctx context.Context, teamId string, request []AddTeamMemberRequest) error {
+func (c *RestClient) AddTeamMember(ctx context.Context, teamID string, request []AddTeamMemberRequest) error {
 	body, err := json.Marshal(request)
 	if err != nil {
 		return fmt.Errorf("could not marshal request: %w", err)
 	}
 
-	req, err := c.createAuthenticatedRequest(ctx, "POST", c.baseURI+"/api/v1/teams/"+teamId+"/members", bytes.NewReader(body))
+	endpoint := c.baseURI + "/api/v1/teams/" + teamID + "/members"
+
+	req, err := c.createAuthenticatedRequest(ctx, "POST", endpoint, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
@@ -177,8 +182,8 @@ func (c *RestClient) AddTeamMember(ctx context.Context, teamId string, request [
 	return nil
 }
 
-func (c *RestClient) RemoveTeamMember(ctx context.Context, teamId string, memberId string) error {
-	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/teams/"+teamId+"/members/"+memberId, nil)
+func (c *RestClient) RemoveTeamMember(ctx context.Context, teamID string, memberID string) error {
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/teams/"+teamID+"/members/"+memberID, nil)
 	if err != nil {
 		return err
 	}

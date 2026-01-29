@@ -32,6 +32,7 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 			defer span.End()
 
 			span.SetAttributes(attribute.Bool("device_code_flow", useDeviceCodeFlow))
+
 			cfg := authenticator.Config{
 				ClientID:    build.ClientID(),
 				Authority:   build.Authority(),
@@ -54,7 +55,7 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not authenticate: %w", err)
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "authenticated as %s", result.Account.PreferredUsername)
+			ux.Fsuccessf(cmd.OutOrStdout(), "authenticated as %s", result.Account.PreferredUsername)
 
 			return nil
 		},

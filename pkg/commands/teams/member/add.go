@@ -1,7 +1,7 @@
 package member
 
 import (
-	"fmt"
+	"context"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -17,14 +17,17 @@ var (
 	errTeamRequired = redact.Errorf("team must be specified")
 	errUserRequired = redact.Errorf("user must be specified")
 	errRoleRequired = redact.Errorf("role must be specified")
-	errInvalidRole  = redact.Errorf("invalid role supplied, valid roles are: \"%s\"", strings.Join(client.GetMemberRoleValues(), ", "))
+	errInvalidRole  = redact.Errorf(
+		"invalid role supplied, valid roles are: \"%s\"",
+		strings.Join(client.GetMemberRoleValues(), ", "),
+	)
 )
 
 type AddMemberOptions struct {
 	Team   string
-	TeamId string
+	TeamID string
 	User   string
-	UserId string
+	UserID string
 	Role   client.MemberRole
 }
 
@@ -40,76 +43,91 @@ func NewAddCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "team.addMember")
 			defer span.End()
 
-			var err error
-			err = validateAddOptions(options)
-			if err != nil {
-				return err
-			}
-
-			if options.TeamId == "" {
-				teamId, err := getTeamIdByName(ctx, set, options.Team)
-				if err != nil {
-					return err
-				}
-				options.TeamId = teamId
-			}
-
-			if options.UserId == "" {
-				userId, err := getUserIdByUpn(ctx, set, options.User)
-				if err != nil {
-					return err
-				}
-				options.UserId = userId
-			}
-
-			err = set.PlatformClient.AddTeamMember(ctx, options.TeamId, []client.AddTeamMemberRequest{
-				{
-					Roles: []client.MemberRole{options.Role},
-					Subject: client.AddMemberSubject{
-						ID:   options.UserId,
-						Type: "user",
-					},
-				},
-			})
-
-			if err != nil {
-				if strings.Contains(err.Error(), "409 Conflict") {
-					return redact.Errorf("user %s is already a member of team %s", options.User, options.Team)
-				}
-				return redact.Errorf("could not add team member: %w", redact.Safe(err))
-			}
-
-			ux.Fsuccess(cmd.OutOrStdout(), "added user: %s (%s) to team: %s (%s)\n", options.User, options.UserId, options.Team, options.TeamId)
-
-			return nil
+			return runAddMemberCommand(ctx, cmd, set, options)
 		},
 	}
 
 	cmd.Flags().StringVarP(&options.Team,
 		"team", "t", "", "Name of the team to add the member to")
 
-	cmd.Flags().StringVar(&options.TeamId,
+	cmd.Flags().StringVar(&options.TeamID,
 		"team-id", "", "ID of the team to add the member to")
 
 	cmd.Flags().StringVarP(&options.User,
 		"user", "u", "", "UPN of the user to add to the team")
 
-	cmd.Flags().StringVar(&options.UserId,
+	cmd.Flags().StringVar(&options.UserID,
 		"user-id", "", "ID of the user to add to the team")
 
-	roleFlagDescription := fmt.Sprintf("Role to assign to the new team member. Valid roles are: %s", strings.Join(client.GetMemberRoleValues(), ", "))
+	roleFlagDescription := "Role to assign to the new team member. Valid roles are: " +
+		strings.Join(client.GetMemberRoleValues(), ", ")
 	cmd.Flags().StringVarP((*string)(&options.Role),
 		"role", "r", "", roleFlagDescription)
 
 	return cmd
 }
 
+func runAddMemberCommand(
+	ctx context.Context,
+	cmd *cobra.Command,
+	set clientset.ClientSet,
+	options AddMemberOptions,
+) error {
+	err := validateAddOptions(options)
+	if err != nil {
+		return err
+	}
+
+	if options.TeamID == "" {
+		teamID, err := getTeamIDByName(ctx, set, options.Team)
+		if err != nil {
+			return err
+		}
+
+		options.TeamID = teamID
+	}
+
+	if options.UserID == "" {
+		userID, err := getUserIDByUpn(ctx, set, options.User)
+		if err != nil {
+			return err
+		}
+
+		options.UserID = userID
+	}
+
+	err = set.PlatformClient.AddTeamMember(ctx, options.TeamID, []client.AddTeamMemberRequest{
+		{
+			Roles: []client.MemberRole{options.Role},
+			Subject: client.AddMemberSubject{
+				ID:   options.UserID,
+				Type: "user",
+			},
+		},
+	})
+	if err != nil {
+		if strings.Contains(err.Error(), "409 Conflict") {
+			return redact.Errorf("user %s is already a member of team %s", options.User, options.Team)
+		}
+
+		return redact.Errorf("could not add team member: %w", redact.Safe(err))
+	}
+
+	ux.Fsuccessf(
+		cmd.OutOrStdout(),
+		"added user: %s (%s) to team: %s (%s)\n",
+		options.User, options.UserID, options.Team, options.TeamID,
+	)
+
+	return nil
+}
+
 func validateAddOptions(options AddMemberOptions) error {
-	if options.TeamId == "" && options.Team == "" {
+	if options.TeamID == "" && options.Team == "" {
 		return errTeamRequired
 	}
 
-	if options.UserId == "" && options.User == "" {
+	if options.UserID == "" && options.User == "" {
 		return errUserRequired
 	}
 

@@ -1,6 +1,7 @@
 package member
 
 import (
+	"context"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -13,9 +14,9 @@ import (
 
 type RemoveMemberOptions struct {
 	Team   string
-	TeamId string
+	TeamID string
 	User   string
-	UserId string
+	UserID string
 }
 
 func NewRemoveCommand(set clientset.ClientSet) *cobra.Command {
@@ -30,64 +31,80 @@ func NewRemoveCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "team.removeMember")
 			defer span.End()
 
-			err := validateRemoveOptions(options)
-			if err != nil {
-				return err
-			}
-
-			if options.TeamId == "" {
-				teamId, err := getTeamIdByName(ctx, set, options.Team)
-				if err != nil {
-					return err
-				}
-				options.TeamId = teamId
-			}
-
-			if options.UserId == "" {
-				userId, err := getUserIdByUpn(ctx, set, options.User)
-				if err != nil {
-					return err
-				}
-				options.UserId = userId
-			}
-
-			memberId := "user:" + options.UserId
-
-			err = set.PlatformClient.RemoveTeamMember(ctx, options.TeamId, memberId)
-			if err != nil {
-				if strings.Contains(err.Error(), "404 Not Found") {
-					return redact.Errorf("user %s is not a member of team %s", options.User, options.Team)
-				}
-				return redact.Errorf("could not remove team member: %w", redact.Safe(err))
-			}
-
-			ux.Fsuccess(cmd.OutOrStdout(), "removed user: %s (%s) from team: %s (%s)\n", options.User, options.UserId, options.Team, options.TeamId)
-
-			return nil
+			return runRemoveMemberCommand(ctx, cmd, set, options)
 		},
 	}
 
 	cmd.Flags().StringVarP(&options.Team,
 		"team", "t", "", "Name of the team to remove the member from")
 
-	cmd.Flags().StringVar(&options.TeamId,
+	cmd.Flags().StringVar(&options.TeamID,
 		"team-id", "", "ID of the team to remove the member from")
 
 	cmd.Flags().StringVarP(&options.User,
 		"user", "u", "", "UPN of the user to remove from the team")
 
-	cmd.Flags().StringVar(&options.UserId,
+	cmd.Flags().StringVar(&options.UserID,
 		"user-id", "", "ID of the user to remove from the team")
 
 	return cmd
 }
 
+func runRemoveMemberCommand(
+	ctx context.Context,
+	cmd *cobra.Command,
+	set clientset.ClientSet,
+	options RemoveMemberOptions,
+) error {
+	err := validateRemoveOptions(options)
+	if err != nil {
+		return err
+	}
+
+	if options.TeamID == "" {
+		teamID, err := getTeamIDByName(ctx, set, options.Team)
+		if err != nil {
+			return err
+		}
+
+		options.TeamID = teamID
+	}
+
+	if options.UserID == "" {
+		userID, err := getUserIDByUpn(ctx, set, options.User)
+		if err != nil {
+			return err
+		}
+
+		options.UserID = userID
+	}
+
+	memberID := "user:" + options.UserID
+
+	err = set.PlatformClient.RemoveTeamMember(ctx, options.TeamID, memberID)
+	if err != nil {
+		if strings.Contains(err.Error(), "404 Not Found") {
+			return redact.Errorf("user %s is not a member of team %s", options.User, options.Team)
+		}
+
+		return redact.Errorf("could not remove team member: %w", redact.Safe(err))
+	}
+
+	ux.Fsuccessf(
+		cmd.OutOrStdout(),
+		"removed user: %s (%s) from team: %s (%s)\n",
+		options.User, options.UserID, options.Team, options.TeamID,
+	)
+
+	return nil
+}
+
 func validateRemoveOptions(options RemoveMemberOptions) error {
-	if options.TeamId == "" && options.Team == "" {
+	if options.TeamID == "" && options.Team == "" {
 		return errTeamRequired
 	}
 
-	if options.UserId == "" && options.User == "" {
+	if options.UserID == "" && options.User == "" {
 		return errUserRequired
 	}
 

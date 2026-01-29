@@ -31,9 +31,8 @@ func TableFromObjects[T any](objects []T, rowFactory ColFactory[T]) Table {
 	)
 
 	for i, object := range objects {
-		var row []string
-
 		objRows := rowFactory(object)
+		row := make([]string, 0, len(objRows))
 
 		for _, objRow := range objRows {
 			if i == 0 {
@@ -83,29 +82,36 @@ func (t *Table) calculateColumnWidths() map[int]int {
 }
 
 func (t *Table) String() string {
-	var (
-		s            string
-		longestInCol = t.calculateColumnWidths()
-	)
+	longestInCol := t.calculateColumnWidths()
+
+	var sb strings.Builder
 
 	// print padded cells
 	for i, header := range t.Header {
-		s += header + " "
+		sb.WriteString(header)
+		sb.WriteString(" ")
+
 		headerWidth := utf8.RuneCountInString(header)
-		s += strings.Repeat(" ", longestInCol[i]-headerWidth) + "\t"
+
+		sb.WriteString(strings.Repeat(" ", longestInCol[i]-headerWidth))
+		sb.WriteString("\t")
 	}
 
-	s += "\n"
+	sb.WriteString("\n")
 
 	for _, row := range t.Rows {
 		for i, cell := range row {
-			s += cell + " "
+			sb.WriteString(cell)
+			sb.WriteString(" ")
+
 			cellWidth := utf8.RuneCountInString(cell)
-			s += strings.Repeat(" ", longestInCol[i]-cellWidth) + "\t"
+
+			sb.WriteString(strings.Repeat(" ", longestInCol[i]-cellWidth))
+			sb.WriteString("\t")
 		}
 
-		s += "\n"
+		sb.WriteString("\n")
 	}
 
-	return s
+	return sb.String()
 }

@@ -1,6 +1,8 @@
 package access
 
 import (
+	"context"
+	"io"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -32,74 +34,7 @@ func NewRevokeCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.access.revoke")
 			defer span.End()
 
-			cmd.SilenceUsage = true
-
-			if err := validateRevokeOptions(options); err != nil {
-				return err
-			}
-
-			// Resolve cluster ID
-			if options.ClusterID == "" {
-				clusterID, err := resolveClusterID(ctx, set, options.Cluster, options.ClusterID)
-				if err != nil {
-					return err
-				}
-				options.ClusterID = clusterID
-			}
-
-			// Determine subject type and resolve ID
-			var subjectType string
-			var subjectID string
-			var subjectName string
-
-			if options.User != "" || options.UserID != "" {
-				subjectType = "user"
-				subjectName = options.User
-				if options.UserID != "" {
-					subjectID = options.UserID
-				} else {
-					userID, err := getUserIDByUPN(ctx, set, options.User)
-					if err != nil {
-						return err
-					}
-					subjectID = userID
-				}
-			} else {
-				subjectType = "team"
-				subjectName = options.Team
-				if options.TeamID != "" {
-					subjectID = options.TeamID
-				} else {
-					teamID, err := getTeamIDByName(ctx, set, options.Team)
-					if err != nil {
-						return err
-					}
-					subjectID = teamID
-				}
-			}
-
-			memberID := subjectType + ":" + subjectID
-
-			err := set.PlatformClient.RemoveClusterMember(ctx, options.ClusterID, memberID)
-			if err != nil {
-				if strings.Contains(err.Error(), "404 Not Found") {
-					return redact.Errorf("%s %s does not have access to cluster %s", subjectType, subjectName, options.Cluster)
-				}
-				return redact.Errorf("could not revoke cluster access: %w", redact.Safe(err))
-			}
-
-			clusterDisplay := options.Cluster
-			if clusterDisplay == "" {
-				clusterDisplay = options.ClusterID
-			}
-
-			if subjectName == "" {
-				subjectName = subjectID
-			}
-
-			ux.Fsuccess(cmd.OutOrStdout(), "Revoked access for %s %s from cluster %s\n", subjectType, subjectName, clusterDisplay)
-
-			return nil
+			return runRevokeCommand(ctx, cmd.OutOrStdout(), set, &options)
 		},
 	}
 
@@ -111,6 +46,59 @@ func NewRevokeCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.Flags().StringVar(&options.TeamID, "team-id", "", "ID of the team to revoke access")
 
 	return cmd
+}
+
+func runRevokeCommand(ctx context.Context, out io.Writer, set clientset.ClientSet, options *RevokeOptions) error {
+	if err := validateRevokeOptions(*options); err != nil {
+		return err
+	}
+
+	// Resolve cluster ID
+	if options.ClusterID == "" {
+		clusterID, err := resolveClusterID(ctx, set, options.Cluster, options.ClusterID)
+		if err != nil {
+			return err
+		}
+
+		options.ClusterID = clusterID
+	}
+
+	// Determine subject type and resolve ID
+	subject, err := resolveSubject(ctx, set, SubjectOptions{
+		User:   options.User,
+		UserID: options.UserID,
+		Team:   options.Team,
+		TeamID: options.TeamID,
+	})
+	if err != nil {
+		return err
+	}
+
+	memberID := subject.Type + ":" + subject.ID
+
+	err = set.PlatformClient.RemoveClusterMember(ctx, options.ClusterID, memberID)
+	if err != nil {
+		if strings.Contains(err.Error(), "404 Not Found") {
+			return redact.Errorf("%s %s does not have access to cluster %s", subject.Type, subject.Name, options.Cluster)
+		}
+
+		return redact.Errorf("could not revoke cluster access: %w", redact.Safe(err))
+	}
+
+	clusterDisplay := options.Cluster
+	if clusterDisplay == "" {
+		clusterDisplay = options.ClusterID
+	}
+
+	subjectName := subject.Name
+	if subjectName == "" {
+		subjectName = subject.ID
+	}
+
+	ux.Fsuccessf(out, "Revoked access for %s %s from cluster %s\n",
+		subject.Type, subjectName, clusterDisplay)
+
+	return nil
 }
 
 func validateRevokeOptions(options RevokeOptions) error {

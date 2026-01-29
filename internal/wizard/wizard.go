@@ -17,6 +17,8 @@ const (
 	FinishReasonCancelled
 )
 
+const keyEnter = "enter"
+
 type State struct {
 	FinishReason FinishReason
 }
@@ -53,17 +55,17 @@ type Answer struct {
 	Value string
 }
 
-// inputField represents any type of input field (text, select, toggle)
+// inputField represents any type of input field (text, select, toggle).
 type inputField interface {
 	Focus() tea.Cmd
 	Blur()
 	Value() string
-	SetValue(string)
-	Update(tea.Msg) (inputField, tea.Cmd)
+	SetValue(value string)
+	Update(msg tea.Msg) (inputField, tea.Cmd)
 	View() string
 }
 
-// textField wraps textinput.Model to implement inputField
+// textField wraps textinput.Model to implement inputField.
 type textField struct {
 	model textinput.Model
 }
@@ -75,11 +77,12 @@ func (t *textField) SetValue(v string) { t.model.SetValue(v) }
 func (t *textField) Update(msg tea.Msg) (inputField, tea.Cmd) {
 	newModel, cmd := t.model.Update(msg)
 	t.model = newModel
+
 	return t, cmd
 }
 func (t *textField) View() string { return t.model.View() }
 
-// selectField implements a simple select/toggle field
+// selectField implements a simple select/toggle field.
 type selectField struct {
 	id          string
 	placeholder string
@@ -103,6 +106,7 @@ func (s *selectField) Value() string {
 	if len(s.options) == 0 {
 		return ""
 	}
+
 	return s.options[s.selected]
 }
 
@@ -120,10 +124,9 @@ func (s *selectField) Update(msg tea.Msg) (inputField, tea.Cmd) {
 		return s, nil
 	}
 
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case " ", "enter":
+	if keyMsg, ok := msg.(tea.KeyMsg); ok {
+		switch keyMsg.String() {
+		case " ", keyEnter:
 			if s.isToggle {
 				// Toggle between yes/no
 				s.selected = (s.selected + 1) % len(s.options)
@@ -138,6 +141,7 @@ func (s *selectField) Update(msg tea.Msg) (inputField, tea.Cmd) {
 			}
 		}
 	}
+
 	return s, nil
 }
 
@@ -147,12 +151,14 @@ func (s *selectField) View() string {
 	if s.isToggle {
 		// Render as toggle (e.g., "[x] Yes  [ ] No")
 		b.WriteString(s.placeholder + ": ")
+
 		for i, opt := range s.options {
 			if i == s.selected {
 				b.WriteString(s.style.Render("[●] " + opt))
 			} else {
 				b.WriteString(s.style.Render("[ ] " + opt))
 			}
+
 			if i < len(s.options)-1 {
 				b.WriteString("  ")
 			}
@@ -184,11 +190,11 @@ type model struct {
 	blurredButton string
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) { //nolint: gocritic
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -202,7 +208,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, cmd
 
 		// Set focus to next input
-		case "tab", "shift+tab", "enter", "up", "down":
+		case "tab", "shift+tab", keyEnter, "up", "down":
 			cmd := m.handleNavigation(msg.String())
 			return m, cmd
 		}
@@ -222,6 +228,7 @@ func (m *model) handleCursorMode() tea.Cmd {
 	}
 
 	var cmds []tea.Cmd
+
 	for _, field := range m.fields {
 		if tf, ok := field.(*textField); ok {
 			cmds = append(cmds, tf.model.Cursor.SetMode(m.cursorMode))
@@ -244,31 +251,44 @@ func (m *model) updateVisibility() {
 }
 
 func (m *model) handleNavigation(s string) tea.Cmd {
-	// Update answers for current field before navigation
+	m.saveCurrentAnswer()
+
+	// Did the user press enter while the submit button was focused?
+	if s == keyEnter && m.focusIndex == len(m.visibleFields) {
+		return m.submitForm()
+	}
+
+	m.updateFocusIndex(s)
+
+	return m.updateFieldFocus()
+}
+
+// saveCurrentAnswer saves the answer from the currently focused field.
+func (m *model) saveCurrentAnswer() {
 	if m.focusIndex < len(m.visibleFields) {
 		fieldIdx := m.visibleFields[m.focusIndex]
 		m.answers[m.items[fieldIdx].ID] = Answer{
 			Value: m.fields[fieldIdx].Value(),
 		}
-		// Update visibility after answer changes
 		m.updateVisibility()
 	}
+}
 
-	// Did the user press enter while the submit button was focused?
-	// If so, exit.
-	if s == "enter" && m.focusIndex == len(m.visibleFields) {
-		// Collect all answers from visible fields
-		for _, idx := range m.visibleFields {
-			m.answers[m.items[idx].ID] = Answer{
-				Value: m.fields[idx].Value(),
-			}
+// submitForm collects all answers and completes the wizard.
+func (m *model) submitForm() tea.Cmd {
+	for _, idx := range m.visibleFields {
+		m.answers[m.items[idx].ID] = Answer{
+			Value: m.fields[idx].Value(),
 		}
-
-		m.state.Complete()
-		return tea.Quit
 	}
 
-	// Cycle indexes through visible fields
+	m.state.Complete()
+
+	return tea.Quit
+}
+
+// updateFocusIndex cycles the focus index based on navigation direction.
+func (m *model) updateFocusIndex(s string) {
 	if s == "up" || s == "shift+tab" {
 		m.focusIndex--
 	} else {
@@ -280,39 +300,46 @@ func (m *model) handleNavigation(s string) tea.Cmd {
 	} else if m.focusIndex < 0 {
 		m.focusIndex = len(m.visibleFields)
 	}
+}
 
+// updateFieldFocus updates focus state and styles for all visible fields.
+func (m *model) updateFieldFocus() tea.Cmd {
 	var cmds []tea.Cmd
 
-	// Update focus for visible fields
 	for i, visIdx := range m.visibleFields {
 		field := m.fields[visIdx]
+		focused := i == m.focusIndex
 
-		if i == m.focusIndex {
-			// Set focused state
+		if focused {
 			cmds = append(cmds, field.Focus())
-
-			// Update style for text fields
-			if tf, ok := field.(*textField); ok {
-				tf.model.PromptStyle = m.focusedStyle
-				tf.model.TextStyle = m.focusedStyle
-			} else if sf, ok := field.(*selectField); ok {
-				sf.style = m.focusedStyle
-			}
 		} else {
-			// Remove focused state
 			field.Blur()
-
-			// Update style for text fields
-			if tf, ok := field.(*textField); ok {
-				tf.model.PromptStyle = m.noStyle
-				tf.model.TextStyle = m.noStyle
-			} else if sf, ok := field.(*selectField); ok {
-				sf.style = m.blurredStyle
-			}
 		}
+
+		m.updateFieldStyle(field, focused)
 	}
 
 	return tea.Batch(cmds...)
+}
+
+// updateFieldStyle sets the appropriate style on a field based on focus state.
+func (m *model) updateFieldStyle(field inputField, focused bool) {
+	switch f := field.(type) {
+	case *textField:
+		if focused {
+			f.model.PromptStyle = m.focusedStyle
+			f.model.TextStyle = m.focusedStyle
+		} else {
+			f.model.PromptStyle = m.noStyle
+			f.model.TextStyle = m.noStyle
+		}
+	case *selectField:
+		if focused {
+			f.style = m.focusedStyle
+		} else {
+			f.style = m.blurredStyle
+		}
+	}
 }
 
 func (m *model) updateInputs(msg tea.Msg) tea.Cmd {
@@ -322,6 +349,7 @@ func (m *model) updateInputs(msg tea.Msg) tea.Cmd {
 	for _, idx := range m.visibleFields {
 		field, cmd := m.fields[idx].Update(msg)
 		m.fields[idx] = field
+
 		if cmd != nil {
 			cmds = append(cmds, cmd)
 		}
@@ -330,7 +358,7 @@ func (m *model) updateInputs(msg tea.Msg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func (m model) View() string {
+func (m *model) View() string {
 	var b strings.Builder
 
 	// Only show visible fields
@@ -375,10 +403,10 @@ func NewWizard(inputs []Input) *Wizard {
 
 		focusedStyle:  focusedStyle,
 		blurredStyle:  blurredStyle,
-		cursorStyle:   focusedStyle.Copy(),
+		cursorStyle:   focusedStyle,
 		noStyle:       lipgloss.NewStyle(),
-		helpStyle:     blurredStyle.Copy().Foreground(lipgloss.Color("244")),
-		focusedButton: focusedStyle.Copy().Render("[ Submit ]"),
+		helpStyle:     blurredStyle.Foreground(lipgloss.Color("244")),
+		focusedButton: focusedStyle.Render("[ Submit ]"),
 		blurredButton: fmt.Sprintf("[ %s ]", blurredStyle.Render("Submit")),
 	}
 
@@ -386,51 +414,11 @@ func NewWizard(inputs []Input) *Wizard {
 	for i, input := range inputs {
 		switch input.Type {
 		case InputTypeToggle:
-			// For toggle, default to yes/no options if not specified
-			options := input.Options
-			if len(options) == 0 {
-				options = []string{"no", "yes"}
-			}
-			m.fields[i] = &selectField{
-				id:          input.ID,
-				placeholder: input.Placeholder,
-				options:     options,
-				selected:    0,
-				isToggle:    true,
-				style:       blurredStyle,
-			}
-
+			m.fields[i] = newSelectField(input, blurredStyle, true)
 		case InputTypeSelect:
-			m.fields[i] = &selectField{
-				id:          input.ID,
-				placeholder: input.Placeholder,
-				options:     input.Options,
-				selected:    0,
-				isToggle:    false,
-				style:       blurredStyle,
-			}
-
-		default: // InputTypeText and InputTypePassword
-			t := textinput.New()
-			t.Cursor.Style = m.cursorStyle
-			t.CharLimit = 32
-			t.Width = 50
-			t.Placeholder = input.Placeholder
-
-			if input.Validator != nil {
-				t.Validate = input.Validator
-			}
-
-			if input.Type == InputTypePassword {
-				t.EchoMode = textinput.EchoPassword
-				t.EchoCharacter = '•'
-			}
-
-			if input.Limit > 0 {
-				t.CharLimit = input.Limit
-			}
-
-			m.fields[i] = &textField{model: t}
+			m.fields[i] = newSelectField(input, blurredStyle, false)
+		case InputTypeText, InputTypePassword:
+			m.fields[i] = newTextField(input, m.cursorStyle)
 		}
 	}
 
@@ -441,18 +429,54 @@ func NewWizard(inputs []Input) *Wizard {
 	if len(m.visibleFields) > 0 {
 		firstField := m.fields[m.visibleFields[0]]
 		firstField.Focus()
-
-		if tf, ok := firstField.(*textField); ok {
-			tf.model.PromptStyle = focusedStyle
-			tf.model.TextStyle = focusedStyle
-		} else if sf, ok := firstField.(*selectField); ok {
-			sf.style = focusedStyle
-		}
+		m.updateFieldStyle(firstField, true)
 	}
 
 	return &Wizard{
 		model: m,
 	}
+}
+
+// newSelectField creates a new select or toggle field from the given input.
+func newSelectField(input Input, style lipgloss.Style, isToggle bool) *selectField {
+	options := input.Options
+	if isToggle && len(options) == 0 {
+		options = []string{"no", "yes"}
+	}
+
+	return &selectField{
+		id:          input.ID,
+		placeholder: input.Placeholder,
+		options:     options,
+		selected:    0,
+		focused:     false,
+		isToggle:    isToggle,
+		style:       style,
+	}
+}
+
+// newTextField creates a new text or password field from the given input.
+func newTextField(input Input, cursorStyle lipgloss.Style) *textField {
+	t := textinput.New()
+	t.Cursor.Style = cursorStyle
+	t.CharLimit = 32
+	t.Width = 50
+	t.Placeholder = input.Placeholder
+
+	if input.Validator != nil {
+		t.Validate = input.Validator
+	}
+
+	if input.Type == InputTypePassword {
+		t.EchoMode = textinput.EchoPassword
+		t.EchoCharacter = '•'
+	}
+
+	if input.Limit > 0 {
+		t.CharLimit = input.Limit
+	}
+
+	return &textField{model: t}
 }
 
 type Result struct {
@@ -476,7 +500,7 @@ func (w *Result) Cancelled() bool {
 func (w *Wizard) Run() (Result, error) {
 	var result Result
 
-	p := tea.NewProgram(w.model)
+	p := tea.NewProgram(&w.model)
 	if _, err := p.Run(); err != nil {
 		return result, fmt.Errorf("error running wizard: %w", err)
 	}

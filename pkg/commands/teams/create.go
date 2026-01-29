@@ -23,8 +23,14 @@ const (
 var (
 	errEmptyName         = redact.Errorf("team name cannot be empty")
 	errEmptyDescription  = redact.Errorf("team description cannot be empty")
-	errInvalidNameLength = redact.Errorf("team name must be between %d and %d characters long", minNameLength, maxNameLength)
-	errInvalidDescLength = redact.Errorf("team description must be between %d and %d characters long", minDescriptionLength, maxDescriptionLength)
+	errInvalidNameLength = redact.Errorf(
+		"team name must be between %d and %d characters long",
+		minNameLength, maxNameLength,
+	)
+	errInvalidDescLength = redact.Errorf(
+		"team description must be between %d and %d characters long",
+		minDescriptionLength, maxDescriptionLength,
+	)
 	errInvalidNameFormat = redact.Errorf("team name must match the pattern %s", validNameRegex)
 )
 
@@ -60,7 +66,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not create team: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccess(cmd.OutOrStdout(), "created team: %s (ID: %s)\n", team.Name, team.ID)
+			ux.Fsuccessf(cmd.OutOrStdout(), "created team: %s (ID: %s)\n", team.Name, team.ID)
 
 			return nil
 		},

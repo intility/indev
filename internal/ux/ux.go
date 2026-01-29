@@ -19,28 +19,28 @@ var (
 	StyleInfoLabel    = lipgloss.NewStyle().Foreground(lipgloss.Color("0")).Background(lipgloss.Color("14"))
 )
 
-func Fsuccess(w io.Writer, format string, a ...any) {
+func Fsuccessf(w io.Writer, format string, a ...any) {
 	_, _ = fmt.Fprint(w, StyleSuccess.Render("success: "))
 	_, _ = fmt.Fprintf(w, format, a...)
 }
 
 //goland:noinspection GoUnusedExportedFunction
-func Finfo(w io.Writer, format string, a ...any) {
+func Finfof(w io.Writer, format string, a ...any) {
 	_, _ = fmt.Fprint(w, StyleInfo.Render("info: "))
 	_, _ = fmt.Fprintf(w, format, a...)
 }
 
 //goland:noinspection GoUnusedExportedFunction
-func Fwarning(w io.Writer, format string, a ...any) {
+func Fwarningf(w io.Writer, format string, a ...any) {
 	_, _ = fmt.Fprint(w, StyleWarning.Render("warning: "))
 	_, _ = fmt.Fprintf(w, format, a...)
 }
 
-func Ferror(w io.Writer, format string, a ...any) {
+func Ferrorf(w io.Writer, format string, a ...any) {
 	_, _ = fmt.Fprint(w, StyleError.Render("error: "))
 	_, _ = fmt.Fprintf(w, format, a...)
 }
 
-func Fprint(w io.Writer, format string, a ...any) {
+func Fprintf(w io.Writer, format string, a ...any) {
 	_, _ = fmt.Fprintf(w, format, a...)
 }

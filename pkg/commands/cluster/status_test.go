@@ -79,9 +79,8 @@ func TestPrintClusterStatus(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var buf bytes.Buffer
-			err := printClusterStatus(&buf, tt.cluster)
+			printClusterStatus(&buf, tt.cluster)
 
-			assert.NoError(t, err)
 			assert.Equal(t, tt.want, buf.String())
 		})
 	}

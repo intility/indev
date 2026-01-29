@@ -2,14 +2,17 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 )
 
+var ErrUserNotFound = errors.New("user not found")
+
 type User struct {
-	ID    string   `json:"id"`
-	Name  string   `json:"name"`
-	UPN   string   `json:"upn"`
-	Roles []string `json:"roles"`
+	ID    string   `json:"id"    yaml:"id"`
+	Name  string   `json:"name"  yaml:"name"`
+	UPN   string   `json:"upn"   yaml:"upn"`
+	Roles []string `json:"roles" yaml:"roles"`
 }
 
 type UserList []User
@@ -41,7 +44,7 @@ func (c *RestClient) GetUser(ctx context.Context, upn string) (*User, error) {
 	}
 
 	if user.UPN != upn {
-		return nil, fmt.Errorf("user not found: %s", upn)
+		return nil, fmt.Errorf("%w: %s", ErrUserNotFound, upn)
 	}
 
 	return &user, nil

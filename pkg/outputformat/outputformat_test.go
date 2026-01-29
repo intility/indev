@@ -63,9 +63,9 @@ func TestFormat_Set(t *testing.T) {
 			"table",
 			"csv",
 			"xml",
-			"JSON",  // case sensitive
-			"YAML",  // case sensitive
-			"Wide",  // case sensitive
+			"JSON", // case sensitive
+			"YAML", // case sensitive
+			"Wide", // case sensitive
 			"plain",
 			"text",
 		}
