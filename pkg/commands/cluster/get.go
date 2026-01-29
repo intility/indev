@@ -50,9 +50,7 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("cluster not found: %s", clusterName)
 			}
 
-			if err = printClusterDetails(cmd.OutOrStdout(), cluster); err != nil {
-				return redact.Errorf("could not print cluster details: %w", redact.Safe(err))
-			}
+			printClusterDetails(cmd.OutOrStdout(), cluster)
 
 			return nil
 		},
@@ -63,7 +61,7 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
-func printClusterDetails(writer io.Writer, cluster *client.Cluster) error {
+func printClusterDetails(writer io.Writer, cluster *client.Cluster) {
 	// Basic cluster information
 	ux.Fprintf(writer, "Cluster Information:\n")
 	ux.Fprintf(writer, "  Name:        %s\n", cluster.Name)
@@ -75,7 +73,24 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) error {
 		ux.Fprintf(writer, "  Roles:       %s\n", strings.Join(cluster.Roles, ", "))
 	}
 
-	// Status - use same logic as status command
+	printStatusInfo(writer, cluster)
+
+	// Node pools
+	if len(cluster.NodePools) > 0 {
+		ux.Fprintf(writer, "\nNode Pools:\n")
+
+		for i, pool := range cluster.NodePools {
+			if i > 0 {
+				ux.Fprintf(writer, "\n")
+			}
+
+			printNodePool(writer, pool, i+1)
+		}
+	}
+}
+
+// printStatusInfo prints the cluster status information.
+func printStatusInfo(writer io.Writer, cluster *client.Cluster) {
 	ux.Fprintf(writer, "  Status:      ")
 
 	switch {
@@ -89,7 +104,6 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) error {
 		ux.Fprintf(writer, "Not Ready\n")
 	}
 
-	// Show message and reason if available
 	if cluster.Status.Ready.Message != "" {
 		ux.Fprintf(writer, "  Message:     %s\n", cluster.Status.Ready.Message)
 	}
@@ -97,48 +111,38 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) error {
 	if cluster.Status.Ready.Reason != "" {
 		ux.Fprintf(writer, "  Reason:      %s\n", cluster.Status.Ready.Reason)
 	}
+}
 
-	// Node pools
-	if len(cluster.NodePools) > 0 {
-		ux.Fprintf(writer, "\nNode Pools:\n")
+// printNodePool prints detailed information about a single node pool.
+func printNodePool(writer io.Writer, pool client.NodePool, index int) {
+	ux.Fprintf(writer, "  Pool %d:\n", index)
+	ux.Fprintf(writer, "    Name:               %s\n", pool.Name)
 
-		for i, pool := range cluster.NodePools {
-			if i > 0 {
-				ux.Fprintf(writer, "\n")
-			}
-
-			ux.Fprintf(writer, "  Pool %d:\n", i+1)
-			ux.Fprintf(writer, "    Name:               %s\n", pool.Name)
-
-			if pool.ID != "" {
-				ux.Fprintf(writer, "    ID:                 %s\n", pool.ID)
-			}
-
-			ux.Fprintf(writer, "    Preset:             %s\n", pool.Preset)
-
-			if pool.Replicas != nil {
-				ux.Fprintf(writer, "    Replicas:           %d\n", *pool.Replicas)
-			}
-
-			if pool.Compute != nil {
-				ux.Fprintf(writer, "    Compute:\n")
-				ux.Fprintf(writer, "      Cores:            %d\n", pool.Compute.Cores)
-				ux.Fprintf(writer, "      Memory:           %s\n", pool.Compute.Memory)
-			}
-
-			ux.Fprintf(writer, "    Autoscaling:        %v\n", pool.AutoscalingEnabled)
-
-			if pool.AutoscalingEnabled {
-				if pool.MinCount != nil {
-					ux.Fprintf(writer, "      Min Count:        %d\n", *pool.MinCount)
-				}
-
-				if pool.MaxCount != nil {
-					ux.Fprintf(writer, "      Max Count:        %d\n", *pool.MaxCount)
-				}
-			}
-		}
+	if pool.ID != "" {
+		ux.Fprintf(writer, "    ID:                 %s\n", pool.ID)
 	}
 
-	return nil
+	ux.Fprintf(writer, "    Preset:             %s\n", pool.Preset)
+
+	if pool.Replicas != nil {
+		ux.Fprintf(writer, "    Replicas:           %d\n", *pool.Replicas)
+	}
+
+	if pool.Compute != nil {
+		ux.Fprintf(writer, "    Compute:\n")
+		ux.Fprintf(writer, "      Cores:            %d\n", pool.Compute.Cores)
+		ux.Fprintf(writer, "      Memory:           %s\n", pool.Compute.Memory)
+	}
+
+	ux.Fprintf(writer, "    Autoscaling:        %v\n", pool.AutoscalingEnabled)
+
+	if pool.AutoscalingEnabled {
+		if pool.MinCount != nil {
+			ux.Fprintf(writer, "      Min Count:        %d\n", *pool.MinCount)
+		}
+
+		if pool.MaxCount != nil {
+			ux.Fprintf(writer, "      Max Count:        %d\n", *pool.MaxCount)
+		}
+	}
 }

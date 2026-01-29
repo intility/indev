@@ -266,6 +266,7 @@ func optionsFromWizard() (CreateOptions, error) {
 	return options, nil
 }
 
+//nolint:cyclop // validation logic is inherently sequential
 func validateOptions(options CreateOptions) error {
 	if options.Name == "" {
 		return errEmptyName

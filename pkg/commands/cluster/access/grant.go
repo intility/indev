@@ -147,6 +147,7 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
+//nolint:cyclop // validation logic is inherently sequential
 func validateGrantOptions(options GrantOptions) error {
 	// Validate cluster is specified
 	if options.ClusterID == "" && options.Cluster == "" {
