@@ -1,6 +1,7 @@
 package member
 
 import (
+	"context"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -42,53 +43,7 @@ func NewAddCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "team.addMember")
 			defer span.End()
 
-			err := validateAddOptions(options)
-			if err != nil {
-				return err
-			}
-
-			if options.TeamID == "" {
-				teamID, err := getTeamIDByName(ctx, set, options.Team)
-				if err != nil {
-					return err
-				}
-
-				options.TeamID = teamID
-			}
-
-			if options.UserID == "" {
-				userID, err := getUserIDByUpn(ctx, set, options.User)
-				if err != nil {
-					return err
-				}
-
-				options.UserID = userID
-			}
-
-			err = set.PlatformClient.AddTeamMember(ctx, options.TeamID, []client.AddTeamMemberRequest{
-				{
-					Roles: []client.MemberRole{options.Role},
-					Subject: client.AddMemberSubject{
-						ID:   options.UserID,
-						Type: "user",
-					},
-				},
-			})
-			if err != nil {
-				if strings.Contains(err.Error(), "409 Conflict") {
-					return redact.Errorf("user %s is already a member of team %s", options.User, options.Team)
-				}
-
-				return redact.Errorf("could not add team member: %w", redact.Safe(err))
-			}
-
-			ux.Fsuccessf(
-				cmd.OutOrStdout(),
-				"added user: %s (%s) to team: %s (%s)\n",
-				options.User, options.UserID, options.Team, options.TeamID,
-			)
-
-			return nil
+			return runAddMemberCommand(ctx, cmd, set, options)
 		},
 	}
 
@@ -110,6 +65,61 @@ func NewAddCommand(set clientset.ClientSet) *cobra.Command {
 		"role", "r", "", roleFlagDescription)
 
 	return cmd
+}
+
+func runAddMemberCommand(
+	ctx context.Context,
+	cmd *cobra.Command,
+	set clientset.ClientSet,
+	options AddMemberOptions,
+) error {
+	err := validateAddOptions(options)
+	if err != nil {
+		return err
+	}
+
+	if options.TeamID == "" {
+		teamID, err := getTeamIDByName(ctx, set, options.Team)
+		if err != nil {
+			return err
+		}
+
+		options.TeamID = teamID
+	}
+
+	if options.UserID == "" {
+		userID, err := getUserIDByUpn(ctx, set, options.User)
+		if err != nil {
+			return err
+		}
+
+		options.UserID = userID
+	}
+
+	err = set.PlatformClient.AddTeamMember(ctx, options.TeamID, []client.AddTeamMemberRequest{
+		{
+			Roles: []client.MemberRole{options.Role},
+			Subject: client.AddMemberSubject{
+				ID:   options.UserID,
+				Type: "user",
+			},
+		},
+	})
+	if err != nil {
+		if strings.Contains(err.Error(), "409 Conflict") {
+			return redact.Errorf("user %s is already a member of team %s", options.User, options.Team)
+		}
+
+		return redact.Errorf("could not add team member: %w", redact.Safe(err))
+	}
+
+	ux.Fsuccessf(
+		cmd.OutOrStdout(),
+		"added user: %s (%s) to team: %s (%s)\n",
+		options.User, options.UserID, options.Team, options.TeamID,
+	)
+
+	return nil
 }
 
 func validateAddOptions(options AddMemberOptions) error {

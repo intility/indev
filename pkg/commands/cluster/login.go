@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -16,10 +17,7 @@ import (
 const mustafarTenantID = "93e01775-815e-4327-83d4-5f9ad73b5aa1"
 
 func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
-	var (
-		clusterName  string
-		errEmptyName = redact.Errorf("cluster name cannot be empty")
-	)
+	var clusterName string
 
 	cmd := &cobra.Command{
 		Use:     "login [name]",
@@ -31,63 +29,67 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.login")
 			defer span.End()
 
-			cmd.SilenceUsage = true
-
 			// If positional argument is provided, use it (takes precedence)
 			if len(args) > 0 {
 				clusterName = args[0]
 			}
 
-			if clusterName == "" {
-				return errEmptyName
-			}
-
-			// Get cluster by name
-			cluster, err := set.PlatformClient.GetCluster(ctx, clusterName)
-			if err != nil {
-				return redact.Errorf("could not get cluster: %w", redact.Safe(err))
-			}
-
-			if cluster == nil {
-				return redact.Errorf("cluster not found: %s", clusterName)
-			}
-
-			// Get tenant ID to determine API URL
-			tenantID, err := set.GetTenantID(ctx)
-			if err != nil {
-				return redact.Errorf("could not get tenant ID: %w", redact.Safe(err))
-			}
-
-			apiURL := getAPIURL(clusterName, tenantID)
-
-			// Check if oc is installed
-			if _, err := exec.LookPath("oc"); err != nil {
-				return redact.Errorf(
-					"oc command not found. Please install the OpenShift CLI: " +
-						"https://developers.intility.com/docs/getting-started/" +
-						"first-steps/deploy-first-application/?h=oc#install-openshift-cli",
-				)
-			}
-
-			ux.Fprintf(cmd.OutOrStdout(), "Logging in to cluster %s...\n\n", clusterName)
-
-			// Execute oc login with web authentication
-			ocCmd := exec.CommandContext(ctx, "oc", "login", "-w", apiURL)
-			ocCmd.Stdin = os.Stdin
-			ocCmd.Stdout = cmd.OutOrStdout()
-			ocCmd.Stderr = cmd.ErrOrStderr()
-
-			if err := ocCmd.Run(); err != nil {
-				return redact.Errorf("oc login failed: %w", redact.Safe(err))
-			}
-
-			return nil
+			return runLoginCommand(ctx, cmd, set, clusterName)
 		},
 	}
 
 	cmd.Flags().StringVarP(&clusterName, "name", "n", "", "Name of the cluster")
 
 	return cmd
+}
+
+func runLoginCommand(ctx context.Context, cmd *cobra.Command, set clientset.ClientSet, clusterName string) error {
+	cmd.SilenceUsage = true
+
+	if clusterName == "" {
+		return redact.Errorf("cluster name cannot be empty")
+	}
+
+	// Get cluster by name
+	cluster, err := set.PlatformClient.GetCluster(ctx, clusterName)
+	if err != nil {
+		return redact.Errorf("could not get cluster: %w", redact.Safe(err))
+	}
+
+	if cluster == nil {
+		return redact.Errorf("cluster not found: %s", clusterName)
+	}
+
+	// Get tenant ID to determine API URL
+	tenantID, err := set.GetTenantID(ctx)
+	if err != nil {
+		return redact.Errorf("could not get tenant ID: %w", redact.Safe(err))
+	}
+
+	apiURL := getAPIURL(clusterName, tenantID)
+
+	// Check if oc is installed
+	if _, err := exec.LookPath("oc"); err != nil {
+		return redact.Errorf(
+			"oc command not found. Please install the OpenShift CLI: " +
+				"https://developers.intility.com/docs/getting-started/" +
+				"first-steps/deploy-first-application/?h=oc#install-openshift-cli",
+		)
+	}
+
+	ux.Fprintf(cmd.OutOrStdout(), "Logging in to cluster %s...\n\n", clusterName)
+
+	// Execute oc login with web authentication
+	ocCmd := exec.CommandContext(ctx, "oc", "login", "-w", apiURL)
+	ocCmd.Stdin = os.Stdin
+	ocCmd.Stdout = cmd.OutOrStdout()
+	ocCmd.Stderr = cmd.ErrOrStderr()
+
+	if err := ocCmd.Run(); err != nil {
+		return redact.Errorf("oc login failed: %w", redact.Safe(err))
+	}
+
+	return nil
 }
 
 // getAPIURL returns the API URL for the cluster based on the tenant ID.

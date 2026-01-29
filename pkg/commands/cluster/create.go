@@ -57,77 +57,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.create")
 			defer span.End()
 
-			var err error
-			if options.Name == "" {
-				options, err = optionsFromWizard()
-				if err != nil {
-					if errors.Is(err, errCancelledByUser) {
-						return nil
-					}
-
-					return redact.Errorf("could not get options from wizard: %w", redact.Safe(err))
-				}
-			}
-
-			err = validateOptions(options)
-			if err != nil {
-				return err
-			}
-
-			// inputs validated, assume correct usage
-			cmd.SilenceUsage = true
-
-			// Fetch SSO provisioner
-			ssoProvisioner, err := selectSSOProvisioner(ctx, set.PlatformClient, cmd.OutOrStdout())
-			if err != nil {
-				return redact.Errorf("could not select SSO provisioner: %w", redact.Safe(err))
-			}
-
-			clusterName := options.Name + "-" + generateSuffix()
-
-			// Create node pool based on autoscaling configuration
-			var nodePool client.NodePool
-
-			if options.EnableAutoscaling {
-				nodePool = client.NodePool{
-					ID:                 "",
-					Name:               "",
-					Preset:             options.Preset,
-					Replicas:           nil,
-					Compute:            nil,
-					AutoscalingEnabled: true,
-					MinCount:           &options.MinNodes,
-					MaxCount:           &options.MaxNodes,
-				}
-			} else {
-				replicas := options.NodeCount
-				nodePool = client.NodePool{
-					ID:                 "",
-					Name:               "",
-					Preset:             options.Preset,
-					Replicas:           &replicas,
-					Compute:            nil,
-					AutoscalingEnabled: false,
-					MinCount:           nil,
-					MaxCount:           nil,
-				}
-			}
-
-			_, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
-				Name:           clusterName,
-				SSOProvisioner: ssoProvisioner,
-				NodePools:      []client.NodePool{nodePool},
-				Version:        "",
-				Environment:    "",
-				PullSecretRef:  nil,
-			})
-			if err != nil {
-				return redact.Errorf("could not create cluster: %w", redact.Safe(err))
-			}
-
-			ux.Fsuccessf(cmd.OutOrStdout(), "created cluster: %s\n", clusterName)
-
-			return nil
+			return runCreateCommand(ctx, cmd, set, options)
 		},
 	}
 
@@ -152,10 +82,129 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
+func runCreateCommand(ctx context.Context, cmd *cobra.Command, set clientset.ClientSet, options CreateOptions) error {
+	var err error
+
+	if options.Name == "" {
+		options, err = optionsFromWizard()
+		if err != nil {
+			if errors.Is(err, errCancelledByUser) {
+				return nil
+			}
+
+			return redact.Errorf("could not get options from wizard: %w", redact.Safe(err))
+		}
+	}
+
+	err = validateOptions(options)
+	if err != nil {
+		return err
+	}
+
+	// inputs validated, assume correct usage
+	cmd.SilenceUsage = true
+
+	// Fetch SSO provisioner
+	ssoProvisioner, err := selectSSOProvisioner(ctx, set.PlatformClient, cmd.OutOrStdout())
+	if err != nil {
+		return redact.Errorf("could not select SSO provisioner: %w", redact.Safe(err))
+	}
+
+	clusterName := options.Name + "-" + generateSuffix()
+	nodePool := buildNodePool(options)
+
+	_, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
+		Name:           clusterName,
+		SSOProvisioner: ssoProvisioner,
+		NodePools:      []client.NodePool{nodePool},
+		Version:        "",
+		Environment:    "",
+		PullSecretRef:  nil,
+	})
+	if err != nil {
+		return redact.Errorf("could not create cluster: %w", redact.Safe(err))
+	}
+
+	ux.Fsuccessf(cmd.OutOrStdout(), "created cluster: %s\n", clusterName)
+
+	return nil
+}
+
+func buildNodePool(options CreateOptions) client.NodePool {
+	if options.EnableAutoscaling {
+		return client.NodePool{
+			ID:                 "",
+			Name:               "",
+			Preset:             options.Preset,
+			Replicas:           nil,
+			Compute:            nil,
+			AutoscalingEnabled: true,
+			MinCount:           &options.MinNodes,
+			MaxCount:           &options.MaxNodes,
+		}
+	}
+
+	replicas := options.NodeCount
+
+	return client.NodePool{
+		ID:                 "",
+		Name:               "",
+		Preset:             options.Preset,
+		Replicas:           &replicas,
+		Compute:            nil,
+		AutoscalingEnabled: false,
+		MinCount:           nil,
+		MaxCount:           nil,
+	}
+}
+
 func optionsFromWizard() (CreateOptions, error) {
 	var options CreateOptions
 
-	wz := wizard.NewWizard([]wizard.Input{
+	wz := wizard.NewWizard(getClusterWizardInputs())
+
+	result, err := wz.Run()
+	if err != nil {
+		return options, redact.Errorf("could not gather information: %w", redact.Safe(err))
+	}
+
+	if result.Cancelled() {
+		return options, errCancelledByUser
+	}
+
+	options.Name = result.MustGetValue("name")
+	options.Preset = result.MustGetValue("preset")
+	options.EnableAutoscaling = result.MustGetValue("autoscaling") == answerYes
+
+	if options.EnableAutoscaling {
+		minNodesStr := result.MustGetValue("minNodes")
+
+		options.MinNodes, err = strconv.Atoi(minNodesStr)
+		if err != nil {
+			return options, redact.Errorf("invalid minimum node count: %w", redact.Safe(err))
+		}
+
+		maxNodesStr := result.MustGetValue("maxNodes")
+
+		options.MaxNodes, err = strconv.Atoi(maxNodesStr)
+		if err != nil {
+			return options, redact.Errorf("invalid maximum node count: %w", redact.Safe(err))
+		}
+	} else {
+		nodeCountStr := result.MustGetValue("nodes")
+
+		options.NodeCount, err = strconv.Atoi(nodeCountStr)
+		if err != nil {
+			return options, redact.Errorf("invalid node count: %w", redact.Safe(err))
+		}
+	}
+
+	return options, nil
+}
+
+//nolint:funlen // wizard input definitions are declarative
+func getClusterWizardInputs() []wizard.Input {
+	return []wizard.Input{
 		{
 			ID:          "name",
 			Placeholder: "Cluster Name",
@@ -225,45 +274,7 @@ func optionsFromWizard() (CreateOptions, error) {
 				return answers["autoscaling"].Value == answerYes
 			},
 		},
-	})
-
-	result, err := wz.Run()
-	if err != nil {
-		return options, redact.Errorf("could not gather information: %w", redact.Safe(err))
 	}
-
-	if result.Cancelled() {
-		return options, errCancelledByUser
-	}
-
-	options.Name = result.MustGetValue("name")
-	options.Preset = result.MustGetValue("preset")
-	options.EnableAutoscaling = result.MustGetValue("autoscaling") == answerYes
-
-	if options.EnableAutoscaling {
-		minNodesStr := result.MustGetValue("minNodes")
-
-		options.MinNodes, err = strconv.Atoi(minNodesStr)
-		if err != nil {
-			return options, redact.Errorf("invalid minimum node count: %w", redact.Safe(err))
-		}
-
-		maxNodesStr := result.MustGetValue("maxNodes")
-
-		options.MaxNodes, err = strconv.Atoi(maxNodesStr)
-		if err != nil {
-			return options, redact.Errorf("invalid maximum node count: %w", redact.Safe(err))
-		}
-	} else {
-		nodeCountStr := result.MustGetValue("nodes")
-
-		options.NodeCount, err = strconv.Atoi(nodeCountStr)
-		if err != nil {
-			return options, redact.Errorf("invalid node count: %w", redact.Safe(err))
-		}
-	}
-
-	return options, nil
 }
 
 //nolint:cyclop // validation logic is inherently sequential
@@ -308,9 +319,13 @@ func generateSuffix() string {
 	return string(suffix)
 }
 
-func selectSSOProvisioner(ctx context.Context, platformClient client.Client, out interface {
-	Write(p []byte) (n int, err error)
-}) (string, error) {
+func selectSSOProvisioner(
+	ctx context.Context,
+	platformClient client.Client,
+	out interface {
+		Write(p []byte) (n int, err error)
+	},
+) (string, error) {
 	instances, err := platformClient.ListIntegrationInstances(ctx)
 	if err != nil {
 		return "", fmt.Errorf("failed to list integration instances: %w", err)
