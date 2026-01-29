@@ -62,13 +62,14 @@ func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
 
 func printClusterStatus(writer io.Writer, cluster *client.Cluster) {
 	// Determine and display ONLY the status
-	if cluster.Status.Ready.Status {
+	switch {
+	case cluster.Status.Ready.Status:
 		ux.Fprintf(writer, "Ready\n")
-	} else if cluster.Status.Deployment.Active {
+	case cluster.Status.Deployment.Active:
 		ux.Fprintf(writer, "In Deployment\n")
-	} else if cluster.Status.Deployment.Failed {
+	case cluster.Status.Deployment.Failed:
 		ux.Fprintf(writer, "Deployment Failed\n")
-	} else {
+	default:
 		ux.Fprintf(writer, "Not Ready\n")
 	}
 }

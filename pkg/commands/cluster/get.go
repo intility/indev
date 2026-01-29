@@ -77,13 +77,15 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) error {
 
 	// Status - use same logic as status command
 	ux.Fprintf(writer, "  Status:      ")
-	if cluster.Status.Ready.Status {
+
+	switch {
+	case cluster.Status.Ready.Status:
 		ux.Fprintf(writer, "Ready\n")
-	} else if cluster.Status.Deployment.Active {
+	case cluster.Status.Deployment.Active:
 		ux.Fprintf(writer, "In Deployment\n")
-	} else if cluster.Status.Deployment.Failed {
+	case cluster.Status.Deployment.Failed:
 		ux.Fprintf(writer, "Deployment Failed\n")
-	} else {
+	default:
 		ux.Fprintf(writer, "Not Ready\n")
 	}
 

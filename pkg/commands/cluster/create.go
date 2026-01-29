@@ -288,11 +288,9 @@ func validateOptions(options CreateOptions) error {
 		if options.MinNodes > options.MaxNodes {
 			return errMinGreaterThanMax
 		}
-	} else {
+	} else if options.NodeCount < minCount || options.NodeCount > maxCount {
 		// Validate fixed node count
-		if options.NodeCount < minCount || options.NodeCount > maxCount {
-			return errInvalidNodeCount
-		}
+		return errInvalidNodeCount
 	}
 
 	return nil

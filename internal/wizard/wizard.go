@@ -124,9 +124,8 @@ func (s *selectField) Update(msg tea.Msg) (inputField, tea.Cmd) {
 		return s, nil
 	}
 
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
+	if keyMsg, ok := msg.(tea.KeyMsg); ok {
+		switch keyMsg.String() {
 		case " ", keyEnter:
 			if s.isToggle {
 				// Toggle between yes/no
