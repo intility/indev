@@ -297,7 +297,7 @@ func validateOptions(options CreateOptions) error {
 }
 
 func generateSuffix() string {
-	var letters = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
+	letters := []rune("abcdefghijklmnopqrstuvwxyz0123456789")
 
 	suffix := make([]rune, suffixLength)
 	for i := range suffix {

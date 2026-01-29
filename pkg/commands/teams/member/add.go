@@ -74,7 +74,6 @@ func NewAddCommand(set clientset.ClientSet) *cobra.Command {
 					},
 				},
 			})
-
 			if err != nil {
 				if strings.Contains(err.Error(), "409 Conflict") {
 					return redact.Errorf("user %s is already a member of team %s", options.User, options.Team)

@@ -106,7 +106,6 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 					Roles: []client.ClusterMemberRole{options.Role},
 				},
 			})
-
 			if err != nil {
 				if strings.Contains(err.Error(), "409 Conflict") {
 					return redact.Errorf("%s %s already has access to cluster %s", subjectType, subjectName, options.Cluster)
