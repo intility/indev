@@ -60,8 +60,8 @@ type inputField interface {
 	Focus() tea.Cmd
 	Blur()
 	Value() string
-	SetValue(string)
-	Update(tea.Msg) (inputField, tea.Cmd)
+	SetValue(value string)
+	Update(msg tea.Msg) (inputField, tea.Cmd)
 	View() string
 }
 

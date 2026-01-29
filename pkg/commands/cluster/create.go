@@ -307,7 +307,9 @@ func generateSuffix() string {
 	return string(suffix)
 }
 
-func selectSSOProvisioner(ctx context.Context, platformClient client.Client, out interface{ Write([]byte) (int, error) }) (string, error) {
+func selectSSOProvisioner(ctx context.Context, platformClient client.Client, out interface {
+	Write(p []byte) (n int, err error)
+}) (string, error) {
 	instances, err := platformClient.ListIntegrationInstances(ctx)
 	if err != nil {
 		return "", fmt.Errorf("failed to list integration instances: %w", err)
