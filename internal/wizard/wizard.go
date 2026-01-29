@@ -190,11 +190,11 @@ type model struct {
 	blurredButton string
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) { //nolint: gocritic
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -358,7 +358,7 @@ func (m *model) updateInputs(msg tea.Msg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func (m model) View() string {
+func (m *model) View() string {
 	var b strings.Builder
 
 	// Only show visible fields
@@ -500,7 +500,7 @@ func (w *Result) Cancelled() bool {
 func (w *Wizard) Run() (Result, error) {
 	var result Result
 
-	p := tea.NewProgram(w.model)
+	p := tea.NewProgram(&w.model)
 	if _, err := p.Run(); err != nil {
 		return result, fmt.Errorf("error running wizard: %w", err)
 	}

@@ -14,6 +14,10 @@ import (
 	"github.com/intility/indev/pkg/client"
 )
 
+// homeAccountIDParts is the expected number of parts when splitting
+// HomeAccountID by ".". Format is "<oid>.<tid>".
+const homeAccountIDParts = 2
+
 var (
 	errNotAuthenticatedPreHook = errors.New("you need to sign in before executing this operation")
 	errInvalidHomeAccountID    = errors.New("invalid HomeAccountID format")
@@ -113,7 +117,7 @@ func (c *ClientSet) GetTenantID(ctx context.Context) (string, error) {
 	}
 
 	parts := strings.Split(account.HomeAccountID, ".")
-	if len(parts) < 2 {
+	if len(parts) < homeAccountIDParts {
 		return "", fmt.Errorf("%w: %s", errInvalidHomeAccountID, account.HomeAccountID)
 	}
 

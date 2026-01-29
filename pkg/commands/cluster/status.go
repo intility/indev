@@ -5,7 +5,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/intility/indev/internal/redact"
 	"github.com/intility/indev/internal/telemetry"
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/client"
@@ -13,10 +12,7 @@ import (
 )
 
 func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
-	var (
-		clusterName  string
-		errEmptyName = redact.Errorf("cluster name cannot be empty")
-	)
+	var clusterName string
 
 	cmd := &cobra.Command{
 		Use:     "status [name]",
@@ -28,30 +24,13 @@ func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.status")
 			defer span.End()
 
-			cmd.SilenceUsage = true
-
-			// If positional argument is provided, use it (takes precedence)
-			if len(args) > 0 {
-				clusterName = args[0]
-			}
-
-			if clusterName == "" {
-				return errEmptyName
-			}
-
-			// Get cluster by name
-			cluster, err := set.PlatformClient.GetCluster(ctx, clusterName)
-			if err != nil {
-				return redact.Errorf("could not get cluster: %w", redact.Safe(err))
-			}
-
-			if cluster == nil {
-				return redact.Errorf("cluster not found: %s", clusterName)
-			}
-
-			printClusterStatus(cmd.OutOrStdout(), cluster)
-
-			return nil
+			return runClusterLookupCommand(ctx, lookupParams{
+				cmd:         cmd,
+				set:         set,
+				args:        args,
+				clusterName: clusterName,
+				printer:     printClusterStatus,
+			})
 		},
 	}
 

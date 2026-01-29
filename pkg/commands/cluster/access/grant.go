@@ -1,6 +1,8 @@
 package access
 
 import (
+	"context"
+	"io"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -44,92 +46,7 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.access.grant")
 			defer span.End()
 
-			cmd.SilenceUsage = true
-
-			if err := validateGrantOptions(options); err != nil {
-				return err
-			}
-
-			// Resolve cluster ID
-			if options.ClusterID == "" {
-				clusterID, err := resolveClusterID(ctx, set, options.Cluster, options.ClusterID)
-				if err != nil {
-					return err
-				}
-
-				options.ClusterID = clusterID
-			}
-
-			// Determine subject type and resolve ID
-			var (
-				subjectType string
-				subjectID   string
-				subjectName string
-			)
-
-			if options.User != "" || options.UserID != "" {
-				subjectType = "user"
-				subjectName = options.User
-
-				if options.UserID != "" {
-					subjectID = options.UserID
-				} else {
-					userID, err := getUserIDByUPN(ctx, set, options.User)
-					if err != nil {
-						return err
-					}
-
-					subjectID = userID
-				}
-			} else {
-				subjectType = "team"
-				subjectName = options.Team
-
-				if options.TeamID != "" {
-					subjectID = options.TeamID
-				} else {
-					teamID, err := getTeamIDByName(ctx, set, options.Team)
-					if err != nil {
-						return err
-					}
-
-					subjectID = teamID
-				}
-			}
-
-			err := set.PlatformClient.AddClusterMember(ctx, options.ClusterID, []client.AddClusterMemberRequest{
-				{
-					Subject: client.AddClusterMemberSubject{
-						Type: subjectType,
-						ID:   subjectID,
-					},
-					Roles: []client.ClusterMemberRole{options.Role},
-				},
-			})
-			if err != nil {
-				if strings.Contains(err.Error(), "409 Conflict") {
-					return redact.Errorf("%s %s already has access to cluster %s", subjectType, subjectName, options.Cluster)
-				}
-
-				return redact.Errorf("could not grant cluster access: %w", redact.Safe(err))
-			}
-
-			clusterDisplay := options.Cluster
-			if clusterDisplay == "" {
-				clusterDisplay = options.ClusterID
-			}
-
-			if subjectName == "" {
-				subjectName = subjectID
-			}
-
-			ux.Fsuccessf(
-				cmd.OutOrStdout(),
-				"Granted %s access to %s %s on cluster %s\n",
-				options.Role, subjectType, subjectName, clusterDisplay,
-			)
-
-			return nil
+			return runGrantCommand(ctx, cmd.OutOrStdout(), set, &options)
 		},
 	}
 
@@ -145,6 +62,65 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.Flags().StringVarP((*string)(&options.Role), "role", "r", "", roleFlagDescription)
 
 	return cmd
+}
+
+func runGrantCommand(ctx context.Context, out io.Writer, set clientset.ClientSet, options *GrantOptions) error {
+	if err := validateGrantOptions(*options); err != nil {
+		return err
+	}
+
+	// Resolve cluster ID
+	if options.ClusterID == "" {
+		clusterID, err := resolveClusterID(ctx, set, options.Cluster, options.ClusterID)
+		if err != nil {
+			return err
+		}
+
+		options.ClusterID = clusterID
+	}
+
+	// Determine subject type and resolve ID
+	subject, err := resolveSubject(ctx, set, SubjectOptions{
+		User:   options.User,
+		UserID: options.UserID,
+		Team:   options.Team,
+		TeamID: options.TeamID,
+	})
+	if err != nil {
+		return err
+	}
+
+	err = set.PlatformClient.AddClusterMember(ctx, options.ClusterID, []client.AddClusterMemberRequest{
+		{
+			Subject: client.AddClusterMemberSubject{
+				Type: subject.Type,
+				ID:   subject.ID,
+			},
+			Roles: []client.ClusterMemberRole{options.Role},
+		},
+	})
+	if err != nil {
+		if strings.Contains(err.Error(), "409 Conflict") {
+			return redact.Errorf("%s %s already has access to cluster %s", subject.Type, subject.Name, options.Cluster)
+		}
+
+		return redact.Errorf("could not grant cluster access: %w", redact.Safe(err))
+	}
+
+	clusterDisplay := options.Cluster
+	if clusterDisplay == "" {
+		clusterDisplay = options.ClusterID
+	}
+
+	subjectName := subject.Name
+	if subjectName == "" {
+		subjectName = subject.ID
+	}
+
+	ux.Fsuccessf(out, "Granted %s access to %s %s on cluster %s\n",
+		options.Role, subject.Type, subjectName, clusterDisplay)
+
+	return nil
 }
 
 //nolint:cyclop // validation logic is inherently sequential

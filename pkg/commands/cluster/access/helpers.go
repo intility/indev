@@ -7,6 +7,68 @@ import (
 	"github.com/intility/indev/pkg/clientset"
 )
 
+// SubjectInfo contains resolved information about a user or team subject.
+type SubjectInfo struct {
+	Type string // "user" or "team"
+	ID   string
+	Name string
+}
+
+// SubjectOptions contains the user/team options from command flags.
+type SubjectOptions struct {
+	User   string
+	UserID string
+	Team   string
+	TeamID string
+}
+
+// resolveSubject resolves the subject (user or team) from the provided options.
+func resolveSubject(ctx context.Context, set clientset.ClientSet, opts SubjectOptions) (SubjectInfo, error) {
+	if opts.User != "" || opts.UserID != "" {
+		return resolveUserSubject(ctx, set, opts.User, opts.UserID)
+	}
+
+	return resolveTeamSubject(ctx, set, opts.Team, opts.TeamID)
+}
+
+func resolveUserSubject(ctx context.Context, set clientset.ClientSet, upn, userID string) (SubjectInfo, error) {
+	info := SubjectInfo{Type: "user", ID: "", Name: upn}
+
+	if userID != "" {
+		info.ID = userID
+
+		return info, nil
+	}
+
+	resolvedID, err := getUserIDByUPN(ctx, set, upn)
+	if err != nil {
+		return info, err
+	}
+
+	info.ID = resolvedID
+
+	return info, nil
+}
+
+func resolveTeamSubject(ctx context.Context, set clientset.ClientSet, teamName, teamID string) (SubjectInfo, error) {
+	info := SubjectInfo{Type: "team", ID: "", Name: teamName}
+
+	if teamID != "" {
+		info.ID = teamID
+
+		return info, nil
+	}
+
+	resolvedID, err := getTeamIDByName(ctx, set, teamName)
+	if err != nil {
+		return info, err
+	}
+
+	info.ID = resolvedID
+
+	return info, nil
+}
+
 func resolveClusterID(ctx context.Context, set clientset.ClientSet, clusterName, clusterID string) (string, error) {
 	// If cluster ID is provided directly, use it
 	if clusterID != "" {

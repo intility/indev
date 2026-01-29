@@ -308,6 +308,7 @@ func validateOptions(options CreateOptions) error {
 	return nil
 }
 
+//nolint:gosec // G404: not security-sensitive - used only for cluster name uniqueness
 func generateSuffix() string {
 	letters := []rune("abcdefghijklmnopqrstuvwxyz0123456789")
 
