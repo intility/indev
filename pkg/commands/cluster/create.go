@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand/v2"
 	"slices"
 	"strconv"
 
@@ -19,11 +18,10 @@ import (
 )
 
 const (
-	maxCount     = 8
-	minCount     = 2
-	suffixLength = 6
-	answerYes    = "yes"
-	answerNo     = "no"
+	maxCount  = 8
+	minCount  = 2
+	answerYes = "yes"
+	answerNo  = "no"
 )
 
 var (
@@ -110,11 +108,11 @@ func runCreateCommand(ctx context.Context, cmd *cobra.Command, set clientset.Cli
 		return redact.Errorf("could not select SSO provisioner: %w", redact.Safe(err))
 	}
 
-	clusterName := options.Name + "-" + generateSuffix()
 	nodePool := buildNodePool(options)
 
-	_, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
-		Name:           clusterName,
+	var cluster *client.Cluster
+	cluster, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
+		Name:           options.Name,
 		SSOProvisioner: ssoProvisioner,
 		NodePools:      []client.NodePool{nodePool},
 		Version:        "",
@@ -125,7 +123,7 @@ func runCreateCommand(ctx context.Context, cmd *cobra.Command, set clientset.Cli
 		return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 	}
 
-	ux.Fsuccessf(cmd.OutOrStdout(), "created cluster: %s\n", clusterName)
+	ux.Fsuccessf(cmd.OutOrStdout(), "created cluster: %s\n", cluster.Name)
 
 	return nil
 }
@@ -306,18 +304,6 @@ func validateOptions(options CreateOptions) error {
 	}
 
 	return nil
-}
-
-//nolint:gosec // G404: not security-sensitive - used only for cluster name uniqueness
-func generateSuffix() string {
-	letters := []rune("abcdefghijklmnopqrstuvwxyz0123456789")
-
-	suffix := make([]rune, suffixLength)
-	for i := range suffix {
-		suffix[i] = letters[rand.IntN(len(letters))]
-	}
-
-	return string(suffix)
 }
 
 func selectSSOProvisioner(

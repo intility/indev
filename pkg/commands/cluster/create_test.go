@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -232,29 +231,6 @@ func TestValidateOptions(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestGenerateSuffix(t *testing.T) {
-	t.Run("returns valid format", func(t *testing.T) {
-		suffix := generateSuffix()
-		want := regexp.MustCompile(`^[a-z0-9]{6}$`)
-		assert.Regexp(t, want, suffix)
-	})
-
-	t.Run("returns correct length", func(t *testing.T) {
-		suffix := generateSuffix()
-		assert.Len(t, suffix, 6)
-	})
-
-	t.Run("generates unique suffixes", func(t *testing.T) {
-		seen := make(map[string]bool)
-		for i := 0; i < 100; i++ {
-			suffix := generateSuffix()
-			seen[suffix] = true
-		}
-		// With 36^6 possible combinations, 100 samples should be mostly unique
-		assert.Greater(t, len(seen), 90, "suffixes should be mostly unique")
-	})
 }
 
 // mockClient implements client.Client for testing selectSSOProvisioner.
