@@ -24,6 +24,8 @@ func TestPrintClusterDetails(t *testing.T) {
 				Name:       "my-production-cluster",
 				Version:    "4.14.5",
 				ConsoleURL: "https://console.example.com",
+				EPG:        "Cluster.abCDef12-EPG",
+				IngressIP:  "2a03:4f00:1::abcd",
 				Status: client.ClusterStatus{
 					Ready: client.StatusReady{Status: true},
 				},
@@ -33,6 +35,8 @@ func TestPrintClusterDetails(t *testing.T) {
 				assert.Contains(t, output, "my-production-cluster")
 				assert.Contains(t, output, "4.14.5")
 				assert.Contains(t, output, "https://console.example.com")
+				assert.Contains(t, output, "Cluster.abCDef12-EPG")
+				assert.Contains(t, output, "2a03:4f00:1::abcd")
 				assert.Contains(t, output, "Ready")
 			},
 		},

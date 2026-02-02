@@ -47,6 +47,8 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) {
 	ux.Fprintf(writer, "  ID:          %s\n", cluster.ID)
 	ux.Fprintf(writer, "  Version:     %s\n", cluster.Version)
 	ux.Fprintf(writer, "  Console URL: %s\n", cluster.ConsoleURL)
+	ux.Fprintf(writer, "  EPG:         %s\n", cluster.EPG)
+	ux.Fprintf(writer, "  Ingress IP:  %s\n", cluster.IngressIP)
 
 	if len(cluster.Roles) > 0 {
 		ux.Fprintf(writer, "  Roles:       %s\n", strings.Join(cluster.Roles, ", "))

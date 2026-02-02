@@ -7,6 +7,8 @@ type Cluster struct {
 	Name       string        `json:"name"`
 	Version    string        `json:"version"`
 	ConsoleURL string        `json:"consoleUrl"`
+	EPG        string        `json:"epg"`
+	IngressIP  string        `json:"ingressIp"`
 	NodePools  NodePools     `json:"nodePools"`
 	Status     ClusterStatus `json:"status"`
 	Roles      []string      `json:"roles"`
