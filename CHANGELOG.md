@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/intility/indev/compare/v1.0.0...v1.1.0) (2026-02-02)
+
+
+### Features
+
+* **cluster:** extend basic cluster information with EPG and IngressIP ([8f29471](https://github.com/intility/indev/commit/8f29471366a80059d409d20e3f60e6ab2c0669c0))
+* **cluster:** extend basic cluster information with EPG and IngressIP ([5f0b71b](https://github.com/intility/indev/commit/5f0b71bbd041021318255cfd4b2574d0704a7aa6))
+
 ## 1.0.0 (2026-01-29)
 
 
