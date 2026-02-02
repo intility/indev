@@ -111,6 +111,7 @@ func runCreateCommand(ctx context.Context, cmd *cobra.Command, set clientset.Cli
 	nodePool := buildNodePool(options)
 
 	var cluster *client.Cluster
+
 	cluster, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
 		Name:           options.Name,
 		SSOProvisioner: ssoProvisioner,
