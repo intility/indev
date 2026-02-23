@@ -3,15 +3,16 @@ package client
 import "github.com/google/uuid"
 
 type Cluster struct {
-	ID         string        `json:"id"`
-	Name       string        `json:"name"`
-	Version    string        `json:"version"`
-	ConsoleURL string        `json:"consoleUrl"`
-	EPG        string        `json:"epg"`
-	IngressIP  string        `json:"ingressIp"`
-	NodePools  NodePools     `json:"nodePools"`
-	Status     ClusterStatus `json:"status"`
-	Roles      []string      `json:"roles"`
+	ID              string           `json:"id"`
+	Name            string           `json:"name"`
+	Version         string           `json:"version"`
+	ConsoleURL      string           `json:"consoleUrl"`
+	EPG             string           `json:"epg"`
+	IngressIP       string           `json:"ingressIp"`
+	NodePools       NodePools        `json:"nodePools"`
+	Status          ClusterStatus    `json:"status"`
+	Roles           []string         `json:"roles"`
+	ImagePullSecret *ImagePullSecret `json:"imagePullSecret"`
 }
 
 type ClusterStatus struct {
