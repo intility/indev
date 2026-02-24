@@ -121,26 +121,12 @@ func runCreateCommand(ctx context.Context, cmd *cobra.Command, set clientset.Cli
 
 	nodePool := buildNodePool(options)
 
-	// Resolve pull secret name to ID
-	var pullSecretRef *string
-
-	if options.PullSecret != "" {
-		for i := range pullSecrets {
-			if pullSecrets[i].Name == options.PullSecret {
-				pullSecretRef = &pullSecrets[i].ID
-
-				break
-			}
-		}
-
-		if pullSecretRef == nil {
-			return redact.Errorf("pull secret not found: %s", options.PullSecret)
-		}
+	pullSecretRef, err := resolvePullSecretRef(options.PullSecret, pullSecrets)
+	if err != nil {
+		return err
 	}
 
-	var cluster *client.Cluster
-
-	cluster, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
+	cluster, err := set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
 		Name:           options.Name,
 		SSOProvisioner: ssoProvisioner,
 		NodePools:      []client.NodePool{nodePool},
@@ -183,6 +169,22 @@ func buildNodePool(options CreateOptions) client.NodePool {
 		MinCount:           nil,
 		MaxCount:           nil,
 	}
+}
+
+var errPullSecretNotFound = redact.Errorf("pull secret not found")
+
+func resolvePullSecretRef(name string, pullSecrets []client.PullSecret) (*string, error) {
+	if name == "" {
+		return nil, nil //nolint:nilnil // nil,nil is intentional: no name means no pull secret ref
+	}
+
+	for i := range pullSecrets {
+		if pullSecrets[i].Name == name {
+			return &pullSecrets[i].ID, nil
+		}
+	}
+
+	return nil, errPullSecretNotFound
 }
 
 func optionsFromWizard(pullSecrets []client.PullSecret) (CreateOptions, error) {
@@ -311,7 +313,9 @@ func getClusterWizardInputs(pullSecrets []client.PullSecret) []wizard.Input {
 	}
 
 	if len(pullSecrets) > 0 {
-		psOptions := []string{noPullSecret}
+		psOptions := make([]string, 0, 1+len(pullSecrets))
+		psOptions = append(psOptions, noPullSecret)
+
 		for _, ps := range pullSecrets {
 			psOptions = append(psOptions, ps.Name)
 		}

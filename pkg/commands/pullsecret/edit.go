@@ -34,7 +34,7 @@ func NewEditCommand(set clientset.ClientSet) *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, span := telemetry.StartSpan(cmd.Context(), "pullsecret.edit")
+			_, span := telemetry.StartSpan(cmd.Context(), "pullsecret.edit")
 			defer span.End()
 
 			if len(args) > 0 {
@@ -47,42 +47,11 @@ func NewEditCommand(set clientset.ClientSet) *cobra.Command {
 
 			cmd.SilenceUsage = true
 
-			ps, err := FindPullSecretByName(ctx, set.PlatformClient, name)
-			if err != nil {
-				return err
-			}
-
-			registries := make(map[string]*client.PullSecretCredential)
-
-			hasFlags := len(addRegistries) > 0 || len(removeRegistries) > 0
-
-			if hasFlags {
-				if err = applyFlagEdits(registries, addRegistries, removeRegistries); err != nil {
-					return err
-				}
-			} else {
-				var wizErr error
-
-				registries, wizErr = editFromWizard(ps)
-				if wizErr != nil {
-					return wizErr
-				}
-			}
-
-			if len(registries) == 0 {
-				return errNoChanges
-			}
-
-			result, err := set.PlatformClient.EditPullSecret(ctx, ps.ID, client.EditPullSecretRequest{
-				Registries: registries,
+			return runEdit(cmd, set, editOptions{
+				name:             name,
+				addRegistries:    addRegistries,
+				removeRegistries: removeRegistries,
 			})
-			if err != nil {
-				return redact.Errorf("could not edit pull secret: %w", redact.Safe(err))
-			}
-
-			ux.Fsuccessf(cmd.OutOrStdout(), "updated pull secret: %s\n", result.Name)
-
-			return nil
 		},
 	}
 
@@ -91,6 +60,51 @@ func NewEditCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.Flags().StringArrayVar(&removeRegistries, "remove-registry", nil, "Remove registry by address")
 
 	return cmd
+}
+
+type editOptions struct {
+	name             string
+	addRegistries    []string
+	removeRegistries []string
+}
+
+func runEdit(cmd *cobra.Command, set clientset.ClientSet, opts editOptions) error {
+	ctx := cmd.Context()
+
+	ps, err := FindPullSecretByName(ctx, set.PlatformClient, opts.name)
+	if err != nil {
+		return err
+	}
+
+	registries := make(map[string]*client.PullSecretCredential)
+
+	hasFlags := len(opts.addRegistries) > 0 || len(opts.removeRegistries) > 0
+
+	if hasFlags {
+		if err = applyFlagEdits(registries, opts.addRegistries, opts.removeRegistries); err != nil {
+			return err
+		}
+	} else {
+		registries, err = editFromWizard(ps)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(registries) == 0 {
+		return errNoChanges
+	}
+
+	result, err := set.PlatformClient.EditPullSecret(ctx, ps.ID, client.EditPullSecretRequest{
+		Registries: registries,
+	})
+	if err != nil {
+		return redact.Errorf("could not edit pull secret: %w", redact.Safe(err))
+	}
+
+	ux.Fsuccessf(cmd.OutOrStdout(), "updated pull secret: %s\n", result.Name)
+
+	return nil
 }
 
 func applyFlagEdits(
@@ -117,45 +131,26 @@ func applyFlagEdits(
 	return nil
 }
 
-//nolint:cyclop // wizard loop is inherently sequential
 func editFromWizard(ps *client.PullSecret) (map[string]*client.PullSecretCredential, error) {
 	registries := make(map[string]*client.PullSecretCredential)
 
-	if len(ps.Registries) > 0 {
-		for _, registry := range ps.Registries {
-			removeWz := wizard.NewWizard([]wizard.Input{
-				{
-					ID:          "remove",
-					Placeholder: "Remove " + registry + "?",
-					Type:        wizard.InputTypeToggle,
-					Limit:       0,
-					Validator:   nil,
-					Options:     []string{"no", answerYes},
-					DependsOn:   "",
-					ShowWhen:    nil,
-				},
-			})
-
-			removeResult, err := removeWz.Run()
-			if err != nil {
-				return nil, redact.Errorf("could not gather information: %w", redact.Safe(err))
-			}
-
-			if removeResult.Cancelled() {
-				return nil, errCancelledByUser
-			}
-
-			if removeResult.MustGetValue("remove") == answerYes {
-				registries[registry] = nil
-			}
-		}
+	if err := promptRemoveRegistries(registries, ps.Registries); err != nil {
+		return nil, err
 	}
 
-	for {
-		addWz := wizard.NewWizard([]wizard.Input{
+	if err := promptAddRegistries(registries); err != nil {
+		return nil, err
+	}
+
+	return registries, nil
+}
+
+func promptRemoveRegistries(registries map[string]*client.PullSecretCredential, current []string) error {
+	for _, registry := range current {
+		wz := wizard.NewWizard([]wizard.Input{
 			{
-				ID:          "addMore",
-				Placeholder: "Add a new registry?",
+				ID:          "remove",
+				Placeholder: "Remove " + registry + "?",
 				Type:        wizard.InputTypeToggle,
 				Limit:       0,
 				Validator:   nil,
@@ -165,70 +160,44 @@ func editFromWizard(ps *client.PullSecret) (map[string]*client.PullSecretCredent
 			},
 		})
 
-		addResult, err := addWz.Run()
+		result, err := wz.Run()
 		if err != nil {
-			return nil, redact.Errorf("could not gather information: %w", redact.Safe(err))
+			return redact.Errorf("could not gather information: %w", redact.Safe(err))
 		}
 
-		if addResult.Cancelled() {
-			return nil, errCancelledByUser
+		if result.Cancelled() {
+			return errCancelledByUser
 		}
 
-		if addResult.MustGetValue("addMore") != answerYes {
-			break
-		}
-
-		regWz := wizard.NewWizard([]wizard.Input{
-			{
-				ID:          "address",
-				Placeholder: "Registry Address (e.g. ghcr.io)",
-				Type:        wizard.InputTypeText,
-				Limit:       0,
-				Validator:   nil,
-				Options:     nil,
-				DependsOn:   "",
-				ShowWhen:    nil,
-			},
-			{
-				ID:          "username",
-				Placeholder: "Username",
-				Type:        wizard.InputTypeText,
-				Limit:       0,
-				Validator:   nil,
-				Options:     nil,
-				DependsOn:   "",
-				ShowWhen:    nil,
-			},
-			{
-				ID:          "password",
-				Placeholder: "Password",
-				Type:        wizard.InputTypePassword,
-				Limit:       0,
-				Validator:   nil,
-				Options:     nil,
-				DependsOn:   "",
-				ShowWhen:    nil,
-			},
-		})
-
-		regResult, err := regWz.Run()
-		if err != nil {
-			return nil, redact.Errorf("could not gather registry information: %w", redact.Safe(err))
-		}
-
-		if regResult.Cancelled() {
-			return nil, errCancelledByUser
-		}
-
-		address := regResult.MustGetValue("address")
-		username := regResult.MustGetValue("username")
-		password := regResult.MustGetValue("password")
-
-		registries[address] = &client.PullSecretCredential{
-			Username: username,
-			Password: password,
+		if result.MustGetValue("remove") == answerYes {
+			registries[registry] = nil
 		}
 	}
 
-	return registries, nil
+	return nil
+}
+
+func promptAddRegistries(registries map[string]*client.PullSecretCredential) error {
+	for {
+		more, err := promptAddMore("Add a new registry?")
+		if err != nil {
+			return err
+		}
+
+		if !more {
+			break
+		}
+
+		cred, err := promptRegistryCredential()
+		if err != nil {
+			return err
+		}
+
+		registries[cred.address] = &client.PullSecretCredential{
+			Username: cred.username,
+			Password: cred.password,
+		}
+	}
+
+	return nil
 }

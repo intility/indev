@@ -71,10 +71,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 
 const answerYes = "yes"
 
-//nolint:cyclop // wizard loop is inherently sequential
 func createFromWizard() (string, map[string]client.PullSecretCredential, error) {
-	registries := make(map[string]client.PullSecretCredential)
-
 	nameWz := wizard.NewWizard([]wizard.Input{
 		{
 			ID:          "name",
@@ -99,84 +96,37 @@ func createFromWizard() (string, map[string]client.PullSecretCredential, error) 
 
 	name := nameResult.MustGetValue("name")
 
+	registries, err := collectRegistries()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return name, registries, nil
+}
+
+func collectRegistries() (map[string]client.PullSecretCredential, error) {
+	registries := make(map[string]client.PullSecretCredential)
+
 	for {
-		regWz := wizard.NewWizard([]wizard.Input{
-			{
-				ID:          "address",
-				Placeholder: "Registry Address (e.g. ghcr.io)",
-				Type:        wizard.InputTypeText,
-				Limit:       0,
-				Validator:   nil,
-				Options:     nil,
-				DependsOn:   "",
-				ShowWhen:    nil,
-			},
-			{
-				ID:          "username",
-				Placeholder: "Username",
-				Type:        wizard.InputTypeText,
-				Limit:       0,
-				Validator:   nil,
-				Options:     nil,
-				DependsOn:   "",
-				ShowWhen:    nil,
-			},
-			{
-				ID:          "password",
-				Placeholder: "Password",
-				Type:        wizard.InputTypePassword,
-				Limit:       0,
-				Validator:   nil,
-				Options:     nil,
-				DependsOn:   "",
-				ShowWhen:    nil,
-			},
-		})
-
-		regResult, err := regWz.Run()
+		cred, err := promptRegistryCredential()
 		if err != nil {
-			return "", nil, redact.Errorf("could not gather registry information: %w", redact.Safe(err))
+			return nil, err
 		}
 
-		if regResult.Cancelled() {
-			return "", nil, errCancelledByUser
+		registries[cred.address] = client.PullSecretCredential{
+			Username: cred.username,
+			Password: cred.password,
 		}
 
-		address := regResult.MustGetValue("address")
-		username := regResult.MustGetValue("username")
-		password := regResult.MustGetValue("password")
-
-		registries[address] = client.PullSecretCredential{
-			Username: username,
-			Password: password,
-		}
-
-		addMoreWz := wizard.NewWizard([]wizard.Input{
-			{
-				ID:          "addMore",
-				Placeholder: "Add another registry?",
-				Type:        wizard.InputTypeToggle,
-				Limit:       0,
-				Validator:   nil,
-				Options:     []string{"no", answerYes},
-				DependsOn:   "",
-				ShowWhen:    nil,
-			},
-		})
-
-		addMoreResult, err := addMoreWz.Run()
+		more, err := promptAddMore("Add another registry?")
 		if err != nil {
-			return "", nil, redact.Errorf("could not gather information: %w", redact.Safe(err))
+			return nil, err
 		}
 
-		if addMoreResult.Cancelled() {
-			return "", nil, errCancelledByUser
-		}
-
-		if addMoreResult.MustGetValue("addMore") != answerYes {
+		if !more {
 			break
 		}
 	}
 
-	return name, registries, nil
+	return registries, nil
 }

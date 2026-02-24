@@ -309,7 +309,7 @@ func (m *mockClient) CreatePullSecret(_ context.Context, _ client.NewPullSecretR
 func (m *mockClient) EditPullSecret(_ context.Context, _ string, _ client.EditPullSecretRequest) (*client.PullSecret, error) {
 	return nil, nil
 }
-func (m *mockClient) DeletePullSecret(_ context.Context, _ string) error          { return nil }
+func (m *mockClient) DeletePullSecret(_ context.Context, _ string) error        { return nil }
 func (m *mockClient) SetClusterPullSecret(_ context.Context, _, _ string) error { return nil }
 
 func TestSelectSSOProvisioner(t *testing.T) {

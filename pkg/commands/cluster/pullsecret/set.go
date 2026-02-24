@@ -6,8 +6,8 @@ import (
 	"github.com/intility/indev/internal/redact"
 	"github.com/intility/indev/internal/telemetry"
 	"github.com/intility/indev/internal/ux"
-	pullsecretcmd "github.com/intility/indev/pkg/commands/pullsecret"
 	"github.com/intility/indev/pkg/clientset"
+	pullsecretcmd "github.com/intility/indev/pkg/commands/pullsecret"
 )
 
 var (
@@ -56,7 +56,7 @@ func NewSetCommand(set clientset.ClientSet) *cobra.Command {
 
 			ps, err := pullsecretcmd.FindPullSecretByName(ctx, set.PlatformClient, pullSecretName)
 			if err != nil {
-				return err
+				return redact.Errorf("could not find pull secret: %w", redact.Safe(err))
 			}
 
 			err = set.PlatformClient.SetClusterPullSecret(ctx, cluster.ID, ps.ID)

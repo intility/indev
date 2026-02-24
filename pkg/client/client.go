@@ -311,7 +311,9 @@ func (c *RestClient) CreatePullSecret(ctx context.Context, request NewPullSecret
 		return nil, fmt.Errorf("could not marshal request: %w", err)
 	}
 
-	req, err := c.createAuthenticatedRequest(ctx, "POST", c.baseURI+"/api/v1/settings/image-pull-secrets", bytes.NewReader(body))
+	endpoint := c.baseURI + "/api/v1/settings/image-pull-secrets"
+
+	req, err := c.createAuthenticatedRequest(ctx, "POST", endpoint, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -324,7 +326,11 @@ func (c *RestClient) CreatePullSecret(ctx context.Context, request NewPullSecret
 	return &pullSecret, nil
 }
 
-func (c *RestClient) EditPullSecret(ctx context.Context, id string, request EditPullSecretRequest) (*PullSecret, error) {
+func (c *RestClient) EditPullSecret(
+	ctx context.Context,
+	id string,
+	request EditPullSecretRequest,
+) (*PullSecret, error) {
 	body, err := json.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal request: %w", err)
