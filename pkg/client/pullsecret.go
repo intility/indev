@@ -9,7 +9,7 @@ type PullSecret struct {
 
 type PullSecretCredential struct {
 	Username string `json:"username"`
-	Password string `json:"password"`
+	Password string `json:"password"` //nolint:gosec // G117: this is a credential payload, not a hardcoded secret
 }
 
 type NewPullSecretRequest struct {
