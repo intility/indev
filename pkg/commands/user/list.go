@@ -1,4 +1,4 @@
-package user
+package user //nolint:revive // var-naming: matches command package naming convention
 
 import (
 	"encoding/json"

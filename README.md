@@ -32,7 +32,7 @@ Download the latest release for your platform from the [GitHub Releases](https:/
 
 ### From Source
 
-Requires Go 1.25 or higher.
+Requires Go 1.26 or higher.
 
 ```sh
 git clone https://github.com/intility/indev.git
@@ -44,8 +44,8 @@ go build -o indev ./cmd/indev
 
 Some commands require additional tools to be installed:
 
-| Command | Requirement |
-|---------|-------------|
+| Command               | Requirement                                                                                                                                 |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `indev cluster login` | [OpenShift CLI (oc)](https://developers.intility.com/docs/getting-started/first-steps/deploy-first-application/?h=oc#install-openshift-cli) |
 
 ## Usage

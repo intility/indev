@@ -1,4 +1,4 @@
-package build
+package build //nolint:revive // var-naming: build is used throughout the project
 
 import (
 	"os"

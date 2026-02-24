@@ -96,7 +96,7 @@ func scheduleTelemetryUpload(ctx context.Context, args []string) {
 
 	exe, err := os.Executable()
 	if err == nil {
-		_ = exec.CommandContext(ctx, exe, uploadTelemetryCommand).Start()
+		_ = exec.CommandContext(ctx, exe, uploadTelemetryCommand).Start() //nolint:gosec // G702 false positive
 	}
 }
 
