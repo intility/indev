@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/intility/indev/compare/v1.1.0...v1.1.1) (2026-02-24)
+
+
+### Bug Fixes
+
+* remove old unused files ([#82](https://github.com/intility/indev/issues/82)) ([cdd3fdf](https://github.com/intility/indev/commit/cdd3fdf93a4775094bba88130a5265fe5ae19131))
+
 ## [1.1.0](https://github.com/intility/indev/compare/v1.0.0...v1.1.0) (2026-02-02)
 
 
