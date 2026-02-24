@@ -16,7 +16,7 @@ func (e *RequestError) Error() string {
 }
 
 func doRequest[T any](client *http.Client, req *http.Request, result *T) error {
-	resp, err := client.Do(req)
+	resp, err := client.Do(req) //nolint:gosec // G704 - request URL is constructed internally
 	if err != nil {
 		return fmt.Errorf("could not perform request: %w", err)
 	}

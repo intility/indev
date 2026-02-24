@@ -73,7 +73,7 @@ func CreatePasswordPrompter(cmd *cobra.Command) func(string) (string, error) {
 	return func(prompt string) (string, error) {
 		ux.Fprintf(cmd.OutOrStdout(), "%s: ", prompt)
 
-		bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
+		bytePassword, err := term.ReadPassword(int(os.Stdin.Fd())) //nolint:gosec // G115 - stdin fd fits in int
 
 		ux.Fprintf(cmd.OutOrStdout(), "\n")
 
