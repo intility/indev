@@ -60,6 +60,15 @@ type UserClient interface {
 	GetUser(ctx context.Context, upn string) (*User, error)
 }
 
+type PullSecretClient interface {
+	ListPullSecrets(ctx context.Context) ([]PullSecret, error)
+	GetPullSecret(ctx context.Context, id string) (*PullSecret, error)
+	CreatePullSecret(ctx context.Context, request NewPullSecretRequest) (*PullSecret, error)
+	EditPullSecret(ctx context.Context, id string, request EditPullSecretRequest) (*PullSecret, error)
+	DeletePullSecret(ctx context.Context, id string) error
+	SetClusterPullSecret(ctx context.Context, clusterID string, pullSecretID string) error
+}
+
 type Client interface {
 	ClusterClient
 	IntegrationClient
@@ -67,6 +76,7 @@ type Client interface {
 	TeamsClient
 	UserClient
 	MemberClient
+	PullSecretClient
 }
 
 type RestClientOption func(*RestClient)
@@ -255,6 +265,109 @@ func (c *RestClient) RemoveClusterMember(ctx context.Context, clusterID string, 
 	endpoint := c.baseURI + "/api/v1/clusters/" + clusterID + "/members/" + memberID
 
 	req, err := c.createAuthenticatedRequest(ctx, "DELETE", endpoint, nil)
+	if err != nil {
+		return err
+	}
+
+	if err = doRequest[any](c.httpClient, req, nil); err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	return nil
+}
+
+func (c *RestClient) ListPullSecrets(ctx context.Context) ([]PullSecret, error) {
+	var pullSecrets []PullSecret
+
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/settings/image-pull-secrets", nil)
+	if err != nil {
+		return pullSecrets, err
+	}
+
+	if err = doRequest(c.httpClient, req, &pullSecrets); err != nil {
+		return pullSecrets, fmt.Errorf("request failed: %w", err)
+	}
+
+	return pullSecrets, nil
+}
+
+func (c *RestClient) GetPullSecret(ctx context.Context, id string) (*PullSecret, error) {
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURI+"/api/v1/settings/image-pull-secrets/"+id, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var pullSecret PullSecret
+	if err = doRequest(c.httpClient, req, &pullSecret); err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	return &pullSecret, nil
+}
+
+func (c *RestClient) CreatePullSecret(ctx context.Context, request NewPullSecretRequest) (*PullSecret, error) {
+	body, err := json.Marshal(request)
+	if err != nil {
+		return nil, fmt.Errorf("could not marshal request: %w", err)
+	}
+
+	endpoint := c.baseURI + "/api/v1/settings/image-pull-secrets"
+
+	req, err := c.createAuthenticatedRequest(ctx, "POST", endpoint, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	var pullSecret PullSecret
+	if err = doRequest(c.httpClient, req, &pullSecret); err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	return &pullSecret, nil
+}
+
+func (c *RestClient) EditPullSecret(
+	ctx context.Context,
+	id string,
+	request EditPullSecretRequest,
+) (*PullSecret, error) {
+	body, err := json.Marshal(request)
+	if err != nil {
+		return nil, fmt.Errorf("could not marshal request: %w", err)
+	}
+
+	endpoint := c.baseURI + "/api/v1/settings/image-pull-secrets/" + id
+
+	req, err := c.createAuthenticatedRequest(ctx, "PATCH", endpoint, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	var pullSecret PullSecret
+	if err = doRequest(c.httpClient, req, &pullSecret); err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	return &pullSecret, nil
+}
+
+func (c *RestClient) DeletePullSecret(ctx context.Context, id string) error {
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURI+"/api/v1/settings/image-pull-secrets/"+id, nil)
+	if err != nil {
+		return err
+	}
+
+	if err = doRequest[any](c.httpClient, req, nil); err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	return nil
+}
+
+func (c *RestClient) SetClusterPullSecret(ctx context.Context, clusterID string, pullSecretID string) error {
+	endpoint := c.baseURI + "/api/v1/clusters/" + clusterID + "/image-pull-secrets/" + pullSecretID
+
+	req, err := c.createAuthenticatedRequest(ctx, "PUT", endpoint, nil)
 	if err != nil {
 		return err
 	}

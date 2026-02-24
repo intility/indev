@@ -297,6 +297,20 @@ func (m *mockClient) ListUsers(_ context.Context) ([]client.User, error)    { re
 func (m *mockClient) GetUser(_ context.Context, _ string) (*client.User, error) {
 	return nil, nil
 }
+func (m *mockClient) ListPullSecrets(_ context.Context) ([]client.PullSecret, error) {
+	return nil, nil
+}
+func (m *mockClient) GetPullSecret(_ context.Context, _ string) (*client.PullSecret, error) {
+	return nil, nil
+}
+func (m *mockClient) CreatePullSecret(_ context.Context, _ client.NewPullSecretRequest) (*client.PullSecret, error) {
+	return nil, nil
+}
+func (m *mockClient) EditPullSecret(_ context.Context, _ string, _ client.EditPullSecretRequest) (*client.PullSecret, error) {
+	return nil, nil
+}
+func (m *mockClient) DeletePullSecret(_ context.Context, _ string) error        { return nil }
+func (m *mockClient) SetClusterPullSecret(_ context.Context, _, _ string) error { return nil }
 
 func TestSelectSSOProvisioner(t *testing.T) {
 	tests := []struct {
