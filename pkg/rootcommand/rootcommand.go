@@ -10,6 +10,8 @@ import (
 	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
 	"github.com/intility/indev/pkg/commands/account"
+	"github.com/intility/indev/pkg/commands/ai"
+	"github.com/intility/indev/pkg/commands/ai/deployment"
 	"github.com/intility/indev/pkg/commands/cluster"
 	"github.com/intility/indev/pkg/commands/cluster/access"
 	"github.com/intility/indev/pkg/commands/teams"
@@ -38,6 +40,7 @@ func GetRootCommand() *cobra.Command {
 	rootCmd.AddCommand(getAccountCommand(clients))
 	rootCmd.AddCommand(getTeamsCommand(clients))
 	rootCmd.AddCommand(getUserCommand(clients))
+	rootCmd.AddCommand(getAICommand(clients))
 
 	return rootCmd
 }
@@ -145,6 +148,46 @@ func getUserCommand(set clientset.ClientSet) *cobra.Command {
 	}
 
 	cmd.AddCommand(user.NewListCommand(set))
+
+	return cmd
+}
+
+func getAICommand(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "ai",
+		Short: "Manage Intility Developer Platform AI Deployments",
+		Long:  "Manage Intility Developer Platform AI Deployments",
+		Run:   showHelp,
+	}
+
+	cmd.AddCommand(getAIModelCommand(set))
+	cmd.AddCommand(getAIDeploymentCommand(set))
+
+	return cmd
+}
+
+func getAIModelCommand(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "model",
+		Short: "Manage AI models",
+		Long:  "Manage AI models",
+		Run:   showHelp,
+	}
+
+	cmd.AddCommand(ai.NewListCommand(set))
+
+	return cmd
+}
+
+func getAIDeploymentCommand(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deployment",
+		Short: "Manage AI deployments",
+		Long:  "Manage AI deployments",
+		Run:   showHelp,
+	}
+
+	cmd.AddCommand(deployment.NewCreateCommand(set))
 
 	return cmd
 }

@@ -22,7 +22,8 @@ var (
 	//goland:noinspection GoBoolExpressions
 	IsDev = Version == "0.0.0-dev" && !forceProd
 
-	PlatformBaseURI = "https://container-platform-backend.apps.intilitycloud.com"
+	PlatformBaseURI        = "https://container-platform-backend.apps.intilitycloud.com"
+	PlatformBaseURIBlurite = "https://container-platform-blurite.apps.intilitycloud.com"
 
 	// SentryDSN is injected in the build from the CI/CD pipeline.
 	// It is disabled by default.
@@ -117,6 +118,14 @@ func PlatformAPIHost() string {
 	}
 
 	return PlatformBaseURI
+}
+
+func PlatformAPIHostBlurite() string {
+	if IsDev {
+		return "http://localhost:8083"
+	}
+
+	return PlatformBaseURIBlurite
 }
 
 func ClientID() string {
