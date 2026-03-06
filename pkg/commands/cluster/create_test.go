@@ -297,7 +297,12 @@ func (m *mockClient) ListUsers(_ context.Context) ([]client.User, error)    { re
 func (m *mockClient) GetUser(_ context.Context, _ string) (*client.User, error) {
 	return nil, nil
 }
-
+func (m *mockClient) CreateAIDeployment(_ context.Context, _ client.NewAIDeploymentRequest) (*client.AIDeployment, error) {
+	return nil, nil
+}
+func (m *mockClient) ListAIModels(_ context.Context) ([]client.AIModel, error) {
+	return nil, nil
+}
 func TestSelectSSOProvisioner(t *testing.T) {
 	tests := []struct {
 		name      string
