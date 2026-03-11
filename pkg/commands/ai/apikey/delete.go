@@ -47,7 +47,7 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not delete API key: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccessf(cmd.OutOrStdout(), "deleted API key: %s", name)
+			ux.Fsuccessf(cmd.OutOrStdout(), "deleted API key: %s\n", name)
 
 			return nil
 		},

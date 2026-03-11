@@ -36,7 +36,7 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not delete AI deployment: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccessf(cmd.OutOrStdout(), "deleted AI deployment: %s", name)
+			ux.Fsuccessf(cmd.OutOrStdout(), "deleted AI deployment: %s\n", name)
 
 			return nil
 		},

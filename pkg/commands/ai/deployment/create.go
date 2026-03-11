@@ -60,7 +60,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not create AI deployment: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccessf(cmd.OutOrStdout(), "created AI deployment: %s", aideployment.Name)
+			ux.Fsuccessf(cmd.OutOrStdout(), "created AI deployment: %s\n", aideployment.Name)
 
 			return nil
 		},
