@@ -15,13 +15,14 @@ import (
 const (
 	maxNameLength  = 50
 	minNameLength  = 3
+	defaultTTLDays = 30
 	validNameRegex = "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
 )
 
 var (
 	errEmptyName         = redact.Errorf("API key name cannot be empty")
 	errEmptyDeployment   = redact.Errorf("deployment name must be specified")
-	errInvalidTTL        = redact.Errorf("TTL must be a positive integer in the range 1 - 365")
+	errInvalidTTL        = redact.Errorf("TTL is required and must be a positive integer in the range 1 - 365")
 	errInvalidNameLength = redact.Errorf(
 		"API key name must be between %d and %d characters long",
 		minNameLength, maxNameLength,
@@ -78,7 +79,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 		"deployment", "d", "", "Name of the AI deployment")
 
 	cmd.Flags().IntVarP(&options.TTLDays,
-		"ttl", "t", 0, "Number of days the API key will be valid")
+		"ttl", "t", defaultTTLDays, "Number of days the API key will be valid")
 
 	return cmd
 }

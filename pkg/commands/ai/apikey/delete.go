@@ -11,6 +11,7 @@ import (
 
 func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 	var deployment string
+
 	var name string
 
 	cmd := &cobra.Command{
@@ -23,10 +24,6 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 			defer span.End()
 
 			cmd.SilenceUsage = true
-
-			if len(args) > 0 {
-				name = args[0]
-			}
 
 			if deployment == "" {
 				return redact.Errorf("deployment name must be specified")

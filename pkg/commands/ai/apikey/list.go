@@ -17,6 +17,7 @@ import (
 
 func NewListCommand(set clientset.ClientSet) *cobra.Command {
 	var deployment string
+
 	output := outputformat.Format("")
 
 	cmd := &cobra.Command{

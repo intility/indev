@@ -11,6 +11,7 @@ import (
 	"github.com/intility/indev/pkg/clientset"
 	"github.com/intility/indev/pkg/commands/account"
 	"github.com/intility/indev/pkg/commands/ai"
+	"github.com/intility/indev/pkg/commands/ai/apikey"
 	"github.com/intility/indev/pkg/commands/ai/deployment"
 	"github.com/intility/indev/pkg/commands/cluster"
 	"github.com/intility/indev/pkg/commands/cluster/access"
@@ -162,6 +163,7 @@ func getAICommand(set clientset.ClientSet) *cobra.Command {
 
 	cmd.AddCommand(getAIModelCommand(set))
 	cmd.AddCommand(getAIDeploymentCommand(set))
+	cmd.AddCommand(getAIAPIKeyCommand(set))
 
 	return cmd
 }
@@ -194,13 +196,17 @@ func getAIDeploymentCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
-func getAIAPIKeyCommands(set clientset.ClientSet) *cobra.Command {
+func getAIAPIKeyCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deployment",
+		Use:   "apikey",
 		Short: "Manage AI deployment API keys",
 		Long:  "Manage AI deployment API keys",
 		Run:   showHelp,
 	}
+
+	cmd.AddCommand(apikey.NewCreateCommand(set))
+	cmd.AddCommand(apikey.NewListCommand(set))
+	cmd.AddCommand(apikey.NewDeleteCommand(set))
 
 	return cmd
 }

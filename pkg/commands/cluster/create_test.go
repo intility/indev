@@ -310,6 +310,16 @@ func (m *mockClient) GetAIDeployment(_ context.Context, _ string) (*client.AIDep
 	return nil, nil
 }
 func (m *mockClient) DeleteAIDeployment(_ context.Context, _ string) error { return nil }
+func (m *mockClient) ListAIAPIKeys(_ context.Context, _ string) ([]client.AIAPIKey, error) {
+	return nil, nil
+}
+func (m *mockClient) GetAIAPIKey(_ context.Context, _ string, _ string) (*client.AIAPIKey, error) {
+	return nil, nil
+}
+func (m *mockClient) CreateAIAPIKey(_ context.Context, _ string, _ client.NewAIAPIKeyRequest) (*client.AIAPIKeyWithSecret, error) {
+	return nil, nil
+}
+func (m *mockClient) DeleteAIAPIKey(_ context.Context, _ string, _ string) error { return nil }
 func TestSelectSSOProvisioner(t *testing.T) {
 	tests := []struct {
 		name      string

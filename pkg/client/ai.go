@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
 )
 
 type AIModel struct {
@@ -89,7 +90,7 @@ func (c *RestClient) ListAIDeployments(ctx context.Context) ([]AIDeployment, err
 }
 
 func (c *RestClient) GetAIDeployment(ctx context.Context, name string) (*AIDeployment, error) {
-	endpoint := c.baseURIBlurite + "/api/v1/blurite/llm-deployments/by-name/" + name
+	endpoint := c.baseURIBlurite + "/api/v1/blurite/llm-deployments/by-name/" + url.PathEscape(name)
 
 	req, err := c.createAuthenticatedRequest(ctx, "GET", endpoint, nil)
 	if err != nil {
@@ -133,7 +134,9 @@ func (c *RestClient) ListAIAPIKeys(ctx context.Context, deploymentID string) ([]
 	return keys, nil
 }
 
-func (c *RestClient) CreateAIAPIKey(ctx context.Context, deploymentID string, request NewAIAPIKeyRequest) (*AIAPIKeyWithSecret, error) {
+func (c *RestClient) CreateAIAPIKey(
+	ctx context.Context, deploymentID string, request NewAIAPIKeyRequest,
+) (*AIAPIKeyWithSecret, error) {
 	body, err := json.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal request: %w", err)
@@ -155,7 +158,8 @@ func (c *RestClient) CreateAIAPIKey(ctx context.Context, deploymentID string, re
 }
 
 func (c *RestClient) GetAIAPIKey(ctx context.Context, deploymentID string, name string) (*AIAPIKey, error) {
-	endpoint := c.baseURIBlurite + "/api/v1/blurite/llm-deployments/" + deploymentID + "/api-keys/by-name/" + name
+	endpoint := c.baseURIBlurite + "/api/v1/blurite/llm-deployments/" +
+		deploymentID + "/api-keys/by-name/" + url.PathEscape(name)
 
 	req, err := c.createAuthenticatedRequest(ctx, "GET", endpoint, nil)
 	if err != nil {
