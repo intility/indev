@@ -11,7 +11,6 @@ import (
 type AIModel struct {
 	ID            string `json:"id"            yaml:"id"`
 	DisplayName   string `json:"displayName"   yaml:"displayName"`
-	Slug          string `json:"slug"          yaml:"slug"`
 	Description   string `json:"description"   yaml:"description"`
 	ContextLength int    `json:"contextLength" yaml:"contextLength"`
 }

@@ -69,10 +69,9 @@ func printAIModelsList(writer io.Writer, format outputformat.Format, aimodels []
 		table := ux.TableFromObjects(aimodels, func(aimodel client.AIModel) []ux.Row {
 			return []ux.Row{
 				ux.NewRow("Name", aimodel.DisplayName),
-				ux.NewRow("ID", aimodel.Slug),
+				ux.NewRow("ID", aimodel.ID),
 				ux.NewRow("Description", aimodel.Description),
 				ux.NewRow("Context Length", strconv.Itoa(aimodel.ContextLength)),
-				ux.NewRow("Resource ID", aimodel.ID),
 			}
 		})
 
@@ -81,7 +80,7 @@ func printAIModelsList(writer io.Writer, format outputformat.Format, aimodels []
 		table := ux.TableFromObjects(aimodels, func(aimodel client.AIModel) []ux.Row {
 			return []ux.Row{
 				ux.NewRow("Name", aimodel.DisplayName),
-				ux.NewRow("ID", aimodel.Slug),
+				ux.NewRow("ID", aimodel.ID),
 				ux.NewRow("Context Length", strconv.Itoa(aimodel.ContextLength)),
 			}
 		})

@@ -70,7 +70,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 		"name", "n", "", "Name of the deployment to create")
 
 	cmd.Flags().StringVarP(&options.Model,
-		"model", "m", "", "Slug of the AI model to use. Available models can be found using 'indev ai model list'")
+		"model", "m", "", "ID of the AI model to use. Available models can be found using 'indev ai model list'")
 
 	return cmd
 }
