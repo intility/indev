@@ -45,6 +45,8 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "aideployment.create")
 			defer span.End()
 
+			cmd.SilenceUsage = true
+
 			err := validateCreateOptions(options)
 			if err != nil {
 				return err
