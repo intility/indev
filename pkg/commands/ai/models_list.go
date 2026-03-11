@@ -82,7 +82,6 @@ func printAIModelsList(writer io.Writer, format outputformat.Format, aimodels []
 			return []ux.Row{
 				ux.NewRow("Name", aimodel.DisplayName),
 				ux.NewRow("ID", aimodel.Slug),
-				ux.NewRow("Description", aimodel.Description),
 				ux.NewRow("Context Length", strconv.Itoa(aimodel.ContextLength)),
 			}
 		})
