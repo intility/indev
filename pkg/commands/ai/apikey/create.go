@@ -68,7 +68,9 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not create API key: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccessf(cmd.OutOrStdout(), "created API key: %s", key.Key)
+			ux.Fsuccessf(cmd.OutOrStdout(), "API key created successfully\n")
+			ux.Fprintf(cmd.OutOrStdout(), "\n  %s\n\n", key.Key)
+			ux.Fwarningf(cmd.OutOrStdout(), "Store this key securely — it will not be shown again.\n")
 
 			return nil
 		},
