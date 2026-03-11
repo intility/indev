@@ -13,10 +13,9 @@ import (
 )
 
 const (
-	// TODO: adjust these
 	maxNameLength  = 50
 	minNameLength  = 3
-	validNameRegex = "^[a-zA-Z0-9]+([-_ ]{0,1}[a-zA-Z0-9])+$" // TODO make it k8s name safe
+	validNameRegex = "^[a-zA-Z0-9]+([-_ ]{0,1}[a-zA-Z0-9])+$"
 )
 
 var (
@@ -69,13 +68,11 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 		"name", "n", "", "Name of the deployment to create")
 
 	cmd.Flags().StringVarP(&options.Model,
-		"model", "m", "", "slug of the ai model to connect") //TODO find a btter description
+		"model", "m", "", "Slug of the AI model to use. Available models can be found using 'indev ai model list'")
 
 	return cmd
 }
 
-// TODO: should we internally call listmodels to validate that the requested
-// model exists or let it fail?
 func validateCreateOptions(options CreateOptions) error {
 	if options.Name == "" {
 		return errEmptyName

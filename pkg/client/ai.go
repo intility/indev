@@ -8,25 +8,25 @@ import (
 )
 
 type AIModel struct {
-	ID            string `json:"id"`
-	DisplayName   string `json:"displayName"`
-	Slug          string `json:"slug"`
-	Description   string `json:"description"`
-	ContextLength int    `json:"contextLength"`
+	ID            string `json:"id"            yaml:"id"`
+	DisplayName   string `json:"displayName"   yaml:"displayName"`
+	Slug          string `json:"slug"          yaml:"slug"`
+	Description   string `json:"description"   yaml:"description"`
+	ContextLength int    `json:"contextLength" yaml:"contextLength"`
 }
 
 type AIDeploymentCreatedBy struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	UPN  string `json:"upn"`
+	ID   string `json:"id"   yaml:"id"`
+	Name string `json:"name" yaml:"name"`
+	UPN  string `json:"upn"  yaml:"upn"`
 }
 
 type AIDeployment struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Model     string                 `json:"model"`
-	Endpoint  string                 `json:"endpoint"`
-	CreatedBy AIDeploymentCreatedBy  `json:"createdBy"`
+	ID        string                `json:"id"        yaml:"id"`
+	Name      string                `json:"name"      yaml:"name"`
+	Model     string                `json:"model"     yaml:"model"`
+	Endpoint  string                `json:"endpoint"  yaml:"endpoint"`
+	CreatedBy AIDeploymentCreatedBy `json:"createdBy" yaml:"createdBy"`
 }
 
 type AIModelList []AIModel
@@ -42,7 +42,9 @@ func (c *RestClient) CreateAIDeployment(ctx context.Context, request NewAIDeploy
 		return nil, fmt.Errorf("could not marshal request: %w", err)
 	}
 
-	req, err := c.createAuthenticatedRequest(ctx, "POST", c.baseURIBlurite+"/api/v1/blurite/llm-deployments", bytes.NewReader(body))
+	endpoint := c.baseURIBlurite + "/api/v1/blurite/llm-deployments"
+
+	req, err := c.createAuthenticatedRequest(ctx, "POST", endpoint, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +72,9 @@ func (c *RestClient) ListAIDeployments(ctx context.Context) ([]AIDeployment, err
 }
 
 func (c *RestClient) GetAIDeployment(ctx context.Context, name string) (*AIDeployment, error) {
-	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURIBlurite+"/api/v1/blurite/llm-deployments/by-name/"+name, nil)
+	endpoint := c.baseURIBlurite + "/api/v1/blurite/llm-deployments/by-name/" + name
+
+	req, err := c.createAuthenticatedRequest(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +101,6 @@ func (c *RestClient) DeleteAIDeployment(ctx context.Context, id string) error {
 }
 
 func (c *RestClient) ListAIModels(ctx context.Context) ([]AIModel, error) {
-
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURIBlurite+"/api/v1/blurite/models", nil)
 	if err != nil {
 		return nil, err
