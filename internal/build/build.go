@@ -122,7 +122,7 @@ func PlatformAPIHost() string {
 
 func PlatformAPIHostBlurite() string {
 	if IsDev {
-		return "http://localhost:8083"
+		return "http://localhost:8082"
 	}
 
 	return PlatformBaseURIBlurite
