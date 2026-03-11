@@ -62,7 +62,10 @@ type UserClient interface {
 
 type AIClient interface {
 	ListAIModels(ctx context.Context) ([]AIModel, error)
+	ListAIDeployments(ctx context.Context) ([]AIDeployment, error)
+	GetAIDeployment(ctx context.Context, name string) (*AIDeployment, error)
 	CreateAIDeployment(ctx context.Context, request NewAIDeploymentRequest) (*AIDeployment, error)
+	DeleteAIDeployment(ctx context.Context, id string) error
 }
 
 type Client interface {

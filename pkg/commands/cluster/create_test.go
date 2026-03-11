@@ -303,6 +303,13 @@ func (m *mockClient) CreateAIDeployment(_ context.Context, _ client.NewAIDeploym
 func (m *mockClient) ListAIModels(_ context.Context) ([]client.AIModel, error) {
 	return nil, nil
 }
+func (m *mockClient) ListAIDeployments(_ context.Context) ([]client.AIDeployment, error) {
+	return nil, nil
+}
+func (m *mockClient) GetAIDeployment(_ context.Context, _ string) (*client.AIDeployment, error) {
+	return nil, nil
+}
+func (m *mockClient) DeleteAIDeployment(_ context.Context, _ string) error { return nil }
 func TestSelectSSOProvisioner(t *testing.T) {
 	tests := []struct {
 		name      string

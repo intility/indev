@@ -55,6 +55,47 @@ func (c *RestClient) CreateAIDeployment(ctx context.Context, request NewAIDeploy
 	return &deploy, nil
 }
 
+func (c *RestClient) ListAIDeployments(ctx context.Context) ([]AIDeployment, error) {
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURIBlurite+"/api/v1/blurite/llm-deployments", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var deployments []AIDeployment
+	if err = doRequest(c.httpClient, req, &deployments); err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	return deployments, nil
+}
+
+func (c *RestClient) GetAIDeployment(ctx context.Context, name string) (*AIDeployment, error) {
+	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURIBlurite+"/api/v1/blurite/llm-deployments/by-name/"+name, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var deploy AIDeployment
+	if err = doRequest(c.httpClient, req, &deploy); err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	return &deploy, nil
+}
+
+func (c *RestClient) DeleteAIDeployment(ctx context.Context, id string) error {
+	req, err := c.createAuthenticatedRequest(ctx, "DELETE", c.baseURIBlurite+"/api/v1/blurite/llm-deployments/"+id, nil)
+	if err != nil {
+		return err
+	}
+
+	if err = doRequest[any](c.httpClient, req, nil); err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	return nil
+}
+
 func (c *RestClient) ListAIModels(ctx context.Context) ([]AIModel, error) {
 
 	req, err := c.createAuthenticatedRequest(ctx, "GET", c.baseURIBlurite+"/api/v1/blurite/models", nil)

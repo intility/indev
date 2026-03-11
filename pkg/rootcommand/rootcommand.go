@@ -188,6 +188,8 @@ func getAIDeploymentCommand(set clientset.ClientSet) *cobra.Command {
 	}
 
 	cmd.AddCommand(deployment.NewCreateCommand(set))
+	cmd.AddCommand(deployment.NewListCommand(set))
+	cmd.AddCommand(deployment.NewDeleteCommand(set))
 
 	return cmd
 }
