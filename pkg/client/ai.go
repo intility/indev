@@ -31,7 +31,7 @@ type AIDeployment struct {
 }
 
 type NewAIDeploymentRequest struct {
-	Name  string `json:"name"  validate:"required,min=3,max=63"`
+	Name  string `json:"name"  validate:"required,min=3,max=50"`
 	Model string `json:"model" validate:"required"`
 }
 
