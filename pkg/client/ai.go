@@ -30,8 +30,8 @@ type AIDeployment struct {
 }
 
 type NewAIDeploymentRequest struct {
-	Name  string `json:"name"  validate:"required,min=3,max=50"`
-	Model string `json:"model" validate:"required"`
+	Name  string `json:"name"`
+	Model string `json:"model"`
 }
 
 type AIAPIKey struct {
@@ -49,7 +49,7 @@ type AIAPIKeyWithSecret struct {
 }
 
 type NewAIAPIKeyRequest struct {
-	Name    string `json:"name"    validate:"required"`
+	Name    string `json:"name"`
 	TTLDays int    `json:"ttlDays"`
 }
 
