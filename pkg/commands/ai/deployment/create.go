@@ -15,7 +15,7 @@ import (
 const (
 	maxNameLength  = 50
 	minNameLength  = 3
-	validNameRegex = "^[a-zA-Z0-9]+([-_ ]{0,1}[a-zA-Z0-9])+$"
+	validNameRegex = "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
 )
 
 var (

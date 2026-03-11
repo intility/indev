@@ -35,7 +35,7 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 			}
 
 			if len(models) == 0 {
-				ux.Fprintf(cmd.OutOrStdout(), "No ai models found\n")
+				ux.Fprintf(cmd.OutOrStdout(), "No AI models found\n")
 				return nil
 			}
 

@@ -29,8 +29,6 @@ type AIDeployment struct {
 	CreatedBy AIDeploymentCreatedBy `json:"createdBy" yaml:"createdBy"`
 }
 
-type AIModelList []AIModel
-
 type NewAIDeploymentRequest struct {
 	Name  string `json:"name"  validate:"required,min=3,max=63"`
 	Model string `json:"model" validate:"required"`
@@ -106,7 +104,7 @@ func (c *RestClient) ListAIModels(ctx context.Context) ([]AIModel, error) {
 		return nil, err
 	}
 
-	var models AIModelList
+	var models []AIModel
 	if err = doRequest(c.httpClient, req, &models); err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
