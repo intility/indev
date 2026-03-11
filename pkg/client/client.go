@@ -68,6 +68,13 @@ type AIClient interface {
 	DeleteAIDeployment(ctx context.Context, id string) error
 }
 
+type AIAPIKeyClient interface {
+	ListAIAPIKeys(ctx context.Context, deploymentID string) ([]AIAPIKey, error)
+	GetAIAPIKey(ctx context.Context, deploymentID string, name string) (*AIAPIKey, error)
+	CreateAIAPIKey(ctx context.Context, deploymentID string, request NewAIAPIKeyRequest) (*AIAPIKeyWithSecret, error)
+	DeleteAIAPIKey(ctx context.Context, deploymentID string, keyID string) error
+}
+
 type Client interface {
 	ClusterClient
 	IntegrationClient
@@ -76,6 +83,7 @@ type Client interface {
 	UserClient
 	MemberClient
 	AIClient
+	AIAPIKeyClient
 }
 
 type RestClientOption func(*RestClient)

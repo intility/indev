@@ -194,6 +194,17 @@ func getAIDeploymentCommand(set clientset.ClientSet) *cobra.Command {
 	return cmd
 }
 
+func getAIAPIKeyCommands(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deployment",
+		Short: "Manage AI deployment API keys",
+		Long:  "Manage AI deployment API keys",
+		Run:   showHelp,
+	}
+
+	return cmd
+}
+
 func showHelp(cmd *cobra.Command, args []string) {
 	_, span := telemetry.StartSpan(cmd.Context(), cmd.Use)
 	defer span.End()
