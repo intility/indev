@@ -15,7 +15,6 @@ import (
 const (
 	maxNameLength  = 50
 	minNameLength  = 3
-	defaultTTLDays = 30
 	validNameRegex = "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
 )
 
@@ -83,7 +82,9 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 		"deployment", "d", "", "Name of the AI deployment")
 
 	cmd.Flags().IntVarP(&options.TTLDays,
-		"ttl", "t", defaultTTLDays, "Number of days the API key will be valid")
+		"ttl", "t", 0, "Number of days the API key will be valid (1-365)")
+
+	_ = cmd.MarkFlagRequired("ttl")
 
 	return cmd
 }

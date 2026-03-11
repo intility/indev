@@ -65,6 +65,18 @@ func printAIModelsList(writer io.Writer, format outputformat.Format, aimodels []
 		enc := yaml.NewEncoder(writer)
 		enc.SetIndent(indent)
 		err = enc.Encode(aimodels)
+	case "wide":
+		table := ux.TableFromObjects(aimodels, func(aimodel client.AIModel) []ux.Row {
+			return []ux.Row{
+				ux.NewRow("Name", aimodel.DisplayName),
+				ux.NewRow("ID", aimodel.Slug),
+				ux.NewRow("Description", aimodel.Description),
+				ux.NewRow("Context Length", strconv.Itoa(aimodel.ContextLength)),
+				ux.NewRow("Resource ID", aimodel.ID),
+			}
+		})
+
+		ux.Fprintf(writer, "%s", table.String())
 	default:
 		table := ux.TableFromObjects(aimodels, func(aimodel client.AIModel) []ux.Row {
 			return []ux.Row{

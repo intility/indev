@@ -77,6 +77,19 @@ func printAPIKeyList(writer io.Writer, format outputformat.Format, keys []client
 		enc := yaml.NewEncoder(writer)
 		enc.SetIndent(indent)
 		err = enc.Encode(keys)
+	case "wide":
+		table := ux.TableFromObjects(keys, func(k client.AIAPIKey) []ux.Row {
+			return []ux.Row{
+				ux.NewRow("Name", k.Name),
+				ux.NewRow("Prefix", k.Prefix),
+				ux.NewRow("Created By", k.CreatedBy.Name),
+				ux.NewRow("Created At", k.CreatedAt),
+				ux.NewRow("Expires At", k.ExpiresAt),
+				ux.NewRow("ID", k.ID),
+			}
+		})
+
+		ux.Fprintf(writer, "%s", table.String())
 	default:
 		table := ux.TableFromObjects(keys, func(k client.AIAPIKey) []ux.Row {
 			return []ux.Row{

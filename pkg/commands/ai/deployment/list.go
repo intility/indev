@@ -64,6 +64,19 @@ func printDeploymentList(writer io.Writer, format outputformat.Format, deploymen
 		enc := yaml.NewEncoder(writer)
 		enc.SetIndent(indent)
 		err = enc.Encode(deployments)
+	case "wide":
+		table := ux.TableFromObjects(deployments, func(d client.AIDeployment) []ux.Row {
+			return []ux.Row{
+				ux.NewRow("Name", d.Name),
+				ux.NewRow("Model", d.Model),
+				ux.NewRow("Endpoint", d.Endpoint),
+				ux.NewRow("Created By", d.CreatedBy.Name),
+				ux.NewRow("Created By UPN", d.CreatedBy.UPN),
+				ux.NewRow("ID", d.ID),
+			}
+		})
+
+		ux.Fprintf(writer, "%s", table.String())
 	default:
 		table := ux.TableFromObjects(deployments, func(d client.AIDeployment) []ux.Row {
 			return []ux.Row{
