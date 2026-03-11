@@ -31,7 +31,7 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 
 			models, err := set.PlatformClient.ListAIModels(ctx)
 			if err != nil {
-				return redact.Errorf("could not list aimodels: %w", redact.Safe(err))
+				return redact.Errorf("could not list AI models: %w", redact.Safe(err))
 			}
 
 			if len(models) == 0 {
