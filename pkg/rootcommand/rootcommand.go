@@ -155,10 +155,12 @@ func getUserCommand(set clientset.ClientSet) *cobra.Command {
 
 func getAICommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ai",
-		Short: "Manage Intility Developer Platform AI Deployments",
-		Long:  "Manage Intility Developer Platform AI Deployments",
-		Run:   showHelp,
+		Use:               "ai",
+		Short:             "Manage Intility Developer Platform AI Deployments",
+		Long:              "Manage Intility Developer Platform AI Deployments",
+		Hidden:            true,
+		PersistentPreRunE: set.EnsureAITenantPreHook,
+		Run:               showHelp,
 	}
 
 	cmd.AddCommand(getAIModelCommand(set))

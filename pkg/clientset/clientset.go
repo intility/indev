@@ -21,6 +21,7 @@ const homeAccountIDParts = 2
 var (
 	errNotAuthenticatedPreHook = errors.New("you need to sign in before executing this operation")
 	errInvalidHomeAccountID    = errors.New("invalid HomeAccountID format")
+	errFeatureNotAvailable     = errors.New("this feature is not available for your tenant")
 )
 
 type Authenticator interface {
@@ -106,6 +107,32 @@ func fqcn(cmd *cobra.Command) string {
 	name := strings.Join(parents, ".") + "." + cmd.Name()
 
 	return name
+}
+
+// EnsureAITenantPreHook is a pre-run hook that checks if the current tenant
+// has access to AI features. It composes EnsureSignedIn so auth is checked first.
+func (c *ClientSet) EnsureAITenantPreHook(cmd *cobra.Command, args []string) error {
+	return c.PreHooks(c.EnsureSignedIn, c.ensureAITenant)(cmd, args)
+}
+
+func (c *ClientSet) ensureAITenant(cmd *cobra.Command, _ []string) error {
+	allowedTenants := map[string]bool{
+		"9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6": true, // intility
+		"f0a51c83-6cc9-4830-9d01-d4d18c068e32": true, // skoglab
+	}
+
+	tenantID, err := c.GetTenantID(cmd.Context())
+	if err != nil {
+		return fmt.Errorf("could not determine tenant: %w", err)
+	}
+
+	if !allowedTenants[tenantID] {
+		cmd.SilenceUsage = true
+
+		return errFeatureNotAvailable
+	}
+
+	return nil
 }
 
 // GetTenantID extracts the tenant ID from the current account's HomeAccountID.
