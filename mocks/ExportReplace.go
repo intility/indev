@@ -6,6 +6,7 @@ import (
 	context "context"
 
 	cache "github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache"
+
 	mock "github.com/stretchr/testify/mock"
 )
 

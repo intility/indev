@@ -6,6 +6,7 @@ import (
 	context "context"
 
 	client "github.com/intility/indev/pkg/client"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
