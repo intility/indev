@@ -61,6 +61,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 			}
 
 			ux.Fsuccessf(cmd.OutOrStdout(), "created AI deployment: %s\n", aideployment.Name)
+			ux.Fprintf(cmd.OutOrStdout(), "\n  endpoint: %s\n\n", aideployment.Endpoint)
 
 			return nil
 		},
@@ -71,6 +72,9 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 
 	cmd.Flags().StringVarP(&options.Model,
 		"model", "m", "", "ID of the AI model to use. Available models can be found using 'indev ai model list'")
+
+	_ = cmd.MarkFlagRequired("name")
+	_ = cmd.MarkFlagRequired("model")
 
 	return cmd
 }

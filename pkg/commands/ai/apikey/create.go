@@ -40,7 +40,7 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "create",
-		Short:   "Create a new API key",
+		Short:   "Create a new API key for an AI deployment",
 		Long:    "Create a new API key for an AI deployment",
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -84,6 +84,8 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.Flags().IntVarP(&options.TTLDays,
 		"ttl", "t", 0, "Number of days the API key will be valid (1-365)")
 
+	_ = cmd.MarkFlagRequired("deployment")
+	_ = cmd.MarkFlagRequired("name")
 	_ = cmd.MarkFlagRequired("ttl")
 
 	return cmd

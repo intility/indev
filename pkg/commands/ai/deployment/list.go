@@ -83,7 +83,6 @@ func printDeploymentList(writer io.Writer, format outputformat.Format, deploymen
 				ux.NewRow("Name", d.Name),
 				ux.NewRow("Model", d.Model),
 				ux.NewRow("Endpoint", d.Endpoint),
-				ux.NewRow("Created By", d.CreatedBy.Name),
 			}
 		})
 
