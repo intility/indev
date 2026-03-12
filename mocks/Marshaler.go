@@ -17,7 +17,7 @@ func (_m *Marshaler) EXPECT() *Marshaler_Expecter {
 	return &Marshaler_Expecter{mock: &_m.Mock}
 }
 
-// Marshal provides a mock function with given fields:
+// Marshal provides a mock function with no fields
 func (_m *Marshaler) Marshal() ([]byte, error) {
 	ret := _m.Called()
 

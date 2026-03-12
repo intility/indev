@@ -49,7 +49,7 @@ func (_c *Option_Execute_Call) Return() *Option_Execute_Call {
 }
 
 func (_c *Option_Execute_Call) RunAndReturn(run func(*tokencache.TokenCache)) *Option_Execute_Call {
-	_c.Call.Return(run)
+	_c.Run(run)
 	return _c
 }
 
