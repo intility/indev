@@ -60,6 +60,21 @@ type UserClient interface {
 	GetUser(ctx context.Context, upn string) (*User, error)
 }
 
+type AIClient interface {
+	ListAIModels(ctx context.Context) ([]AIModel, error)
+	ListAIDeployments(ctx context.Context) ([]AIDeployment, error)
+	GetAIDeployment(ctx context.Context, name string) (*AIDeployment, error)
+	CreateAIDeployment(ctx context.Context, request NewAIDeploymentRequest) (*AIDeployment, error)
+	DeleteAIDeployment(ctx context.Context, id string) error
+}
+
+type AIAPIKeyClient interface {
+	ListAIAPIKeys(ctx context.Context, deploymentID string) ([]AIAPIKey, error)
+	GetAIAPIKey(ctx context.Context, deploymentID string, name string) (*AIAPIKey, error)
+	CreateAIAPIKey(ctx context.Context, deploymentID string, request NewAIAPIKeyRequest) (*AIAPIKeyWithSecret, error)
+	DeleteAIAPIKey(ctx context.Context, deploymentID string, keyID string) error
+}
+
 type Client interface {
 	ClusterClient
 	IntegrationClient
@@ -67,14 +82,17 @@ type Client interface {
 	TeamsClient
 	UserClient
 	MemberClient
+	AIClient
+	AIAPIKeyClient
 }
 
 type RestClientOption func(*RestClient)
 
 type RestClient struct {
-	baseURI       string
-	httpClient    *http.Client
-	authenticator *authenticator.Authenticator
+	baseURI        string
+	baseURIBlurite string
+	httpClient     *http.Client
+	authenticator  *authenticator.Authenticator
 }
 
 var _ Client = New()
@@ -85,9 +103,10 @@ func New(options ...RestClientOption) *RestClient {
 		Timeout:   defaultHTTPTimeout,
 	}
 	restClient := &RestClient{
-		baseURI:       build.PlatformAPIHost(),
-		httpClient:    client,
-		authenticator: authenticator.NewAuthenticator(authenticator.ConfigFromBuildProps()),
+		baseURI:        build.PlatformAPIHost(),
+		baseURIBlurite: build.PlatformAPIHostBlurite(),
+		httpClient:     client,
+		authenticator:  authenticator.NewAuthenticator(authenticator.ConfigFromBuildProps()),
 	}
 
 	for _, opt := range options {

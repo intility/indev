@@ -119,6 +119,125 @@ func (_c *Client_AddTeamMember_Call) RunAndReturn(run func(context.Context, stri
 	return _c
 }
 
+// CreateAIAPIKey provides a mock function with given fields: ctx, deploymentID, request
+func (_m *Client) CreateAIAPIKey(ctx context.Context, deploymentID string, request client.NewAIAPIKeyRequest) (*client.AIAPIKeyWithSecret, error) {
+	ret := _m.Called(ctx, deploymentID, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateAIAPIKey")
+	}
+
+	var r0 *client.AIAPIKeyWithSecret
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, client.NewAIAPIKeyRequest) (*client.AIAPIKeyWithSecret, error)); ok {
+		return rf(ctx, deploymentID, request)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, client.NewAIAPIKeyRequest) *client.AIAPIKeyWithSecret); ok {
+		r0 = rf(ctx, deploymentID, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*client.AIAPIKeyWithSecret)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, client.NewAIAPIKeyRequest) error); ok {
+		r1 = rf(ctx, deploymentID, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_CreateAIAPIKey_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateAIAPIKey'
+type Client_CreateAIAPIKey_Call struct {
+	*mock.Call
+}
+
+// CreateAIAPIKey is a helper method to define mock.On call
+//   - ctx context.Context
+//   - deploymentID string
+//   - request client.NewAIAPIKeyRequest
+func (_e *Client_Expecter) CreateAIAPIKey(ctx interface{}, deploymentID interface{}, request interface{}) *Client_CreateAIAPIKey_Call {
+	return &Client_CreateAIAPIKey_Call{Call: _e.mock.On("CreateAIAPIKey", ctx, deploymentID, request)}
+}
+
+func (_c *Client_CreateAIAPIKey_Call) Run(run func(ctx context.Context, deploymentID string, request client.NewAIAPIKeyRequest)) *Client_CreateAIAPIKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(client.NewAIAPIKeyRequest))
+	})
+	return _c
+}
+
+func (_c *Client_CreateAIAPIKey_Call) Return(_a0 *client.AIAPIKeyWithSecret, _a1 error) *Client_CreateAIAPIKey_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_CreateAIAPIKey_Call) RunAndReturn(run func(context.Context, string, client.NewAIAPIKeyRequest) (*client.AIAPIKeyWithSecret, error)) *Client_CreateAIAPIKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateAIDeployment provides a mock function with given fields: ctx, request
+func (_m *Client) CreateAIDeployment(ctx context.Context, request client.NewAIDeploymentRequest) (*client.AIDeployment, error) {
+	ret := _m.Called(ctx, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateAIDeployment")
+	}
+
+	var r0 *client.AIDeployment
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, client.NewAIDeploymentRequest) (*client.AIDeployment, error)); ok {
+		return rf(ctx, request)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, client.NewAIDeploymentRequest) *client.AIDeployment); ok {
+		r0 = rf(ctx, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*client.AIDeployment)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, client.NewAIDeploymentRequest) error); ok {
+		r1 = rf(ctx, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_CreateAIDeployment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateAIDeployment'
+type Client_CreateAIDeployment_Call struct {
+	*mock.Call
+}
+
+// CreateAIDeployment is a helper method to define mock.On call
+//   - ctx context.Context
+//   - request client.NewAIDeploymentRequest
+func (_e *Client_Expecter) CreateAIDeployment(ctx interface{}, request interface{}) *Client_CreateAIDeployment_Call {
+	return &Client_CreateAIDeployment_Call{Call: _e.mock.On("CreateAIDeployment", ctx, request)}
+}
+
+func (_c *Client_CreateAIDeployment_Call) Run(run func(ctx context.Context, request client.NewAIDeploymentRequest)) *Client_CreateAIDeployment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(client.NewAIDeploymentRequest))
+	})
+	return _c
+}
+
+func (_c *Client_CreateAIDeployment_Call) Return(_a0 *client.AIDeployment, _a1 error) *Client_CreateAIDeployment_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_CreateAIDeployment_Call) RunAndReturn(run func(context.Context, client.NewAIDeploymentRequest) (*client.AIDeployment, error)) *Client_CreateAIDeployment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateCluster provides a mock function with given fields: ctx, request
 func (_m *Client) CreateCluster(ctx context.Context, request client.NewClusterRequest) (*client.Cluster, error) {
 	ret := _m.Called(ctx, request)
@@ -237,6 +356,101 @@ func (_c *Client_CreateTeam_Call) RunAndReturn(run func(context.Context, client.
 	return _c
 }
 
+// DeleteAIAPIKey provides a mock function with given fields: ctx, deploymentID, keyID
+func (_m *Client) DeleteAIAPIKey(ctx context.Context, deploymentID string, keyID string) error {
+	ret := _m.Called(ctx, deploymentID, keyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteAIAPIKey")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, deploymentID, keyID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Client_DeleteAIAPIKey_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteAIAPIKey'
+type Client_DeleteAIAPIKey_Call struct {
+	*mock.Call
+}
+
+// DeleteAIAPIKey is a helper method to define mock.On call
+//   - ctx context.Context
+//   - deploymentID string
+//   - keyID string
+func (_e *Client_Expecter) DeleteAIAPIKey(ctx interface{}, deploymentID interface{}, keyID interface{}) *Client_DeleteAIAPIKey_Call {
+	return &Client_DeleteAIAPIKey_Call{Call: _e.mock.On("DeleteAIAPIKey", ctx, deploymentID, keyID)}
+}
+
+func (_c *Client_DeleteAIAPIKey_Call) Run(run func(ctx context.Context, deploymentID string, keyID string)) *Client_DeleteAIAPIKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Client_DeleteAIAPIKey_Call) Return(_a0 error) *Client_DeleteAIAPIKey_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Client_DeleteAIAPIKey_Call) RunAndReturn(run func(context.Context, string, string) error) *Client_DeleteAIAPIKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteAIDeployment provides a mock function with given fields: ctx, id
+func (_m *Client) DeleteAIDeployment(ctx context.Context, id string) error {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteAIDeployment")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Client_DeleteAIDeployment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteAIDeployment'
+type Client_DeleteAIDeployment_Call struct {
+	*mock.Call
+}
+
+// DeleteAIDeployment is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id string
+func (_e *Client_Expecter) DeleteAIDeployment(ctx interface{}, id interface{}) *Client_DeleteAIDeployment_Call {
+	return &Client_DeleteAIDeployment_Call{Call: _e.mock.On("DeleteAIDeployment", ctx, id)}
+}
+
+func (_c *Client_DeleteAIDeployment_Call) Run(run func(ctx context.Context, id string)) *Client_DeleteAIDeployment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Client_DeleteAIDeployment_Call) Return(_a0 error) *Client_DeleteAIDeployment_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Client_DeleteAIDeployment_Call) RunAndReturn(run func(context.Context, string) error) *Client_DeleteAIDeployment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteCluster provides a mock function with given fields: ctx, name
 func (_m *Client) DeleteCluster(ctx context.Context, name string) error {
 	ret := _m.Called(ctx, name)
@@ -327,6 +541,125 @@ func (_c *Client_DeleteTeam_Call) Return(_a0 error) *Client_DeleteTeam_Call {
 }
 
 func (_c *Client_DeleteTeam_Call) RunAndReturn(run func(context.Context, client.DeleteTeamRequest) error) *Client_DeleteTeam_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetAIAPIKey provides a mock function with given fields: ctx, deploymentID, name
+func (_m *Client) GetAIAPIKey(ctx context.Context, deploymentID string, name string) (*client.AIAPIKey, error) {
+	ret := _m.Called(ctx, deploymentID, name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAIAPIKey")
+	}
+
+	var r0 *client.AIAPIKey
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*client.AIAPIKey, error)); ok {
+		return rf(ctx, deploymentID, name)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) *client.AIAPIKey); ok {
+		r0 = rf(ctx, deploymentID, name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*client.AIAPIKey)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = rf(ctx, deploymentID, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_GetAIAPIKey_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAIAPIKey'
+type Client_GetAIAPIKey_Call struct {
+	*mock.Call
+}
+
+// GetAIAPIKey is a helper method to define mock.On call
+//   - ctx context.Context
+//   - deploymentID string
+//   - name string
+func (_e *Client_Expecter) GetAIAPIKey(ctx interface{}, deploymentID interface{}, name interface{}) *Client_GetAIAPIKey_Call {
+	return &Client_GetAIAPIKey_Call{Call: _e.mock.On("GetAIAPIKey", ctx, deploymentID, name)}
+}
+
+func (_c *Client_GetAIAPIKey_Call) Run(run func(ctx context.Context, deploymentID string, name string)) *Client_GetAIAPIKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Client_GetAIAPIKey_Call) Return(_a0 *client.AIAPIKey, _a1 error) *Client_GetAIAPIKey_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_GetAIAPIKey_Call) RunAndReturn(run func(context.Context, string, string) (*client.AIAPIKey, error)) *Client_GetAIAPIKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetAIDeployment provides a mock function with given fields: ctx, name
+func (_m *Client) GetAIDeployment(ctx context.Context, name string) (*client.AIDeployment, error) {
+	ret := _m.Called(ctx, name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAIDeployment")
+	}
+
+	var r0 *client.AIDeployment
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*client.AIDeployment, error)); ok {
+		return rf(ctx, name)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *client.AIDeployment); ok {
+		r0 = rf(ctx, name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*client.AIDeployment)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_GetAIDeployment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAIDeployment'
+type Client_GetAIDeployment_Call struct {
+	*mock.Call
+}
+
+// GetAIDeployment is a helper method to define mock.On call
+//   - ctx context.Context
+//   - name string
+func (_e *Client_Expecter) GetAIDeployment(ctx interface{}, name interface{}) *Client_GetAIDeployment_Call {
+	return &Client_GetAIDeployment_Call{Call: _e.mock.On("GetAIDeployment", ctx, name)}
+}
+
+func (_c *Client_GetAIDeployment_Call) Run(run func(ctx context.Context, name string)) *Client_GetAIDeployment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Client_GetAIDeployment_Call) Return(_a0 *client.AIDeployment, _a1 error) *Client_GetAIDeployment_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_GetAIDeployment_Call) RunAndReturn(run func(context.Context, string) (*client.AIDeployment, error)) *Client_GetAIDeployment_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -737,6 +1070,181 @@ func (_c *Client_GetUser_Call) Return(_a0 *client.User, _a1 error) *Client_GetUs
 }
 
 func (_c *Client_GetUser_Call) RunAndReturn(run func(context.Context, string) (*client.User, error)) *Client_GetUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListAIAPIKeys provides a mock function with given fields: ctx, deploymentID
+func (_m *Client) ListAIAPIKeys(ctx context.Context, deploymentID string) ([]client.AIAPIKey, error) {
+	ret := _m.Called(ctx, deploymentID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListAIAPIKeys")
+	}
+
+	var r0 []client.AIAPIKey
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) ([]client.AIAPIKey, error)); ok {
+		return rf(ctx, deploymentID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) []client.AIAPIKey); ok {
+		r0 = rf(ctx, deploymentID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]client.AIAPIKey)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, deploymentID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_ListAIAPIKeys_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListAIAPIKeys'
+type Client_ListAIAPIKeys_Call struct {
+	*mock.Call
+}
+
+// ListAIAPIKeys is a helper method to define mock.On call
+//   - ctx context.Context
+//   - deploymentID string
+func (_e *Client_Expecter) ListAIAPIKeys(ctx interface{}, deploymentID interface{}) *Client_ListAIAPIKeys_Call {
+	return &Client_ListAIAPIKeys_Call{Call: _e.mock.On("ListAIAPIKeys", ctx, deploymentID)}
+}
+
+func (_c *Client_ListAIAPIKeys_Call) Run(run func(ctx context.Context, deploymentID string)) *Client_ListAIAPIKeys_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Client_ListAIAPIKeys_Call) Return(_a0 []client.AIAPIKey, _a1 error) *Client_ListAIAPIKeys_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_ListAIAPIKeys_Call) RunAndReturn(run func(context.Context, string) ([]client.AIAPIKey, error)) *Client_ListAIAPIKeys_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListAIDeployments provides a mock function with given fields: ctx
+func (_m *Client) ListAIDeployments(ctx context.Context) ([]client.AIDeployment, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListAIDeployments")
+	}
+
+	var r0 []client.AIDeployment
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]client.AIDeployment, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []client.AIDeployment); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]client.AIDeployment)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_ListAIDeployments_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListAIDeployments'
+type Client_ListAIDeployments_Call struct {
+	*mock.Call
+}
+
+// ListAIDeployments is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *Client_Expecter) ListAIDeployments(ctx interface{}) *Client_ListAIDeployments_Call {
+	return &Client_ListAIDeployments_Call{Call: _e.mock.On("ListAIDeployments", ctx)}
+}
+
+func (_c *Client_ListAIDeployments_Call) Run(run func(ctx context.Context)) *Client_ListAIDeployments_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *Client_ListAIDeployments_Call) Return(_a0 []client.AIDeployment, _a1 error) *Client_ListAIDeployments_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_ListAIDeployments_Call) RunAndReturn(run func(context.Context) ([]client.AIDeployment, error)) *Client_ListAIDeployments_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListAIModels provides a mock function with given fields: ctx
+func (_m *Client) ListAIModels(ctx context.Context) ([]client.AIModel, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListAIModels")
+	}
+
+	var r0 []client.AIModel
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]client.AIModel, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []client.AIModel); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]client.AIModel)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_ListAIModels_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListAIModels'
+type Client_ListAIModels_Call struct {
+	*mock.Call
+}
+
+// ListAIModels is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *Client_Expecter) ListAIModels(ctx interface{}) *Client_ListAIModels_Call {
+	return &Client_ListAIModels_Call{Call: _e.mock.On("ListAIModels", ctx)}
+}
+
+func (_c *Client_ListAIModels_Call) Run(run func(ctx context.Context)) *Client_ListAIModels_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *Client_ListAIModels_Call) Return(_a0 []client.AIModel, _a1 error) *Client_ListAIModels_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_ListAIModels_Call) RunAndReturn(run func(context.Context) ([]client.AIModel, error)) *Client_ListAIModels_Call {
 	_c.Call.Return(run)
 	return _c
 }
