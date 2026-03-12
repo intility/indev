@@ -49,7 +49,7 @@ func (_c *FileSystemOption_Execute_Call) Return() *FileSystemOption_Execute_Call
 }
 
 func (_c *FileSystemOption_Execute_Call) RunAndReturn(run func(*credentialstore.FilesystemCredentialStore)) *FileSystemOption_Execute_Call {
-	_c.Call.Return(run)
+	_c.Run(run)
 	return _c
 }
 

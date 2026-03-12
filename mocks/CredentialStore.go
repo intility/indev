@@ -17,7 +17,7 @@ func (_m *CredentialStore) EXPECT() *CredentialStore_Expecter {
 	return &CredentialStore_Expecter{mock: &_m.Mock}
 }
 
-// Clear provides a mock function with given fields:
+// Clear provides a mock function with no fields
 func (_m *CredentialStore) Clear() error {
 	ret := _m.Called()
 

@@ -17,7 +17,7 @@ func (_m *Serializer) EXPECT() *Serializer_Expecter {
 	return &Serializer_Expecter{mock: &_m.Mock}
 }
 
-// Marshal provides a mock function with given fields:
+// Marshal provides a mock function with no fields
 func (_m *Serializer) Marshal() ([]byte, error) {
 	ret := _m.Called()
 
