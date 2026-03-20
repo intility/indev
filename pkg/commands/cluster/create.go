@@ -18,10 +18,11 @@ import (
 )
 
 const (
-	maxCount  = 8
-	minCount  = 2
-	answerYes = "yes"
-	answerNo  = "no"
+	maxCount     = 8
+	minCount     = 2
+	answerYes    = "yes"
+	answerNo     = "no"
+	noPullSecret = "(none)"
 )
 
 var (
@@ -41,6 +42,7 @@ type CreateOptions struct {
 	EnableAutoscaling bool
 	MinNodes          int // Used when autoscaling is enabled
 	MaxNodes          int // Used when autoscaling is enabled
+	PullSecret        string
 }
 
 func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
@@ -77,14 +79,23 @@ func NewCreateCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.Flags().IntVar(&options.MaxNodes,
 		"max-nodes", maxCount, fmt.Sprintf("Maximum number of nodes when autoscaling is enabled (%d-%d)", minCount, maxCount))
 
+	cmd.Flags().StringVar(&options.PullSecret,
+		"pull-secret", "", "Name of the image pull secret to use")
+
 	return cmd
 }
 
 func runCreateCommand(ctx context.Context, cmd *cobra.Command, set clientset.ClientSet, options CreateOptions) error {
 	var err error
 
+	// Fetch pull secrets for wizard
+	pullSecrets, psErr := set.PlatformClient.ListPullSecrets(ctx)
+	if psErr != nil {
+		pullSecrets = nil
+	}
+
 	if options.Name == "" {
-		options, err = optionsFromWizard()
+		options, err = optionsFromWizard(pullSecrets)
 		if err != nil {
 			if errors.Is(err, errCancelledByUser) {
 				return nil
@@ -110,15 +121,18 @@ func runCreateCommand(ctx context.Context, cmd *cobra.Command, set clientset.Cli
 
 	nodePool := buildNodePool(options)
 
-	var cluster *client.Cluster
+	pullSecretRef, err := resolvePullSecretRef(options.PullSecret, pullSecrets)
+	if err != nil {
+		return err
+	}
 
-	cluster, err = set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
+	cluster, err := set.PlatformClient.CreateCluster(ctx, client.NewClusterRequest{
 		Name:           options.Name,
 		SSOProvisioner: ssoProvisioner,
 		NodePools:      []client.NodePool{nodePool},
 		Version:        "",
 		Environment:    "",
-		PullSecretRef:  nil,
+		PullSecretRef:  pullSecretRef,
 	})
 	if err != nil {
 		return redact.Errorf("could not create cluster: %w", redact.Safe(err))
@@ -157,10 +171,26 @@ func buildNodePool(options CreateOptions) client.NodePool {
 	}
 }
 
-func optionsFromWizard() (CreateOptions, error) {
+var errPullSecretNotFound = redact.Errorf("pull secret not found")
+
+func resolvePullSecretRef(name string, pullSecrets []client.PullSecret) (*string, error) {
+	if name == "" {
+		return nil, nil //nolint:nilnil // nil,nil is intentional: no name means no pull secret ref
+	}
+
+	for i := range pullSecrets {
+		if pullSecrets[i].Name == name {
+			return &pullSecrets[i].ID, nil
+		}
+	}
+
+	return nil, errPullSecretNotFound
+}
+
+func optionsFromWizard(pullSecrets []client.PullSecret) (CreateOptions, error) {
 	var options CreateOptions
 
-	wz := wizard.NewWizard(getClusterWizardInputs())
+	wz := wizard.NewWizard(getClusterWizardInputs(pullSecrets))
 
 	result, err := wz.Run()
 	if err != nil {
@@ -198,12 +228,19 @@ func optionsFromWizard() (CreateOptions, error) {
 		}
 	}
 
+	if len(pullSecrets) > 0 {
+		selected := result.MustGetValue("pullSecret")
+		if selected != noPullSecret {
+			options.PullSecret = selected
+		}
+	}
+
 	return options, nil
 }
 
 //nolint:funlen // wizard input definitions are declarative
-func getClusterWizardInputs() []wizard.Input {
-	return []wizard.Input{
+func getClusterWizardInputs(pullSecrets []client.PullSecret) []wizard.Input {
+	inputs := []wizard.Input{
 		{
 			ID:          "name",
 			Placeholder: "Cluster Name",
@@ -274,6 +311,28 @@ func getClusterWizardInputs() []wizard.Input {
 			},
 		},
 	}
+
+	if len(pullSecrets) > 0 {
+		psOptions := make([]string, 0, 1+len(pullSecrets))
+		psOptions = append(psOptions, noPullSecret)
+
+		for _, ps := range pullSecrets {
+			psOptions = append(psOptions, ps.Name)
+		}
+
+		inputs = append(inputs, wizard.Input{
+			ID:          "pullSecret",
+			Placeholder: "Image Pull Secret",
+			Type:        wizard.InputTypeSelect,
+			Limit:       0,
+			Validator:   nil,
+			Options:     psOptions,
+			DependsOn:   "",
+			ShowWhen:    nil,
+		})
+	}
+
+	return inputs
 }
 
 //nolint:cyclop // validation logic is inherently sequential
