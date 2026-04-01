@@ -37,7 +37,7 @@ func NewRemoveCommand(set clientset.ClientSet) *cobra.Command {
 
 			ps, err := pullsecretcmd.FindPullSecretByName(ctx, set.PlatformClient, options.PullSecretName)
 			if err != nil {
-				return err
+				return redact.Errorf("could not find pull secret: %w", redact.Safe(err))
 			}
 
 			_, err = set.PlatformClient.EditPullSecret(ctx, ps.ID, client.EditPullSecretRequest{
@@ -49,7 +49,8 @@ func NewRemoveCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not remove registry: %w", redact.Safe(err))
 			}
 
-			ux.Fsuccessf(cmd.OutOrStdout(), "removed registry %s from pull secret: %s\n", options.Address, options.PullSecretName)
+			ux.Fsuccessf(cmd.OutOrStdout(), "removed registry %s from pull secret: %s\n",
+				options.Address, options.PullSecretName)
 
 			return nil
 		},

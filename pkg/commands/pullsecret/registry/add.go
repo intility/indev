@@ -23,7 +23,7 @@ type AddOptions struct {
 	PullSecretName string
 	Address        string
 	Username       string
-	Password       string
+	Password       string //nolint:gosec // G117: this is a credential payload, not a hardcoded secret
 }
 
 func NewAddCommand(set clientset.ClientSet) *cobra.Command {
@@ -46,14 +46,14 @@ func NewAddCommand(set clientset.ClientSet) *cobra.Command {
 
 			ps, err := pullsecretcmd.FindPullSecretByName(ctx, set.PlatformClient, options.PullSecretName)
 			if err != nil {
-				return err
+				return redact.Errorf("could not find pull secret: %w", redact.Safe(err))
 			}
 
 			_, err = set.PlatformClient.EditPullSecret(ctx, ps.ID, client.EditPullSecretRequest{
 				Registries: map[string]*client.PullSecretCredential{
 					options.Address: {
 						Username: options.Username,
-						Password: options.Password, //nolint:gosec // G117: this is a credential payload, not a hardcoded secret
+						Password: options.Password,
 					},
 				},
 			})
