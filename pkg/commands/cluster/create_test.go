@@ -235,8 +235,6 @@ func TestValidateOptions(t *testing.T) {
 	}
 }
 
-
-
 func TestSelectSSOProvisioner(t *testing.T) {
 	tests := []struct {
 		name      string

@@ -114,7 +114,7 @@ func OS() OSInfo { //nolint:cyclop
 
 func PlatformAPIHost() string {
 	if IsDev {
-		return "http://localhost:8080"
+		return "http://localhost:8081"
 	}
 
 	return PlatformBaseURI
