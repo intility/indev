@@ -53,46 +53,7 @@ To add registries with explicit ports (e.g. myregistry.io:5000), create the
 pull secret first and then use 'indev pull-secret registry add'.`,
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, span := telemetry.StartSpan(cmd.Context(), "pullsecret.create")
-			defer span.End()
-
-			registries := make([]RegistryEntry, 0, len(registryFlags))
-			for _, flag := range registryFlags {
-				entry, err := parseRegistryFlag(flag)
-				if err != nil {
-					return err
-				}
-
-				registries = append(registries, entry)
-			}
-
-			options := CreateOptions{Name: name, Registries: registries}
-
-			if err := validateCreateOptions(options); err != nil {
-				return err
-			}
-
-			cmd.SilenceUsage = true
-
-			regMap := make(map[string]client.PullSecretCredential, len(options.Registries))
-			for _, r := range options.Registries {
-				regMap[r.Address] = client.PullSecretCredential{
-					Username: r.Username,
-					Password: r.Password,
-				}
-			}
-
-			ps, err := set.PlatformClient.CreatePullSecret(ctx, client.NewPullSecretRequest{
-				Name:       options.Name,
-				Registries: regMap,
-			})
-			if err != nil {
-				return redact.Errorf("could not create pull secret: %w", redact.Safe(err))
-			}
-
-			ux.Fsuccessf(cmd.OutOrStdout(), "created pull secret: %s\n", ps.Name)
-
-			return nil
+			return runCreate(cmd, set, name, registryFlags)
 		},
 	}
 
@@ -103,11 +64,58 @@ pull secret first and then use 'indev pull-secret registry add'.`,
 	return cmd
 }
 
+func runCreate(cmd *cobra.Command, set clientset.ClientSet, name string, registryFlags []string) error {
+	ctx, span := telemetry.StartSpan(cmd.Context(), "pullsecret.create")
+	defer span.End()
+
+	registries := make([]RegistryEntry, 0, len(registryFlags))
+
+	for _, flag := range registryFlags {
+		entry, err := parseRegistryFlag(flag)
+		if err != nil {
+			return err
+		}
+
+		registries = append(registries, entry)
+	}
+
+	options := CreateOptions{Name: name, Registries: registries}
+
+	if err := validateCreateOptions(options); err != nil {
+		return err
+	}
+
+	cmd.SilenceUsage = true
+
+	regMap := make(map[string]client.PullSecretCredential, len(options.Registries))
+	for _, r := range options.Registries {
+		regMap[r.Address] = client.PullSecretCredential{
+			Username: r.Username,
+			Password: r.Password,
+		}
+	}
+
+	ps, err := set.PlatformClient.CreatePullSecret(ctx, client.NewPullSecretRequest{
+		Name:       options.Name,
+		Registries: regMap,
+	})
+	if err != nil {
+		return redact.Errorf("could not create pull secret: %w", redact.Safe(err))
+	}
+
+	ux.Fsuccessf(cmd.OutOrStdout(), "created pull secret: %s\n", ps.Name)
+
+	return nil
+}
+
+// registryFlagParts is the number of colon-separated parts in a --registry flag value.
+const registryFlagParts = 3
+
 // parseRegistryFlag parses a registry flag value in the format address:username:password.
 // Passwords may contain colons — only the first two colons are used as separators.
 func parseRegistryFlag(value string) (RegistryEntry, error) {
-	parts := strings.SplitN(value, ":", 3)
-	if len(parts) != 3 {
+	parts := strings.SplitN(value, ":", registryFlagParts)
+	if len(parts) != registryFlagParts {
 		return RegistryEntry{}, errInvalidRegistry
 	}
 
