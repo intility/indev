@@ -62,7 +62,6 @@ func printPullSecretsList(writer io.Writer, format outputformat.Format, pullSecr
 				ux.NewRow("Id", ps.ID),
 				ux.NewRow("Name", ps.Name),
 				ux.NewRow("Registries", strconv.Itoa(len(ps.Registries))),
-				ux.NewRow("Created At", ps.CreatedAt),
 			}
 		})
 
@@ -81,7 +80,6 @@ func printPullSecretsList(writer io.Writer, format outputformat.Format, pullSecr
 			return []ux.Row{
 				ux.NewRow("Name", ps.Name),
 				ux.NewRow("Registries", strconv.Itoa(len(ps.Registries))),
-				ux.NewRow("Created At", ps.CreatedAt),
 			}
 		})
 
