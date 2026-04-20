@@ -78,7 +78,6 @@ func printPullSecretDetails(writer io.Writer, ps *client.PullSecret) {
 	ux.Fprintf(writer, "Pull Secret Information:\n")
 	ux.Fprintf(writer, "  Name:       %s\n", ps.Name)
 	ux.Fprintf(writer, "  ID:         %s\n", ps.ID)
-	ux.Fprintf(writer, "  Created At: %s\n", ps.CreatedAt)
 
 	if len(ps.Registries) > 0 {
 		ux.Fprintf(writer, "Registries:\n")
