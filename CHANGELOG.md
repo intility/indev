@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/intility/indev/compare/v1.2.0...v1.4.0) (2026-04-21)
+
+
+### Features
+
+* **pull-secret:** add pull secret management commands ([#80](https://github.com/intility/indev/issues/80)) ([b3b49e0](https://github.com/intility/indev/commit/b3b49e0c836c216e9c3112ac4ac8819620368855))
+
 ## [1.3.0](https://github.com/intility/indev/compare/v1.2.0...v1.3.0) (2026-04-21)
 
 
