@@ -4,8 +4,9 @@
 name: Build, test, release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
