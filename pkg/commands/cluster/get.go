@@ -54,6 +54,10 @@ func printClusterDetails(writer io.Writer, cluster *client.Cluster) {
 		ux.Fprintf(writer, "  Roles:       %s\n", strings.Join(cluster.Roles, ", "))
 	}
 
+	if cluster.ImagePullSecret != nil {
+		ux.Fprintf(writer, "  Pull Secret: %s\n", cluster.ImagePullSecret.Name)
+	}
+
 	printStatusInfo(writer, cluster)
 
 	// Node pools

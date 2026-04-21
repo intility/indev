@@ -297,6 +297,65 @@ func (_c *Client_CreateCluster_Call) RunAndReturn(run func(context.Context, clie
 	return _c
 }
 
+// CreatePullSecret provides a mock function with given fields: ctx, request
+func (_m *Client) CreatePullSecret(ctx context.Context, request client.NewPullSecretRequest) (*client.PullSecret, error) {
+	ret := _m.Called(ctx, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreatePullSecret")
+	}
+
+	var r0 *client.PullSecret
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, client.NewPullSecretRequest) (*client.PullSecret, error)); ok {
+		return rf(ctx, request)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, client.NewPullSecretRequest) *client.PullSecret); ok {
+		r0 = rf(ctx, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*client.PullSecret)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, client.NewPullSecretRequest) error); ok {
+		r1 = rf(ctx, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_CreatePullSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePullSecret'
+type Client_CreatePullSecret_Call struct {
+	*mock.Call
+}
+
+// CreatePullSecret is a helper method to define mock.On call
+//   - ctx context.Context
+//   - request client.NewPullSecretRequest
+func (_e *Client_Expecter) CreatePullSecret(ctx interface{}, request interface{}) *Client_CreatePullSecret_Call {
+	return &Client_CreatePullSecret_Call{Call: _e.mock.On("CreatePullSecret", ctx, request)}
+}
+
+func (_c *Client_CreatePullSecret_Call) Run(run func(ctx context.Context, request client.NewPullSecretRequest)) *Client_CreatePullSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(client.NewPullSecretRequest))
+	})
+	return _c
+}
+
+func (_c *Client_CreatePullSecret_Call) Return(_a0 *client.PullSecret, _a1 error) *Client_CreatePullSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_CreatePullSecret_Call) RunAndReturn(run func(context.Context, client.NewPullSecretRequest) (*client.PullSecret, error)) *Client_CreatePullSecret_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateTeam provides a mock function with given fields: ctx, request
 func (_m *Client) CreateTeam(ctx context.Context, request client.NewTeamRequest) (*client.Team, error) {
 	ret := _m.Called(ctx, request)
@@ -498,6 +557,53 @@ func (_c *Client_DeleteCluster_Call) RunAndReturn(run func(context.Context, stri
 	return _c
 }
 
+// DeletePullSecret provides a mock function with given fields: ctx, id
+func (_m *Client) DeletePullSecret(ctx context.Context, id string) error {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeletePullSecret")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Client_DeletePullSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeletePullSecret'
+type Client_DeletePullSecret_Call struct {
+	*mock.Call
+}
+
+// DeletePullSecret is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id string
+func (_e *Client_Expecter) DeletePullSecret(ctx interface{}, id interface{}) *Client_DeletePullSecret_Call {
+	return &Client_DeletePullSecret_Call{Call: _e.mock.On("DeletePullSecret", ctx, id)}
+}
+
+func (_c *Client_DeletePullSecret_Call) Run(run func(ctx context.Context, id string)) *Client_DeletePullSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Client_DeletePullSecret_Call) Return(_a0 error) *Client_DeletePullSecret_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Client_DeletePullSecret_Call) RunAndReturn(run func(context.Context, string) error) *Client_DeletePullSecret_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteTeam provides a mock function with given fields: ctx, request
 func (_m *Client) DeleteTeam(ctx context.Context, request client.DeleteTeamRequest) error {
 	ret := _m.Called(ctx, request)
@@ -541,6 +647,66 @@ func (_c *Client_DeleteTeam_Call) Return(_a0 error) *Client_DeleteTeam_Call {
 }
 
 func (_c *Client_DeleteTeam_Call) RunAndReturn(run func(context.Context, client.DeleteTeamRequest) error) *Client_DeleteTeam_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// EditPullSecret provides a mock function with given fields: ctx, id, request
+func (_m *Client) EditPullSecret(ctx context.Context, id string, request client.EditPullSecretRequest) (*client.PullSecret, error) {
+	ret := _m.Called(ctx, id, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for EditPullSecret")
+	}
+
+	var r0 *client.PullSecret
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, client.EditPullSecretRequest) (*client.PullSecret, error)); ok {
+		return rf(ctx, id, request)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, client.EditPullSecretRequest) *client.PullSecret); ok {
+		r0 = rf(ctx, id, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*client.PullSecret)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, client.EditPullSecretRequest) error); ok {
+		r1 = rf(ctx, id, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_EditPullSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'EditPullSecret'
+type Client_EditPullSecret_Call struct {
+	*mock.Call
+}
+
+// EditPullSecret is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id string
+//   - request client.EditPullSecretRequest
+func (_e *Client_Expecter) EditPullSecret(ctx interface{}, id interface{}, request interface{}) *Client_EditPullSecret_Call {
+	return &Client_EditPullSecret_Call{Call: _e.mock.On("EditPullSecret", ctx, id, request)}
+}
+
+func (_c *Client_EditPullSecret_Call) Run(run func(ctx context.Context, id string, request client.EditPullSecretRequest)) *Client_EditPullSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(client.EditPullSecretRequest))
+	})
+	return _c
+}
+
+func (_c *Client_EditPullSecret_Call) Return(_a0 *client.PullSecret, _a1 error) *Client_EditPullSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_EditPullSecret_Call) RunAndReturn(run func(context.Context, string, client.EditPullSecretRequest) (*client.PullSecret, error)) *Client_EditPullSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -893,6 +1059,65 @@ func (_c *Client_GetMe_Call) Return(_a0 client.Me, _a1 error) *Client_GetMe_Call
 }
 
 func (_c *Client_GetMe_Call) RunAndReturn(run func(context.Context) (client.Me, error)) *Client_GetMe_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetPullSecret provides a mock function with given fields: ctx, id
+func (_m *Client) GetPullSecret(ctx context.Context, id string) (*client.PullSecret, error) {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPullSecret")
+	}
+
+	var r0 *client.PullSecret
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*client.PullSecret, error)); ok {
+		return rf(ctx, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *client.PullSecret); ok {
+		r0 = rf(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*client.PullSecret)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_GetPullSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPullSecret'
+type Client_GetPullSecret_Call struct {
+	*mock.Call
+}
+
+// GetPullSecret is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id string
+func (_e *Client_Expecter) GetPullSecret(ctx interface{}, id interface{}) *Client_GetPullSecret_Call {
+	return &Client_GetPullSecret_Call{Call: _e.mock.On("GetPullSecret", ctx, id)}
+}
+
+func (_c *Client_GetPullSecret_Call) Run(run func(ctx context.Context, id string)) *Client_GetPullSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Client_GetPullSecret_Call) Return(_a0 *client.PullSecret, _a1 error) *Client_GetPullSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_GetPullSecret_Call) RunAndReturn(run func(context.Context, string) (*client.PullSecret, error)) *Client_GetPullSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1365,6 +1590,64 @@ func (_c *Client_ListIntegrationInstances_Call) RunAndReturn(run func(context.Co
 	return _c
 }
 
+// ListPullSecrets provides a mock function with given fields: ctx
+func (_m *Client) ListPullSecrets(ctx context.Context) ([]client.PullSecret, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListPullSecrets")
+	}
+
+	var r0 []client.PullSecret
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]client.PullSecret, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []client.PullSecret); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]client.PullSecret)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Client_ListPullSecrets_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListPullSecrets'
+type Client_ListPullSecrets_Call struct {
+	*mock.Call
+}
+
+// ListPullSecrets is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *Client_Expecter) ListPullSecrets(ctx interface{}) *Client_ListPullSecrets_Call {
+	return &Client_ListPullSecrets_Call{Call: _e.mock.On("ListPullSecrets", ctx)}
+}
+
+func (_c *Client_ListPullSecrets_Call) Run(run func(ctx context.Context)) *Client_ListPullSecrets_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *Client_ListPullSecrets_Call) Return(_a0 []client.PullSecret, _a1 error) *Client_ListPullSecrets_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Client_ListPullSecrets_Call) RunAndReturn(run func(context.Context) ([]client.PullSecret, error)) *Client_ListPullSecrets_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListTeams provides a mock function with given fields: ctx
 func (_m *Client) ListTeams(ctx context.Context) ([]client.Team, error) {
 	ret := _m.Called(ctx)
@@ -1573,6 +1856,54 @@ func (_c *Client_RemoveTeamMember_Call) Return(_a0 error) *Client_RemoveTeamMemb
 }
 
 func (_c *Client_RemoveTeamMember_Call) RunAndReturn(run func(context.Context, string, string) error) *Client_RemoveTeamMember_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetClusterPullSecret provides a mock function with given fields: ctx, clusterID, pullSecretID
+func (_m *Client) SetClusterPullSecret(ctx context.Context, clusterID string, pullSecretID string) error {
+	ret := _m.Called(ctx, clusterID, pullSecretID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetClusterPullSecret")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, clusterID, pullSecretID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Client_SetClusterPullSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetClusterPullSecret'
+type Client_SetClusterPullSecret_Call struct {
+	*mock.Call
+}
+
+// SetClusterPullSecret is a helper method to define mock.On call
+//   - ctx context.Context
+//   - clusterID string
+//   - pullSecretID string
+func (_e *Client_Expecter) SetClusterPullSecret(ctx interface{}, clusterID interface{}, pullSecretID interface{}) *Client_SetClusterPullSecret_Call {
+	return &Client_SetClusterPullSecret_Call{Call: _e.mock.On("SetClusterPullSecret", ctx, clusterID, pullSecretID)}
+}
+
+func (_c *Client_SetClusterPullSecret_Call) Run(run func(ctx context.Context, clusterID string, pullSecretID string)) *Client_SetClusterPullSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Client_SetClusterPullSecret_Call) Return(_a0 error) *Client_SetClusterPullSecret_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Client_SetClusterPullSecret_Call) RunAndReturn(run func(context.Context, string, string) error) *Client_SetClusterPullSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }

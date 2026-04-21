@@ -15,6 +15,9 @@ import (
 	"github.com/intility/indev/pkg/commands/ai/deployment"
 	"github.com/intility/indev/pkg/commands/cluster"
 	"github.com/intility/indev/pkg/commands/cluster/access"
+	clusterpullsecret "github.com/intility/indev/pkg/commands/cluster/pullsecret"
+	"github.com/intility/indev/pkg/commands/pullsecret"
+	pullsecretregistry "github.com/intility/indev/pkg/commands/pullsecret/registry"
 	"github.com/intility/indev/pkg/commands/teams"
 	"github.com/intility/indev/pkg/commands/teams/member"
 	"github.com/intility/indev/pkg/commands/user"
@@ -42,6 +45,7 @@ func GetRootCommand() *cobra.Command {
 	rootCmd.AddCommand(getTeamsCommand(clients))
 	rootCmd.AddCommand(getUserCommand(clients))
 	rootCmd.AddCommand(getAICommand(clients))
+	rootCmd.AddCommand(getPullSecretCommand(clients))
 
 	return rootCmd
 }
@@ -76,6 +80,20 @@ func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.AddCommand(cluster.NewOpenCommand(set))
 	cmd.AddCommand(cluster.NewStatusCommand(set))
 	cmd.AddCommand(getAccessCommand(set))
+	cmd.AddCommand(getClusterPullSecretCommand(set))
+
+	return cmd
+}
+
+func getClusterPullSecretCommand(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pullsecret",
+		Short: "Manage Intility Developer Platform cluster pull secrets",
+		Long:  "Manage Intility Developer Platform cluster pull secrets",
+		Run:   showHelp,
+	}
+
+	cmd.AddCommand(clusterpullsecret.NewSetCommand(set))
 
 	return cmd
 }
@@ -209,6 +227,37 @@ func getAIAPIKeyCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.AddCommand(apikey.NewCreateCommand(set))
 	cmd.AddCommand(apikey.NewListCommand(set))
 	cmd.AddCommand(apikey.NewDeleteCommand(set))
+
+	return cmd
+}
+
+func getPullSecretCommand(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pullsecret",
+		Short: "Manage Intility Developer Platform image pull secrets",
+		Long:  "Manage Intility Developer Platform image pull secrets",
+		Run:   showHelp,
+	}
+
+	cmd.AddCommand(pullsecret.NewCreateCommand(set))
+	cmd.AddCommand(pullsecret.NewListCommand(set))
+	cmd.AddCommand(pullsecret.NewGetCommand(set))
+	cmd.AddCommand(pullsecret.NewDeleteCommand(set))
+	cmd.AddCommand(getRegistryCommand(set))
+
+	return cmd
+}
+
+func getRegistryCommand(set clientset.ClientSet) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "registry",
+		Short: "Manage registries in a pull secret",
+		Long:  "Manage registries in a pull secret",
+		Run:   showHelp,
+	}
+
+	cmd.AddCommand(pullsecretregistry.NewAddCommand(set))
+	cmd.AddCommand(pullsecretregistry.NewRemoveCommand(set))
 
 	return cmd
 }
