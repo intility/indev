@@ -52,6 +52,7 @@ release:
   github:
     owner: intility
     name: indev
+  use_existing_draft: true
 
 archives:
   - formats: [ 'tar.gz' ]
