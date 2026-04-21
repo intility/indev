@@ -50,7 +50,7 @@ Use --registry once per registry in the format address:username:password.
 Passwords may contain colons.
 
 To add registries with explicit ports (e.g. myregistry.io:5000), create the
-pull secret first and then use 'indev pull-secret registry add'.`,
+pull secret first and then use 'indev pullsecret registry add'.`,
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runCreate(cmd, set, name, registryFlags)

@@ -87,7 +87,7 @@ func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 
 func getClusterPullSecretCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "pull-secret",
+		Use:   "pullsecret",
 		Short: "Manage cluster pull secrets",
 		Run:   showHelp,
 	}
@@ -232,7 +232,7 @@ func getAIAPIKeyCommand(set clientset.ClientSet) *cobra.Command {
 
 func getPullSecretCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "pull-secret",
+		Use:   "pullsecret",
 		Short: "Manage image pull secrets",
 		Run:   showHelp,
 	}
