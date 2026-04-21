@@ -88,7 +88,8 @@ func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 func getClusterPullSecretCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pullsecret",
-		Short: "Manage cluster pull secrets",
+		Short: "Manage Intility Developer Platform cluster pull secrets",
+		Long:  "Manage Intility Developer Platform cluster pull secrets",
 		Run:   showHelp,
 	}
 
@@ -233,7 +234,8 @@ func getAIAPIKeyCommand(set clientset.ClientSet) *cobra.Command {
 func getPullSecretCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pullsecret",
-		Short: "Manage image pull secrets",
+		Short: "Manage Intility Developer Platform image pull secrets",
+		Long:  "Manage Intility Developer Platform image pull secrets",
 		Run:   showHelp,
 	}
 
