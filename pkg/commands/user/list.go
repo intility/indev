@@ -23,7 +23,7 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "list",
 		Short:   "List all users",
-		Long:    `List all users in the Intility Developer Platform`,
+		Long:    `List all your For Developers users`,
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "users.list")

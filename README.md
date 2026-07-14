@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  A command-line interface for managing Intility Developer Platform resources.
+  A command-line interface to For Developers.
 </p>
 
 <p align="center">
@@ -52,7 +52,7 @@ Some commands require additional tools to be installed:
 
 ### Authentication
 
-Log in to the Intility Developer Platform:
+Log in to For Developers:
 
 ```sh
 indev login

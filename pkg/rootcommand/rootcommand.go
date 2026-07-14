@@ -31,7 +31,7 @@ func GetRootCommand() *cobra.Command {
 
 	rootCmd := &cobra.Command{
 		Use:           build.AppName,
-		Short:         build.AppName + " controls your Intility Developer Platform instance.",
+		Short:         build.AppName + " is the command-line interface to For Developers.",
 		Long:          ``,
 		Run:           showHelp,
 		SilenceErrors: true,
@@ -67,8 +67,8 @@ func getVersionCommand() *cobra.Command {
 func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cluster",
-		Short: "Manage your Intility Developer Platform clusters",
-		Long:  `Manage your Intility Developer Platform clusters`,
+		Short: "Manage your Intility Kubernetes clusters",
+		Long:  `Manage your Intility Kubernetes clusters`,
 		Run:   showHelp,
 	}
 
@@ -88,8 +88,8 @@ func getClusterCommand(set clientset.ClientSet) *cobra.Command {
 func getClusterPullSecretCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pullsecret",
-		Short: "Manage Intility Developer Platform cluster pull secrets",
-		Long:  "Manage Intility Developer Platform cluster pull secrets",
+		Short: "Manage Intility Kubernetes cluster pull secrets",
+		Long:  "Manage Intility Kubernetes cluster pull secrets",
 		Run:   showHelp,
 	}
 
@@ -116,8 +116,8 @@ func getAccessCommand(set clientset.ClientSet) *cobra.Command {
 func getAccountCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "account",
-		Short: "Manage your Intility Developer Platform account",
-		Long:  `Manage your Intility Developer Platform account`,
+		Short: "Manage your For Developers account",
+		Long:  `Manage your For Developers account`,
 		Run:   showHelp,
 	}
 
@@ -129,8 +129,8 @@ func getAccountCommand(set clientset.ClientSet) *cobra.Command {
 func getTeamsCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "team",
-		Short: "Manage Intility Developer Platform teams",
-		Long:  "Manage Intility Developer Platform teams",
+		Short: "Manage For Developers teams",
+		Long:  "Manage For Developers teams",
 		Run:   showHelp,
 	}
 
@@ -147,8 +147,8 @@ func getTeamsCommand(set clientset.ClientSet) *cobra.Command {
 func getMemberCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "member",
-		Short: "Manage Intility Developer Platform team members",
-		Long:  "Manage Intility Developer Platform team members",
+		Short: "Manage For Developers team members",
+		Long:  "Manage For Developers team members",
 		Run:   showHelp,
 	}
 
@@ -161,8 +161,8 @@ func getMemberCommand(set clientset.ClientSet) *cobra.Command {
 func getUserCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "user",
-		Short: "Manage Intility Developer Platform users",
-		Long:  "Manage Intility Developer Platform users",
+		Short: "Manage For Developers users",
+		Long:  "Manage For Developers users",
 		Run:   showHelp,
 	}
 
@@ -174,8 +174,8 @@ func getUserCommand(set clientset.ClientSet) *cobra.Command {
 func getAICommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "ai",
-		Short:             "Manage Intility Developer Platform AI Deployments",
-		Long:              "Manage Intility Developer Platform AI Deployments",
+		Short:             "Manage Intility Inference AI Deployments",
+		Long:              "Manage Intility Inference AI Deployments",
 		PersistentPreRunE: set.EnsureSignedInPreHook,
 		Run:               showHelp,
 	}
@@ -233,8 +233,8 @@ func getAIAPIKeyCommand(set clientset.ClientSet) *cobra.Command {
 func getPullSecretCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pullsecret",
-		Short: "Manage Intility Developer Platform image pull secrets",
-		Long:  "Manage Intility Developer Platform image pull secrets",
+		Short: "Manage For Developers image pull secrets",
+		Long:  "Manage For Developers image pull secrets",
 		Run:   showHelp,
 	}
 
