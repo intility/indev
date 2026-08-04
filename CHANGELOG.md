@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/intility/indev/compare/v1.4.0...v1.5.0) (2026-08-04)
+
+
+### Features
+
+* make intility inference generally available ([#124](https://github.com/intility/indev/issues/124)) ([2e6ea1c](https://github.com/intility/indev/commit/2e6ea1c16b3d150d08af7b83df5bc79313c4bd6e))
+
 ## [1.4.0](https://github.com/intility/indev/compare/v1.2.0...v1.4.0) (2026-04-21)
 
 
