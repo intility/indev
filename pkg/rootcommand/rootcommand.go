@@ -176,8 +176,7 @@ func getAICommand(set clientset.ClientSet) *cobra.Command {
 		Use:               "ai",
 		Short:             "Manage Intility Developer Platform AI Deployments",
 		Long:              "Manage Intility Developer Platform AI Deployments",
-		Hidden:            true,
-		PersistentPreRunE: set.EnsureAITenantPreHook,
+		PersistentPreRunE: set.EnsureSignedInPreHook,
 		Run:               showHelp,
 	}
 
