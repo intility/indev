@@ -15,7 +15,7 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delete",
 		Short:   "Delete an AI deployment",
-		Long:    "Delete an AI deployment from the Intility Developer Platform",
+		Long:    "Delete an AI deployment from Intility Inference",
 		PreRunE: set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "aideployment.delete")

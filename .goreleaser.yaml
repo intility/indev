@@ -80,7 +80,7 @@ homebrew_casks:
       name: homebrew-tap
       token: "{{ .Env.TAP_REPO_GITHUB_TOKEN }}"
     homepage: https://developers.intility.com
-    description: "A CLI for managing developer platform resources."
+    description: "A command-line interface to Intility Build."
     directory: Casks
     url:
       template: "https://github.com/intility/indev/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
