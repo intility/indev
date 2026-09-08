@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/intility/indev/compare/v1.6.0...v1.6.1) (2026-09-08)
+
+
+### Bug Fixes
+
+* **release:** open pull request to homebrew tap instead of direct push ([#129](https://github.com/intility/indev/issues/129)) ([1653b64](https://github.com/intility/indev/commit/1653b647bb7ed71ae0c0e3e147221bece6c2a351))
+
 ## [1.6.0](https://github.com/intility/indev/compare/v1.5.0...v1.6.0) (2026-09-08)
 
 
