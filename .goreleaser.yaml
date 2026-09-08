@@ -79,6 +79,15 @@ homebrew_casks:
       owner: intility
       name: homebrew-tap
       token: "{{ .Env.TAP_REPO_GITHUB_TOKEN }}"
+      # The tap's main branch is protected by rulesets that require pull
+      # requests, so push the cask to a branch and open a PR instead.
+      branch: "indev-{{ .Tag }}"
+      pull_request:
+        enabled: true
+        base:
+          owner: intility
+          name: homebrew-tap
+          branch: main
     homepage: https://developers.intility.com
     description: "A command-line interface to Intility Build."
     directory: Casks
