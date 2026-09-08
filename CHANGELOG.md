@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/intility/indev/compare/v1.5.0...v1.6.0) (2026-09-08)
+
+
+### Features
+
+* rename platform to Intility Build ([#126](https://github.com/intility/indev/issues/126)) ([7f07476](https://github.com/intility/indev/commit/7f074761603c29d9cc01fb8f47cbc91ae6232585))
+
 ## [1.5.0](https://github.com/intility/indev/compare/v1.4.0...v1.5.0) (2026-08-04)
 
 
