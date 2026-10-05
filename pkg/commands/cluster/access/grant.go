@@ -12,6 +12,7 @@ import (
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 )
 
 var (
@@ -60,6 +61,8 @@ func NewGrantCommand(set clientset.ClientSet) *cobra.Command {
 	roleFlagDescription := "Role to grant. Valid roles are: " +
 		strings.Join(client.GetClusterMemberRoleValues(), ", ")
 	cmd.Flags().StringVarP((*string)(&options.Role), "role", "r", "", roleFlagDescription)
+
+	completion.RegisterClusterNameFlag(cmd, "cluster", set)
 
 	return cmd
 }

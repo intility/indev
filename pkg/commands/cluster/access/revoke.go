@@ -11,6 +11,7 @@ import (
 	"github.com/intility/indev/internal/telemetry"
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 )
 
 type RevokeOptions struct {
@@ -44,6 +45,8 @@ func NewRevokeCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.Flags().StringVar(&options.UserID, "user-id", "", "ID of the user to revoke access")
 	cmd.Flags().StringVarP(&options.Team, "team", "t", "", "Name of the team to revoke access")
 	cmd.Flags().StringVar(&options.TeamID, "team-id", "", "ID of the team to revoke access")
+
+	completion.RegisterClusterNameFlag(cmd, "cluster", set)
 
 	return cmd
 }

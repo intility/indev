@@ -12,6 +12,7 @@ import (
 	"github.com/intility/indev/internal/telemetry"
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 )
 
 const mustafarTenantID = "93e01775-815e-4327-83d4-5f9ad73b5aa1"
@@ -20,11 +21,12 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 	var clusterName string
 
 	cmd := &cobra.Command{
-		Use:     "login [name]",
-		Short:   "Login to a cluster using oc",
-		Long:    `Login to a cluster using the OpenShift CLI (oc). Opens a browser for OAuth authentication.`,
-		Args:    cobra.MaximumNArgs(1),
-		PreRunE: set.EnsureSignedInPreHook,
+		Use:               "login [name]",
+		Short:             "Login to a cluster using oc",
+		Long:              `Login to a cluster using the OpenShift CLI (oc). Opens a browser for OAuth authentication.`,
+		Args:              cobra.MaximumNArgs(1),
+		ValidArgsFunction: completion.ClusterNameArg(set),
+		PreRunE:           set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.login")
 			defer span.End()
@@ -39,6 +41,8 @@ func NewLoginCommand(set clientset.ClientSet) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&clusterName, "name", "n", "", "Name of the cluster")
+
+	completion.RegisterClusterNameFlag(cmd, "name", set)
 
 	return cmd
 }

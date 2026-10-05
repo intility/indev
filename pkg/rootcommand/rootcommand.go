@@ -37,6 +37,9 @@ func GetRootCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
+	// No command takes a file path, so never suggest files from the working directory.
+	rootCmd.CompletionOptions.SetDefaultShellCompDirective(cobra.ShellCompDirectiveNoFileComp)
+
 	rootCmd.AddCommand(getVersionCommand())
 	rootCmd.AddCommand(account.NewLoginCommand(clients))
 	rootCmd.AddCommand(account.NewLogoutCommand(clients))
