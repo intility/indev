@@ -8,6 +8,7 @@ import (
 	"github.com/intility/indev/internal/telemetry"
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 )
 
 func NewOpenCommand(set clientset.ClientSet) *cobra.Command {
@@ -17,11 +18,12 @@ func NewOpenCommand(set clientset.ClientSet) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:     "open [name]",
-		Short:   "Open the cluster console in a browser",
-		Long:    `Open the OpenShift web console for the specified cluster in your default browser.`,
-		Args:    cobra.MaximumNArgs(1),
-		PreRunE: set.EnsureSignedInPreHook,
+		Use:               "open [name]",
+		Short:             "Open the cluster console in a browser",
+		Long:              `Open the OpenShift web console for the specified cluster in your default browser.`,
+		Args:              cobra.MaximumNArgs(1),
+		ValidArgsFunction: completion.ClusterNameArg(set),
+		PreRunE:           set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.open")
 			defer span.End()
@@ -63,6 +65,8 @@ func NewOpenCommand(set clientset.ClientSet) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&clusterName, "name", "n", "", "Name of the cluster")
+
+	completion.RegisterClusterNameFlag(cmd, "name", set)
 
 	return cmd
 }
