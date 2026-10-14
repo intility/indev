@@ -13,6 +13,7 @@ import (
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 	"github.com/intility/indev/pkg/outputformat"
 )
 
@@ -34,6 +35,8 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 			if err != nil {
 				return redact.Errorf("could not list clusters: %w", redact.Safe(err))
 			}
+
+			completion.SetNames(ctx, set, completion.ResourceClusters, clusters.Names())
 
 			if len(clusters) == 0 {
 				ux.Fprintf(cmd.OutOrStdout(), "No clusters found\n")

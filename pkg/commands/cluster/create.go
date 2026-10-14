@@ -15,6 +15,7 @@ import (
 	"github.com/intility/indev/internal/wizard"
 	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 )
 
 const (
@@ -137,6 +138,8 @@ func runCreateCommand(ctx context.Context, cmd *cobra.Command, set clientset.Cli
 	if err != nil {
 		return redact.Errorf("could not create cluster: %w", redact.Safe(err))
 	}
+
+	completion.Invalidate(ctx, set, completion.ResourceClusters)
 
 	ux.Fsuccessf(cmd.OutOrStdout(), "created cluster: %s\n", cluster.Name)
 

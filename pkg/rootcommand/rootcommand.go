@@ -21,12 +21,14 @@ import (
 	"github.com/intility/indev/pkg/commands/teams"
 	"github.com/intility/indev/pkg/commands/teams/member"
 	"github.com/intility/indev/pkg/commands/user"
+	"github.com/intility/indev/pkg/completion"
 )
 
 func GetRootCommand() *cobra.Command {
 	clients := clientset.ClientSet{
 		Authenticator:  authenticator.NewAuthenticator(authenticator.ConfigFromBuildProps()),
 		PlatformClient: client.New(),
+		NameCache:      completion.NewNameCache(),
 	}
 
 	rootCmd := &cobra.Command{

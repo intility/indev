@@ -6,3 +6,4 @@ dist/
 .env
 .envrc
 main
+indev

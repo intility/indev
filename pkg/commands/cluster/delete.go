@@ -51,6 +51,8 @@ func NewDeleteCommand(set clientset.ClientSet) *cobra.Command {
 				return redact.Errorf("could not delete cluster: %w", redact.Safe(err))
 			}
 
+			completion.Invalidate(ctx, set, completion.ResourceClusters)
+
 			ux.Fprintf(cmd.OutOrStdout(), "%s\n", clusterName)
 
 			return nil

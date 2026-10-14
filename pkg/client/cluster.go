@@ -33,6 +33,17 @@ type StatusDeployment struct {
 
 type ClusterList []Cluster
 
+// Names returns the names of all clusters in the list.
+func (list ClusterList) Names() []string {
+	names := make([]string, 0, len(list))
+
+	for _, cluster := range list {
+		names = append(names, cluster.Name)
+	}
+
+	return names
+}
+
 type NewClusterRequest struct {
 	Name           string    `json:"name"`
 	SSOProvisioner string    `json:"ssoProvisioner"`

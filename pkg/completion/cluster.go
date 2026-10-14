@@ -2,39 +2,20 @@ package completion
 
 import (
 	"context"
-	"strings"
+	"fmt"
 
 	"github.com/spf13/cobra"
 
 	"github.com/intility/indev/pkg/clientset"
 )
 
+// ResourceClusters identifies the cluster name cache resource.
+const ResourceClusters = "clusters"
+
 // ClusterNames returns a completion function that suggests cluster names.
 // It is intended for flags that take a cluster name.
 func ClusterNames(set clientset.ClientSet) cobra.CompletionFunc {
-	return func(cmd *cobra.Command, _ []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
-		ctx, cancel := context.WithTimeout(cmd.Context(), timeout)
-		defer cancel()
-
-		if !signedIn(ctx, set) {
-			return nil, cobra.ShellCompDirectiveNoFileComp
-		}
-
-		clusters, err := set.PlatformClient.ListClusters(ctx)
-		if err != nil {
-			return nil, cobra.ShellCompDirectiveNoFileComp
-		}
-
-		var names []cobra.Completion
-
-		for _, cluster := range clusters {
-			if strings.HasPrefix(cluster.Name, toComplete) {
-				names = append(names, cluster.Name)
-			}
-		}
-
-		return names, cobra.ShellCompDirectiveNoFileComp
-	}
+	return completeNames(set, ResourceClusters, listClusterNames)
 }
 
 // ClusterNameArg returns a completion function that suggests cluster names
@@ -55,4 +36,13 @@ func ClusterNameArg(set clientset.ClientSet) cobra.CompletionFunc {
 func RegisterClusterNameFlag(cmd *cobra.Command, flagName string, set clientset.ClientSet) {
 	// Registration only fails if the flag does not exist, which is a programming error.
 	cobra.CheckErr(cmd.RegisterFlagCompletionFunc(flagName, ClusterNames(set)))
+}
+
+func listClusterNames(ctx context.Context, set clientset.ClientSet) ([]string, error) {
+	clusters, err := set.PlatformClient.ListClusters(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not list clusters: %w", err)
+	}
+
+	return clusters.Names(), nil
 }
