@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/intility/indev/compare/v1.6.1...v1.7.0) (2026-10-16)
+
+
+### Features
+
+* **cluster:** add shell completion for cluster names ([#139](https://github.com/intility/indev/issues/139)) ([5b9346e](https://github.com/intility/indev/commit/5b9346e910c6036588d003c1207b3bc6d90a1e32))
+
 ## [1.6.1](https://github.com/intility/indev/compare/v1.6.0...v1.6.1) (2026-09-08)
 
 
