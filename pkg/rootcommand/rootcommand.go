@@ -21,12 +21,14 @@ import (
 	"github.com/intility/indev/pkg/commands/teams"
 	"github.com/intility/indev/pkg/commands/teams/member"
 	"github.com/intility/indev/pkg/commands/user"
+	"github.com/intility/indev/pkg/completion"
 )
 
 func GetRootCommand() *cobra.Command {
 	clients := clientset.ClientSet{
 		Authenticator:  authenticator.NewAuthenticator(authenticator.ConfigFromBuildProps()),
 		PlatformClient: client.New(),
+		NameCache:      completion.NewNameCache(),
 	}
 
 	rootCmd := &cobra.Command{
@@ -36,6 +38,9 @@ func GetRootCommand() *cobra.Command {
 		Run:           showHelp,
 		SilenceErrors: true,
 	}
+
+	// No command takes a file path, so never suggest files from the working directory.
+	rootCmd.CompletionOptions.SetDefaultShellCompDirective(cobra.ShellCompDirectiveNoFileComp)
 
 	rootCmd.AddCommand(getVersionCommand())
 	rootCmd.AddCommand(account.NewLoginCommand(clients))

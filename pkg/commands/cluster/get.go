@@ -10,17 +10,19 @@ import (
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 )
 
 func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 	var clusterName string
 
 	cmd := &cobra.Command{
-		Use:     "get [name]",
-		Short:   "Get detailed information about a cluster",
-		Long:    `Display comprehensive cluster information.`,
-		Args:    cobra.MaximumNArgs(1),
-		PreRunE: set.EnsureSignedInPreHook,
+		Use:               "get [name]",
+		Short:             "Get detailed information about a cluster",
+		Long:              `Display comprehensive cluster information.`,
+		Args:              cobra.MaximumNArgs(1),
+		ValidArgsFunction: completion.ClusterNameArg(set),
+		PreRunE:           set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.get")
 			defer span.End()
@@ -36,6 +38,8 @@ func NewGetCommand(set clientset.ClientSet) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&clusterName, "name", "n", "", "Name of the cluster")
+
+	completion.RegisterClusterNameFlag(cmd, "name", set)
 
 	return cmd
 }

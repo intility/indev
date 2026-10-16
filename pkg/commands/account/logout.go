@@ -7,6 +7,7 @@ import (
 
 	"github.com/intility/indev/internal/telemetry"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 	"github.com/intility/indev/pkg/tokencache"
 )
 
@@ -18,6 +19,8 @@ func NewLogoutCommand(set clientset.ClientSet) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, span := telemetry.StartSpan(cmd.Context(), "account.logout")
 			defer span.End()
+
+			completion.NewNameCache().Clear()
 
 			err := tokencache.New().Clear()
 			if err != nil {

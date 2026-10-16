@@ -28,9 +28,24 @@ type Authenticator interface {
 	GetCurrentAccount(ctx context.Context) (public.Account, error)
 }
 
+// NameCacheKey identifies a cached name list by resource, account and API host.
+type NameCacheKey struct {
+	Resource  string
+	AccountID string
+	Host      string
+}
+
+// NameCache caches resource names for shell completion, keyed per resource, account and API host.
+type NameCache interface {
+	Get(key NameCacheKey) ([]string, bool)
+	Set(key NameCacheKey, names []string)
+	Delete(key NameCacheKey)
+}
+
 type ClientSet struct {
 	Authenticator  Authenticator
 	PlatformClient client.Client
+	NameCache      NameCache
 }
 
 func (c *ClientSet) EnsureSignedIn(cmd *cobra.Command, _ []string) error {

@@ -10,9 +10,13 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"slices"
 	"syscall"
 
+	"github.com/spf13/cobra"
 	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
+	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 
 	"github.com/intility/indev/internal/telemetry"
 	"github.com/intility/indev/internal/telemetry/exporters"
@@ -42,11 +46,34 @@ func main() {
 	}
 }
 
+// isCompletionRequest reports whether the shell is asking for completions.
+// These run on every tab press, so they skip telemetry entirely.
+func isCompletionRequest(args []string) bool {
+	if len(args) == 0 {
+		return false
+	}
+
+	completionCmds := []string{cobra.ShellCompRequestCmd, cobra.ShellCompNoDescRequestCmd}
+
+	return slices.Contains(completionCmds, args[0])
+}
+
+// initTracer returns a recording tracer, or a no-op tracer for completion requests.
+func initTracer(ctx context.Context, args []string) (trace.Tracer, telemetry.ShutdownFunc) { //nolint:ireturn
+	if isCompletionRequest(args) {
+		return noop.NewTracerProvider().Tracer(""), func(context.Context) error { return nil }
+	}
+
+	tracer, shutdown, _ := telemetry.InitTracer(ctx, semconv.ProcessCommandArgs(args...))
+
+	return tracer, shutdown
+}
+
 func run(args []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	tracer, shutdown, _ := telemetry.InitTracer(ctx, semconv.ProcessCommandArgs(args...))
+	tracer, shutdown := initTracer(ctx, args)
 	ctx = telemetry.ContextWithTracer(ctx, tracer)
 
 	defer func() { _ = shutdown(ctx) }()
@@ -90,7 +117,7 @@ func run(args []string) error {
 
 func scheduleTelemetryUpload(ctx context.Context, args []string) {
 	// prevent fork-bomb
-	if len(args) == 0 || args[0] == uploadTelemetryCommand {
+	if len(args) == 0 || args[0] == uploadTelemetryCommand || isCompletionRequest(args) {
 		return
 	}
 

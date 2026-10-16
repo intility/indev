@@ -13,6 +13,7 @@ import (
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 	"github.com/intility/indev/pkg/outputformat"
 )
 
@@ -24,11 +25,12 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:     "list [cluster-name]",
-		Short:   "List cluster members",
-		Long:    `List all members who have access to a cluster and their roles.`,
-		Args:    cobra.MaximumNArgs(1),
-		PreRunE: set.EnsureSignedInPreHook,
+		Use:               "list [cluster-name]",
+		Short:             "List cluster members",
+		Long:              `List all members who have access to a cluster and their roles.`,
+		Args:              cobra.MaximumNArgs(1),
+		ValidArgsFunction: completion.ClusterNameArg(set),
+		PreRunE:           set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.access.list")
 			defer span.End()
@@ -67,6 +69,8 @@ func NewListCommand(set clientset.ClientSet) *cobra.Command {
 	cmd.Flags().StringVarP(&clusterName, "cluster", "c", "", "Name of the cluster")
 	cmd.Flags().StringVar(&clusterID, "cluster-id", "", "ID of the cluster")
 	cmd.Flags().VarP(&output, "output", "o", "Output format (wide, json, yaml)")
+
+	completion.RegisterClusterNameFlag(cmd, "cluster", set)
 
 	return cmd
 }

@@ -9,17 +9,19 @@ import (
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/client"
 	"github.com/intility/indev/pkg/clientset"
+	"github.com/intility/indev/pkg/completion"
 )
 
 func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
 	var clusterName string
 
 	cmd := &cobra.Command{
-		Use:     "status [name]",
-		Short:   "Show detailed status of a cluster",
-		Long:    `Display comprehensive status information for a cluster.`,
-		Args:    cobra.MaximumNArgs(1),
-		PreRunE: set.EnsureSignedInPreHook,
+		Use:               "status [name]",
+		Short:             "Show detailed status of a cluster",
+		Long:              `Display comprehensive status information for a cluster.`,
+		Args:              cobra.MaximumNArgs(1),
+		ValidArgsFunction: completion.ClusterNameArg(set),
+		PreRunE:           set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.status")
 			defer span.End()
@@ -35,6 +37,8 @@ func NewStatusCommand(set clientset.ClientSet) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&clusterName, "name", "n", "", "Name of the cluster")
+
+	completion.RegisterClusterNameFlag(cmd, "name", set)
 
 	return cmd
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/intility/indev/internal/ux"
 	"github.com/intility/indev/pkg/clientset"
 	pullsecretcmd "github.com/intility/indev/pkg/commands/pullsecret"
+	"github.com/intility/indev/pkg/completion"
 )
 
 var (
@@ -22,11 +23,12 @@ func NewSetCommand(set clientset.ClientSet) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:     "set [cluster-name] [pull-secret-name]",
-		Short:   "Set the image pull secret for a cluster",
-		Long:    `Assign an image pull secret to a cluster.`,
-		Args:    cobra.MaximumNArgs(2), //nolint:mnd
-		PreRunE: set.EnsureSignedInPreHook,
+		Use:               "set [cluster-name] [pull-secret-name]",
+		Short:             "Set the image pull secret for a cluster",
+		Long:              `Assign an image pull secret to a cluster.`,
+		Args:              cobra.MaximumNArgs(2), //nolint:mnd
+		ValidArgsFunction: completion.ClusterNameArg(set),
+		PreRunE:           set.EnsureSignedInPreHook,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, span := telemetry.StartSpan(cmd.Context(), "cluster.pullsecret.set")
 			defer span.End()
@@ -72,6 +74,8 @@ func NewSetCommand(set clientset.ClientSet) *cobra.Command {
 
 	cmd.Flags().StringVarP(&clusterName, "cluster", "c", "", "Name of the cluster")
 	cmd.Flags().StringVarP(&pullSecretName, "pull-secret", "p", "", "Name of the pull secret")
+
+	completion.RegisterClusterNameFlag(cmd, "cluster", set)
 
 	return cmd
 }

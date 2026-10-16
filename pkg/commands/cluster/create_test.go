@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/intility/indev/mocks"
 	"github.com/intility/indev/pkg/client"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestValidateOptions(t *testing.T) {
