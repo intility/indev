@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/intility/indev/compare/v1.7.0...v1.7.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* use goreleaser install_steps for cask postflight hook ([#135](https://github.com/intility/indev/issues/135)) ([25afecf](https://github.com/intility/indev/commit/25afecf64edcc741385151911a292abcb34afedb))
+
 ## [1.7.0](https://github.com/intility/indev/compare/v1.6.1...v1.7.0) (2026-10-16)
 
 
